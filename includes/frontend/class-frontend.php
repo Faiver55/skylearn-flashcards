@@ -499,25 +499,305 @@ class SkyLearn_Flashcards_Frontend {
 	public function submit_lead() {
 
 		// Verify nonce
-		if ( ! wp_verify_nonce( $_POST['nonce'] ?? '', 'skylearn_frontend_nonce' ) ) {
+		if ( ! wp_verify_nonce( $_POST['nonce'] ?? '', 'skylearn_lead_submit' ) ) {
 			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'skylearn-flashcards' ) ) );
 		}
 
-		// Check if lead capture is enabled
-		if ( ! skylearn_get_setting( 'enable_lead_capture', false ) ) {
-			wp_send_json_error( array( 'message' => __( 'Lead capture is not enabled.', 'skylearn-flashcards' ) ) );
+		// Check if premium and lead capture is enabled
+		if ( ! skylearn_is_premium() ) {
+			wp_send_json_error( array( 
+				'message' => __( 'Lead collection is a premium feature.', 'skylearn-flashcards' ),
+				'upgrade_url' => SkyLearn_Flashcards_Premium::get_upgrade_url( 'lead_collection' )
+			) );
 		}
 
 		$set_id = absint( $_POST['set_id'] ?? 0 );
-		$name = sanitize_text_field( $_POST['name'] ?? '' );
-		$email = sanitize_email( $_POST['email'] ?? '' );
-		$phone = sanitize_text_field( $_POST['phone'] ?? '' );
-		$message = sanitize_textarea_field( $_POST['message'] ?? '' );
+		$name = sanitize_text_field( $_POST['lead_name'] ?? '' );
+		$email = sanitize_email( $_POST['lead_email'] ?? '' );
+		$consent = isset( $_POST['lead_consent'] ) && $_POST['lead_consent'] === 'on';
+		$context = sanitize_text_field( $_POST['context'] ?? 'completion' );
 
 		// Validate required fields
-		if ( empty( $name ) || empty( $email ) ) {
-			wp_send_json_error( array( 'message' => __( 'Name and email are required.', 'skylearn-flashcards' ) ) );
+		if ( empty( $email ) || ! is_email( $email ) ) {
+			wp_send_json_error( array( 'message' => __( 'Please enter a valid email address.', 'skylearn-flashcards' ) ) );
 		}
+
+		if ( ! $consent ) {
+			wp_send_json_error( array( 'message' => __( 'You must agree to receive emails to continue.', 'skylearn-flashcards' ) ) );
+		}
+
+		if ( ! $set_id ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid flashcard set.', 'skylearn-flashcards' ) ) );
+		}
+
+		// Prepare lead data
+		$lead_data = array(
+			'set_id'  => $set_id,
+			'name'    => $name,
+			'email'   => $email,
+			'source'  => 'flashcard_' . $context,
+			'tags'    => 'flashcard-lead,set-' . $set_id,
+		);
+
+		// Collect additional custom fields
+		$additional_data = array();
+		foreach ( $_POST as $key => $value ) {
+			if ( strpos( $key, 'skylearn_field_' ) === 0 ) {
+				$field_name = str_replace( 'skylearn_field_', '', $key );
+				$additional_data[ $field_name ] = sanitize_text_field( $value );
+			}
+		}
+
+		if ( ! empty( $additional_data ) ) {
+			$lead_data['message'] = json_encode( $additional_data );
+		}
+
+		// Initialize leads manager
+		$leads_manager = new SkyLearn_Flashcards_Leads( $this->plugin_name, $this->version );
+		
+		// Collect the lead
+		$lead_id = $leads_manager->collect_lead( $lead_data );
+
+		if ( $lead_id ) {
+			// Generate study results/report
+			$results = $this->generate_study_results( $set_id );
+			
+			// Send email with results (if configured)
+			$this->send_study_results_email( $email, $name, $results );
+			
+			wp_send_json_success( array( 
+				'message' => __( 'Thank you! Your study results have been sent to your email.', 'skylearn-flashcards' ),
+				'lead_id' => $lead_id,
+				'results' => $results
+			) );
+		} else {
+			wp_send_json_error( array( 'message' => __( 'Failed to save your information. Please try again.', 'skylearn-flashcards' ) ) );
+		}
+
+	}
+
+	/**
+	 * Generate study results for a flashcard set
+	 *
+	 * @since    1.0.0
+	 * @param    int     $set_id    Flashcard set ID
+	 * @return   array              Study results data
+	 */
+	private function generate_study_results( $set_id ) {
+		
+		global $wpdb;
+		
+		$analytics_table = $wpdb->prefix . 'skylearn_flashcard_analytics';
+		$session_id = skylearn_generate_session_id();
+		$user_id = get_current_user_id();
+		
+		// Get session analytics
+		$session_analytics = $wpdb->get_results( $wpdb->prepare(
+			"SELECT * FROM {$analytics_table} 
+			 WHERE set_id = %d AND session_id = %s 
+			 ORDER BY created_at ASC",
+			$set_id,
+			$session_id
+		), ARRAY_A );
+		
+		// Calculate metrics
+		$total_cards = count( skylearn_get_flashcard_set( $set_id )['cards'] ?? array() );
+		$cards_viewed = count( array_filter( $session_analytics, function( $record ) {
+			return $record['action'] === 'view';
+		} ) );
+		
+		$completion_record = array_filter( $session_analytics, function( $record ) {
+			return $record['action'] === 'complete';
+		} );
+		$accuracy = ! empty( $completion_record ) ? array_values( $completion_record )[0]['accuracy'] : 0;
+		
+		$total_time = array_sum( array_column( $session_analytics, 'time_spent' ) );
+		$avg_time_per_card = $cards_viewed > 0 ? $total_time / $cards_viewed : 0;
+		
+		return array(
+			'set_id'             => $set_id,
+			'set_title'          => get_the_title( $set_id ),
+			'total_cards'        => $total_cards,
+			'cards_completed'    => $cards_viewed,
+			'completion_rate'    => $total_cards > 0 ? ( $cards_viewed / $total_cards ) * 100 : 0,
+			'accuracy'           => $accuracy,
+			'total_time'         => $total_time,
+			'avg_time_per_card'  => $avg_time_per_card,
+			'session_date'       => current_time( 'mysql' ),
+			'recommendations'    => $this->generate_study_recommendations( $accuracy, $completion_rate ?? 0 ),
+		);
+		
+	}
+
+	/**
+	 * Generate study recommendations based on performance
+	 *
+	 * @since    1.0.0
+	 * @param    float   $accuracy         Accuracy percentage
+	 * @param    float   $completion_rate  Completion percentage
+	 * @return   array                     Recommendations array
+	 */
+	private function generate_study_recommendations( $accuracy, $completion_rate ) {
+		
+		$recommendations = array();
+		
+		if ( $accuracy < 70 ) {
+			$recommendations[] = __( 'Consider reviewing the material again to improve understanding.', 'skylearn-flashcards' );
+			$recommendations[] = __( 'Try studying in shorter, more frequent sessions.', 'skylearn-flashcards' );
+		} elseif ( $accuracy >= 70 && $accuracy < 85 ) {
+			$recommendations[] = __( 'Good progress! Review challenging cards to boost your score.', 'skylearn-flashcards' );
+			$recommendations[] = __( 'Focus on the concepts you found most difficult.', 'skylearn-flashcards' );
+		} else {
+			$recommendations[] = __( 'Excellent work! You have a strong grasp of this material.', 'skylearn-flashcards' );
+			$recommendations[] = __( 'Consider moving on to more advanced topics.', 'skylearn-flashcards' );
+		}
+		
+		if ( $completion_rate < 100 ) {
+			$recommendations[] = __( 'Try to complete all cards in the set for better results.', 'skylearn-flashcards' );
+		}
+		
+		return $recommendations;
+		
+	}
+
+	/**
+	 * Send study results email to user
+	 *
+	 * @since    1.0.0
+	 * @param    string  $email     User email
+	 * @param    string  $name      User name
+	 * @param    array   $results   Study results
+	 * @return   bool               True if email sent successfully
+	 */
+	private function send_study_results_email( $email, $name, $results ) {
+		
+		$subject = sprintf( 
+			__( 'Your Study Results for "%s"', 'skylearn-flashcards' ), 
+			$results['set_title'] 
+		);
+		
+		$message = $this->get_results_email_template( $name, $results );
+		
+		$headers = array(
+			'Content-Type: text/html; charset=UTF-8',
+			'From: ' . get_bloginfo( 'name' ) . ' <' . get_option( 'admin_email' ) . '>',
+		);
+		
+		return wp_mail( $email, $subject, $message, $headers );
+		
+	}
+
+	/**
+	 * Get email template for study results
+	 *
+	 * @since    1.0.0
+	 * @param    string  $name      User name
+	 * @param    array   $results   Study results
+	 * @return   string             Email HTML content
+	 */
+	private function get_results_email_template( $name, $results ) {
+		
+		$template = '
+		<html>
+		<head>
+			<style>
+				body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+				.container { max-width: 600px; margin: 0 auto; padding: 20px; }
+				.header { background: %1$s; color: white; padding: 20px; text-align: center; }
+				.content { padding: 20px; background: #f9f9f9; }
+				.stats { background: white; padding: 15px; margin: 15px 0; border-radius: 5px; }
+				.stat-item { margin: 10px 0; }
+				.stat-label { font-weight: bold; color: %1$s; }
+				.recommendations { background: white; padding: 15px; margin: 15px 0; border-radius: 5px; }
+				.footer { text-align: center; padding: 20px; font-size: 12px; color: #666; }
+			</style>
+		</head>
+		<body>
+			<div class="container">
+				<div class="header">
+					<h1>Study Results</h1>
+					<p>%2$s</p>
+				</div>
+				
+				<div class="content">
+					<h2>Hello %3$s!</h2>
+					<p>Here are your detailed study results for <strong>%4$s</strong>:</p>
+					
+					<div class="stats">
+						<h3>Performance Summary</h3>
+						<div class="stat-item">
+							<span class="stat-label">Cards Completed:</span> %5$d / %6$d (%7$.1f%%)
+						</div>
+						<div class="stat-item">
+							<span class="stat-label">Accuracy:</span> %8$.1f%%
+						</div>
+						<div class="stat-item">
+							<span class="stat-label">Study Time:</span> %9$s
+						</div>
+						<div class="stat-item">
+							<span class="stat-label">Average Time per Card:</span> %10$s
+						</div>
+					</div>
+					
+					<div class="recommendations">
+						<h3>Study Recommendations</h3>
+						<ul>%11$s</ul>
+					</div>
+					
+					<p>Keep up the great work with your studies!</p>
+				</div>
+				
+				<div class="footer">
+					<p>Powered by SkyLearn Flashcards | <a href="%12$s">%13$s</a></p>
+				</div>
+			</div>
+		</body>
+		</html>';
+		
+		$recommendations_html = '';
+		foreach ( $results['recommendations'] as $recommendation ) {
+			$recommendations_html .= '<li>' . esc_html( $recommendation ) . '</li>';
+		}
+		
+		return sprintf(
+			$template,
+			SKYLEARN_FLASHCARDS_COLOR_PRIMARY, // %1$s - primary color
+			esc_html( get_bloginfo( 'name' ) ), // %2$s - site name
+			esc_html( $name ), // %3$s - user name
+			esc_html( $results['set_title'] ), // %4$s - set title
+			$results['cards_completed'], // %5$d - cards completed
+			$results['total_cards'], // %6$d - total cards
+			$results['completion_rate'], // %7$.1f - completion rate
+			$results['accuracy'], // %8$.1f - accuracy
+			$this->format_time( $results['total_time'] ), // %9$s - total time
+			$this->format_time( $results['avg_time_per_card'] ), // %10$s - avg time
+			$recommendations_html, // %11$s - recommendations
+			esc_url( home_url() ), // %12$s - site URL
+			esc_html( get_bloginfo( 'name' ) ) // %13$s - site name
+		);
+		
+	}
+
+	/**
+	 * Format time duration for display
+	 *
+	 * @since    1.0.0
+	 * @param    int     $seconds   Time in seconds
+	 * @return   string             Formatted time string
+	 */
+	private function format_time( $seconds ) {
+		
+		if ( $seconds < 60 ) {
+			return sprintf( __( '%d seconds', 'skylearn-flashcards' ), $seconds );
+		} elseif ( $seconds < 3600 ) {
+			return sprintf( __( '%d minutes', 'skylearn-flashcards' ), floor( $seconds / 60 ) );
+		} else {
+			$hours = floor( $seconds / 3600 );
+			$minutes = floor( ( $seconds % 3600 ) / 60 );
+			return sprintf( __( '%d hours %d minutes', 'skylearn-flashcards' ), $hours, $minutes );
+		}
+		
+	}
 
 		if ( ! is_email( $email ) ) {
 			wp_send_json_error( array( 'message' => __( 'Please enter a valid email address.', 'skylearn-flashcards' ) ) );

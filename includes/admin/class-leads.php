@@ -59,8 +59,69 @@ class SkyLearn_Flashcards_Leads {
 	 * @return int|false Lead ID on success, false on failure
 	 */
 	public function collect_lead( $lead_data ) {
-		// TODO: Implement lead collection logic
-		// Validate data, check for duplicates, insert into database
+		global $wpdb;
+		
+		// Validate required fields
+		if ( empty( $lead_data['email'] ) || ! is_email( $lead_data['email'] ) ) {
+			return false;
+		}
+		
+		// Sanitize data
+		$sanitized_data = array(
+			'set_id'     => absint( $lead_data['set_id'] ?? 0 ),
+			'name'       => sanitize_text_field( $lead_data['name'] ?? '' ),
+			'email'      => sanitize_email( $lead_data['email'] ),
+			'phone'      => sanitize_text_field( $lead_data['phone'] ?? '' ),
+			'message'    => sanitize_textarea_field( $lead_data['message'] ?? '' ),
+			'source'     => sanitize_text_field( $lead_data['source'] ?? 'flashcard_completion' ),
+			'status'     => 'new',
+			'tags'       => sanitize_text_field( $lead_data['tags'] ?? '' ),
+			'ip_address' => skylearn_get_user_ip(),
+			'user_agent' => sanitize_text_field( $_SERVER['HTTP_USER_AGENT'] ?? '' ),
+		);
+		
+		// Check for existing lead with same email
+		$table_name = $wpdb->prefix . 'skylearn_flashcard_leads';
+		$existing_lead = $wpdb->get_var( $wpdb->prepare(
+			"SELECT id FROM {$table_name} WHERE email = %s",
+			$sanitized_data['email']
+		) );
+		
+		if ( $existing_lead ) {
+			// Update existing lead with new interaction
+			$updated = $wpdb->update(
+				$table_name,
+				array(
+					'set_id'     => $sanitized_data['set_id'],
+					'updated_at' => current_time( 'mysql' ),
+				),
+				array( 'id' => $existing_lead ),
+				array( '%d', '%s' ),
+				array( '%d' )
+			);
+			
+			return $updated ? $existing_lead : false;
+		}
+		
+		// Insert new lead
+		$inserted = $wpdb->insert(
+			$table_name,
+			$sanitized_data,
+			array( '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
+		);
+		
+		if ( $inserted ) {
+			$lead_id = $wpdb->insert_id;
+			
+			// Send to email marketing service if configured
+			$this->sync_to_email_service( $lead_id, $sanitized_data );
+			
+			// Trigger action for other plugins
+			do_action( 'skylearn_lead_collected', $lead_id, $sanitized_data );
+			
+			return $lead_id;
+		}
+		
 		return false;
 	}
 
@@ -72,20 +133,64 @@ class SkyLearn_Flashcards_Leads {
 	 * @return array Array of leads
 	 */
 	public function get_leads( $args = array() ) {
+		global $wpdb;
+		
 		$defaults = array(
 			'limit'     => 20,
 			'offset'    => 0,
-			'orderby'   => 'created',
+			'orderby'   => 'created_at',
 			'order'     => 'DESC',
 			'status'    => 'any',
 			'date_from' => null,
 			'date_to'   => null,
+			'search'    => '',
 		);
 		
 		$args = wp_parse_args( $args, $defaults );
 		
-		// TODO: Implement leads retrieval logic
-		return array();
+		$table_name = $wpdb->prefix . 'skylearn_flashcard_leads';
+		$where_clauses = array( '1=1' );
+		$where_values = array();
+		
+		// Status filter
+		if ( $args['status'] !== 'any' ) {
+			$where_clauses[] = 'status = %s';
+			$where_values[] = $args['status'];
+		}
+		
+		// Date range filter
+		if ( $args['date_from'] ) {
+			$where_clauses[] = 'created_at >= %s';
+			$where_values[] = $args['date_from'];
+		}
+		
+		if ( $args['date_to'] ) {
+			$where_clauses[] = 'created_at <= %s';
+			$where_values[] = $args['date_to'];
+		}
+		
+		// Search filter
+		if ( ! empty( $args['search'] ) ) {
+			$where_clauses[] = '(name LIKE %s OR email LIKE %s)';
+			$search_term = '%' . $wpdb->esc_like( $args['search'] ) . '%';
+			$where_values[] = $search_term;
+			$where_values[] = $search_term;
+		}
+		
+		$where_sql = implode( ' AND ', $where_clauses );
+		$order_sql = sprintf( 'ORDER BY %s %s', 
+			sanitize_sql_orderby( $args['orderby'] ), 
+			$args['order'] === 'ASC' ? 'ASC' : 'DESC' 
+		);
+		$limit_sql = sprintf( 'LIMIT %d OFFSET %d', absint( $args['limit'] ), absint( $args['offset'] ) );
+		
+		$query = "SELECT * FROM {$table_name} WHERE {$where_sql} {$order_sql} {$limit_sql}";
+		
+		if ( ! empty( $where_values ) ) {
+			$query = $wpdb->prepare( $query, $where_values );
+		}
+		
+		return $wpdb->get_results( $query, ARRAY_A );
 	}
 
 	/**
@@ -96,8 +201,15 @@ class SkyLearn_Flashcards_Leads {
 	 * @return array|false Lead data on success, false on failure
 	 */
 	public function get_lead( $lead_id ) {
-		// TODO: Implement lead retrieval logic
-		return false;
+		global $wpdb;
+		
+		$table_name = $wpdb->prefix . 'skylearn_flashcard_leads';
+		$lead = $wpdb->get_row( $wpdb->prepare(
+			"SELECT * FROM {$table_name} WHERE id = %d",
+			$lead_id
+		), ARRAY_A );
+		
+		return $lead ?: false;
 	}
 
 	/**
@@ -109,8 +221,37 @@ class SkyLearn_Flashcards_Leads {
 	 * @return bool True on success, false on failure
 	 */
 	public function update_lead( $lead_id, $lead_data ) {
-		// TODO: Implement lead update logic
-		return false;
+		global $wpdb;
+		
+		$table_name = $wpdb->prefix . 'skylearn_flashcard_leads';
+		$allowed_fields = array( 'name', 'email', 'phone', 'message', 'status', 'tags' );
+		
+		$update_data = array();
+		foreach ( $allowed_fields as $field ) {
+			if ( isset( $lead_data[ $field ] ) ) {
+				$update_data[ $field ] = sanitize_text_field( $lead_data[ $field ] );
+			}
+		}
+		
+		if ( empty( $update_data ) ) {
+			return false;
+		}
+		
+		$update_data['updated_at'] = current_time( 'mysql' );
+		
+		$updated = $wpdb->update(
+			$table_name,
+			$update_data,
+			array( 'id' => $lead_id ),
+			null,
+			array( '%d' )
+		);
+		
+		if ( $updated ) {
+			do_action( 'skylearn_lead_updated', $lead_id, $update_data );
+		}
+		
+		return $updated !== false;
 	}
 
 	/**
@@ -121,8 +262,20 @@ class SkyLearn_Flashcards_Leads {
 	 * @return bool True on success, false on failure
 	 */
 	public function delete_lead( $lead_id ) {
-		// TODO: Implement lead deletion logic
-		return false;
+		global $wpdb;
+		
+		$table_name = $wpdb->prefix . 'skylearn_flashcard_leads';
+		$deleted = $wpdb->delete(
+			$table_name,
+			array( 'id' => $lead_id ),
+			array( '%d' )
+		);
+		
+		if ( $deleted ) {
+			do_action( 'skylearn_lead_deleted', $lead_id );
+		}
+		
+		return $deleted !== false;
 	}
 
 	/**
@@ -133,8 +286,7 @@ class SkyLearn_Flashcards_Leads {
 	 * @return bool True on success, false on failure
 	 */
 	public function mark_contacted( $lead_id ) {
-		// TODO: Implement lead status update logic
-		return false;
+		return $this->update_lead( $lead_id, array( 'status' => 'contacted' ) );
 	}
 
 	/**
@@ -145,9 +297,143 @@ class SkyLearn_Flashcards_Leads {
 	 * @return string|false CSV data on success, false on failure
 	 */
 	public function export_leads( $args = array() ) {
-		// TODO: Implement lead export logic
-		// Get leads based on criteria, format as CSV
+		$leads = $this->get_leads( $args );
+		
+		if ( empty( $leads ) ) {
+			return false;
+		}
+		
+		// CSV headers
+		$headers = array(
+			__( 'ID', 'skylearn-flashcards' ),
+			__( 'Name', 'skylearn-flashcards' ),
+			__( 'Email', 'skylearn-flashcards' ),
+			__( 'Phone', 'skylearn-flashcards' ),
+			__( 'Message', 'skylearn-flashcards' ),
+			__( 'Flashcard Set', 'skylearn-flashcards' ),
+			__( 'Source', 'skylearn-flashcards' ),
+			__( 'Status', 'skylearn-flashcards' ),
+			__( 'Tags', 'skylearn-flashcards' ),
+			__( 'IP Address', 'skylearn-flashcards' ),
+			__( 'Created Date', 'skylearn-flashcards' ),
+		);
+		
+		// Start CSV output
+		$csv_data = '';
+		
+		// Add headers
+		$csv_data .= '"' . implode( '","', $headers ) . '"' . "\n";
+		
+		// Add data rows
+		foreach ( $leads as $lead ) {
+			$set_title = get_the_title( $lead['set_id'] ) ?: __( 'Unknown Set', 'skylearn-flashcards' );
+			
+			$row = array(
+				$lead['id'],
+				$lead['name'],
+				$lead['email'],
+				$lead['phone'],
+				$lead['message'],
+				$set_title,
+				$lead['source'],
+				$lead['status'],
+				$lead['tags'],
+				$lead['ip_address'],
+				$lead['created_at'],
+			);
+			
+			// Escape CSV data
+			$escaped_row = array_map( function( $field ) {
+				return '"' . str_replace( '"', '""', $field ) . '"';
+			}, $row );
+			
+			$csv_data .= implode( ',', $escaped_row ) . "\n";
+		}
+		
+		return $csv_data;
+	}
+
+	/**
+	 * Sync lead to email marketing service
+	 *
+	 * @since 1.0.0
+	 * @param int   $lead_id   Lead ID
+	 * @param array $lead_data Lead data
+	 * @return bool True on success, false on failure
+	 */
+	private function sync_to_email_service( $lead_id, $lead_data ) {
+		$email_settings = get_option( 'skylearn_flashcards_email_settings', array() );
+		$provider = $email_settings['provider'] ?? '';
+		
+		if ( empty( $provider ) || ! isset( $email_settings[ $provider ] ) ) {
+			return false;
+		}
+		
+		$settings = $email_settings[ $provider ];
+		$email = $lead_data['email'];
+		$name = $lead_data['name'];
+		
+		try {
+			switch ( $provider ) {
+				case 'mailchimp':
+					$integration = new SkyLearn_Flashcards_Mailchimp();
+					return $integration->add_subscriber( $email, $name, $settings );
+					
+				case 'sendfox':
+					$integration = new SkyLearn_Flashcards_SendFox();
+					return $integration->add_subscriber( $email, $name, $settings );
+					
+				case 'vbout':
+					$integration = new SkyLearn_Flashcards_Vbout();
+					return $integration->add_subscriber( $email, $name, $settings );
+			}
+		} catch ( Exception $e ) {
+			skylearn_log( 'Email service sync error: ' . $e->getMessage(), 'error' );
+		}
+		
 		return false;
+	}
+
+	/**
+	 * Get leads count
+	 *
+	 * @since 1.0.0
+	 * @param array $args Query arguments
+	 * @return int Lead count
+	 */
+	public function get_leads_count( $args = array() ) {
+		global $wpdb;
+		
+		$table_name = $wpdb->prefix . 'skylearn_flashcard_leads';
+		$where_clauses = array( '1=1' );
+		$where_values = array();
+		
+		// Status filter
+		if ( isset( $args['status'] ) && $args['status'] !== 'any' ) {
+			$where_clauses[] = 'status = %s';
+			$where_values[] = $args['status'];
+		}
+		
+		// Date range filter
+		if ( isset( $args['date_from'] ) && $args['date_from'] ) {
+			$where_clauses[] = 'created_at >= %s';
+			$where_values[] = $args['date_from'];
+		}
+		
+		if ( isset( $args['date_to'] ) && $args['date_to'] ) {
+			$where_clauses[] = 'created_at <= %s';
+			$where_values[] = $args['date_to'];
+		}
+		
+		$where_sql = implode( ' AND ', $where_clauses );
+		$query = "SELECT COUNT(*) FROM {$table_name} WHERE {$where_sql}";
+		
+		if ( ! empty( $where_values ) ) {
+			$query = $wpdb->prepare( $query, $where_values );
+		}
+		
+		return (int) $wpdb->get_var( $query );
+	}
 	}
 
 	/**
