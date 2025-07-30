@@ -253,8 +253,8 @@ class SkyLearn_Flashcards_Admin {
 	 */
 	private function setup_post_type_columns() {
 
-		add_filter( 'manage_skylearn_flashcard_posts_columns', array( $this, 'set_custom_columns' ) );
-		add_action( 'manage_skylearn_flashcard_posts_custom_column', array( $this, 'custom_column_content' ), 10, 2 );
+		add_filter( 'manage_flashcard_set_posts_columns', array( $this, 'set_custom_columns' ) );
+		add_action( 'manage_flashcard_set_posts_custom_column', array( $this, 'custom_column_content' ), 10, 2 );
 
 	}
 
@@ -299,7 +299,7 @@ class SkyLearn_Flashcards_Admin {
 				break;
 
 			case 'shortcode':
-				echo '<code>[skylearn_flashcards id="' . esc_attr( $post_id ) . '"]</code>';
+				echo '<code>[skylearn_flashcard_set id="' . esc_attr( $post_id ) . '"]</code>';
 				break;
 		}
 

@@ -27,17 +27,31 @@
 }
 
 .skylearn-admin-header {
-    background: var(--skylearn-primary);
+    background: linear-gradient(135deg, var(--skylearn-primary), var(--skylearn-accent));
     color: white;
     padding: 20px;
     border-radius: 8px 8px 0 0;
     margin-bottom: 0;
+    position: relative;
+}
+
+.skylearn-admin-header::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    width: 100px;
+    height: 40px;
+    background: url('../img/logo-horiz.png') no-repeat center;
+    background-size: contain;
+    opacity: 0.8;
 }
 
 .skylearn-admin-header h1 {
     color: white;
     margin: 0;
     font-size: 24px;
+    font-weight: 600;
 }
 
 .skylearn-admin-content {
@@ -46,6 +60,369 @@
     border-top: none;
     padding: 20px;
     border-radius: 0 0 8px 8px;
+}
+
+/* Flashcard Editor Styles */
+#skylearn-flashcard-editor {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.skylearn-editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: var(--skylearn-background);
+    border-radius: 8px;
+    border: 1px solid var(--skylearn-border);
+}
+
+.skylearn-editor-stats {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.card-count {
+    font-weight: 600;
+    color: var(--skylearn-primary);
+}
+
+#add-new-card {
+    background: var(--skylearn-primary);
+    border-color: var(--skylearn-primary);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+#add-new-card:hover {
+    background: #2980b9;
+    border-color: #2980b9;
+    transform: translateY(-1px);
+}
+
+/* Cards Container */
+.skylearn-cards-container {
+    margin-bottom: 20px;
+}
+
+.skylearn-empty-state {
+    text-align: center;
+    padding: 40px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 2px dashed #dee2e6;
+}
+
+.skylearn-empty-state h3 {
+    color: #6c757d;
+    margin-bottom: 10px;
+}
+
+.skylearn-empty-state p {
+    color: #6c757d;
+    margin: 0;
+}
+
+/* Individual Card Editor */
+.skylearn-card-editor {
+    background: white;
+    border: 1px solid var(--skylearn-border);
+    border-radius: 8px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    cursor: move;
+}
+
+.skylearn-card-editor:hover {
+    border-color: var(--skylearn-primary);
+    box-shadow: 0 2px 10px rgba(52, 152, 219, 0.1);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: var(--skylearn-background);
+    border-bottom: 1px solid var(--skylearn-border);
+    border-radius: 8px 8px 0 0;
+}
+
+.card-number {
+    font-weight: 600;
+    color: var(--skylearn-text);
+}
+
+.card-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.card-actions .button-link {
+    padding: 5px;
+    color: #6c757d;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.card-actions .button-link:hover {
+    color: var(--skylearn-primary);
+    background: rgba(52, 152, 219, 0.1);
+}
+
+.move-card {
+    cursor: grab;
+}
+
+.move-card:active {
+    cursor: grabbing;
+}
+
+.delete-card:hover {
+    color: var(--skylearn-error) !important;
+    background: rgba(231, 76, 60, 0.1) !important;
+}
+
+.card-content {
+    padding: 15px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.card-side label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--skylearn-text);
+}
+
+.card-front,
+.card-back {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.4;
+    resize: vertical;
+    transition: border-color 0.3s ease;
+}
+
+.card-front:focus,
+.card-back:focus {
+    border-color: var(--skylearn-primary);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    outline: none;
+}
+
+/* Editor Actions */
+.skylearn-editor-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: var(--skylearn-background);
+    border-radius: 8px;
+    border: 1px solid var(--skylearn-border);
+}
+
+#save-cards {
+    background: var(--skylearn-success);
+    border-color: var(--skylearn-success);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+#save-cards:hover {
+    background: #219a52;
+    border-color: #219a52;
+    transform: translateY(-1px);
+}
+
+.save-status {
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.save-status.success {
+    color: var(--skylearn-success);
+    background: rgba(39, 174, 96, 0.1);
+}
+
+.save-status.error {
+    color: var(--skylearn-error);
+    background: rgba(231, 76, 60, 0.1);
+}
+
+/* Set Settings Meta Box */
+.skylearn-set-settings {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.skylearn-set-settings p {
+    margin-bottom: 15px;
+}
+
+.skylearn-set-settings label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.skylearn-set-settings input[type="checkbox"] {
+    margin: 0;
+}
+
+.skylearn-set-settings input[type="number"] {
+    width: 60px;
+    margin-left: 8px;
+}
+
+.skylearn-set-settings input[type="text"] {
+    font-family: monospace;
+    font-size: 12px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+/* Sortable UI */
+.skylearn-cards-container.ui-sortable .skylearn-card-editor {
+    cursor: move;
+}
+
+.skylearn-card-editor.ui-sortable-helper {
+    transform: rotate(2deg);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+}
+
+.skylearn-card-editor.ui-sortable-placeholder {
+    border: 2px dashed var(--skylearn-primary);
+    background: rgba(52, 152, 219, 0.05);
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.skylearn-card-editor.ui-sortable-placeholder::before {
+    content: 'Drop card here';
+    color: var(--skylearn-primary);
+    font-weight: 600;
+}
+
+/* Admin Notice Styles */
+.notice.skylearn-notice {
+    border-left-color: var(--skylearn-primary);
+}
+
+.notice.skylearn-notice.notice-success {
+    border-left-color: var(--skylearn-success);
+}
+
+.notice.skylearn-notice.notice-warning {
+    border-left-color: var(--skylearn-warning);
+}
+
+.notice.skylearn-notice.notice-error {
+    border-left-color: var(--skylearn-error);
+}
+
+/* Upsell Messages */
+.skylearn-upsell {
+    background: linear-gradient(135deg, var(--skylearn-primary), var(--skylearn-accent));
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.skylearn-upsell h3 {
+    color: white;
+    margin-top: 0;
+}
+
+.skylearn-upsell .button {
+    background: white;
+    color: var(--skylearn-primary);
+    border: none;
+    padding: 10px 20px;
+    font-weight: 600;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+}
+
+.skylearn-upsell .button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    color: var(--skylearn-primary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .skylearn-editor-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .card-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .skylearn-editor-actions {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .skylearn-admin-header::before {
+        display: none;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .skylearn-card-editor {
+        border-width: 2px;
+    }
+    
+    .card-front,
+    .card-back {
+        border-width: 2px;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .card-actions,
+    .skylearn-editor-actions,
+    #add-new-card {
+        display: none !important;
+    }
+    
+    .skylearn-card-editor {
+        break-inside: avoid;
+        margin-bottom: 20px;
+    }
 }
 
 /* Navigation Tabs */

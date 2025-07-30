@@ -257,25 +257,25 @@ class SkyLearn_Flashcards_Setup {
 	 *
 	 * @since    1.0.0
 	 */
-	private static function register_post_types() {
+	public static function register_post_types() {
 		
-		// Flashcard set post type
-		register_post_type( 'skylearn_flashcard', array(
+		// Flashcard set post type (PHASE 2 requirement: 'flashcard_set')
+		register_post_type( 'flashcard_set', array(
 			'labels' => array(
-				'name'               => 'Flashcard Sets',
-				'singular_name'      => 'Flashcard Set',
-				'menu_name'          => 'Flashcards',
-				'name_admin_bar'     => 'Flashcard Set',
-				'add_new'            => 'Add New',
-				'add_new_item'       => 'Add New Flashcard Set',
-				'new_item'           => 'New Flashcard Set',
-				'edit_item'          => 'Edit Flashcard Set',
-				'view_item'          => 'View Flashcard Set',
-				'all_items'          => 'All Flashcard Sets',
-				'search_items'       => 'Search Flashcard Sets',
-				'parent_item_colon'  => 'Parent Flashcard Sets:',
-				'not_found'          => 'No flashcard sets found.',
-				'not_found_in_trash' => 'No flashcard sets found in Trash.',
+				'name'               => __( 'Flashcard Sets', 'skylearn-flashcards' ),
+				'singular_name'      => __( 'Flashcard Set', 'skylearn-flashcards' ),
+				'menu_name'          => __( 'Flashcards', 'skylearn-flashcards' ),
+				'name_admin_bar'     => __( 'Flashcard Set', 'skylearn-flashcards' ),
+				'add_new'            => __( 'Add New', 'skylearn-flashcards' ),
+				'add_new_item'       => __( 'Add New Flashcard Set', 'skylearn-flashcards' ),
+				'new_item'           => __( 'New Flashcard Set', 'skylearn-flashcards' ),
+				'edit_item'          => __( 'Edit Flashcard Set', 'skylearn-flashcards' ),
+				'view_item'          => __( 'View Flashcard Set', 'skylearn-flashcards' ),
+				'all_items'          => __( 'All Flashcard Sets', 'skylearn-flashcards' ),
+				'search_items'       => __( 'Search Flashcard Sets', 'skylearn-flashcards' ),
+				'parent_item_colon'  => __( 'Parent Flashcard Sets:', 'skylearn-flashcards' ),
+				'not_found'          => __( 'No flashcard sets found.', 'skylearn-flashcards' ),
+				'not_found_in_trash' => __( 'No flashcard sets found in Trash.', 'skylearn-flashcards' ),
 			),
 			'public'              => true,
 			'publicly_queryable'  => true,
@@ -283,13 +283,24 @@ class SkyLearn_Flashcards_Setup {
 			'show_in_menu'        => false, // We'll add our own menu
 			'query_var'           => true,
 			'rewrite'             => array( 'slug' => 'flashcard-set' ),
-			'capability_type'     => 'post',
+			'capability_type'     => 'flashcard_set',
+			'capabilities'        => array(
+				'edit_post'          => 'edit_skylearn_flashcards',
+				'read_post'          => 'read_skylearn_flashcards',
+				'delete_post'        => 'delete_skylearn_flashcards',
+				'edit_posts'         => 'edit_skylearn_flashcards',
+				'edit_others_posts'  => 'manage_skylearn_flashcards',
+				'delete_posts'       => 'delete_skylearn_flashcards',
+				'publish_posts'      => 'edit_skylearn_flashcards',
+				'read_private_posts' => 'read_skylearn_flashcards',
+			),
+			'map_meta_cap'        => true,
 			'has_archive'         => true,
 			'hierarchical'        => false,
 			'menu_position'       => null,
-			'supports'            => array( 'title', 'editor', 'author', 'thumbnail', 'excerpt', 'custom-fields' ),
+			'supports'            => array( 'title', 'author', 'custom-fields' ),
 			'show_in_rest'        => true,
-			'rest_base'           => 'flashcards',
+			'rest_base'           => 'flashcard-sets',
 		) );
 	}
 
@@ -298,23 +309,23 @@ class SkyLearn_Flashcards_Setup {
 	 *
 	 * @since    1.0.0
 	 */
-	private static function register_taxonomies() {
+	public static function register_taxonomies() {
 		
 		// Flashcard category taxonomy
-		register_taxonomy( 'flashcard_category', array( 'skylearn_flashcard' ), array(
+		register_taxonomy( 'flashcard_category', array( 'flashcard_set' ), array(
 			'hierarchical'      => true,
 			'labels'            => array(
-				'name'              => 'Flashcard Categories',
-				'singular_name'     => 'Flashcard Category',
-				'search_items'      => 'Search Categories',
-				'all_items'         => 'All Categories',
-				'parent_item'       => 'Parent Category',
-				'parent_item_colon' => 'Parent Category:',
-				'edit_item'         => 'Edit Category',
-				'update_item'       => 'Update Category',
-				'add_new_item'      => 'Add New Category',
-				'new_item_name'     => 'New Category Name',
-				'menu_name'         => 'Categories',
+				'name'              => __( 'Flashcard Categories', 'skylearn-flashcards' ),
+				'singular_name'     => __( 'Flashcard Category', 'skylearn-flashcards' ),
+				'search_items'      => __( 'Search Categories', 'skylearn-flashcards' ),
+				'all_items'         => __( 'All Categories', 'skylearn-flashcards' ),
+				'parent_item'       => __( 'Parent Category', 'skylearn-flashcards' ),
+				'parent_item_colon' => __( 'Parent Category:', 'skylearn-flashcards' ),
+				'edit_item'         => __( 'Edit Category', 'skylearn-flashcards' ),
+				'update_item'       => __( 'Update Category', 'skylearn-flashcards' ),
+				'add_new_item'      => __( 'Add New Category', 'skylearn-flashcards' ),
+				'new_item_name'     => __( 'New Category Name', 'skylearn-flashcards' ),
+				'menu_name'         => __( 'Categories', 'skylearn-flashcards' ),
 			),
 			'show_ui'           => true,
 			'show_admin_column' => true,
@@ -324,23 +335,23 @@ class SkyLearn_Flashcards_Setup {
 		) );
 
 		// Flashcard tag taxonomy
-		register_taxonomy( 'flashcard_tag', array( 'skylearn_flashcard' ), array(
+		register_taxonomy( 'flashcard_tag', array( 'flashcard_set' ), array(
 			'hierarchical'      => false,
 			'labels'            => array(
-				'name'                       => 'Flashcard Tags',
-				'singular_name'              => 'Flashcard Tag',
-				'search_items'               => 'Search Tags',
-				'popular_items'              => 'Popular Tags',
-				'all_items'                  => 'All Tags',
-				'edit_item'                  => 'Edit Tag',
-				'update_item'                => 'Update Tag',
-				'add_new_item'               => 'Add New Tag',
-				'new_item_name'              => 'New Tag Name',
-				'separate_items_with_commas' => 'Separate tags with commas',
-				'add_or_remove_items'        => 'Add or remove tags',
-				'choose_from_most_used'      => 'Choose from the most used tags',
-				'not_found'                  => 'No tags found.',
-				'menu_name'                  => 'Tags',
+				'name'                       => __( 'Flashcard Tags', 'skylearn-flashcards' ),
+				'singular_name'              => __( 'Flashcard Tag', 'skylearn-flashcards' ),
+				'search_items'               => __( 'Search Tags', 'skylearn-flashcards' ),
+				'popular_items'              => __( 'Popular Tags', 'skylearn-flashcards' ),
+				'all_items'                  => __( 'All Tags', 'skylearn-flashcards' ),
+				'edit_item'                  => __( 'Edit Tag', 'skylearn-flashcards' ),
+				'update_item'                => __( 'Update Tag', 'skylearn-flashcards' ),
+				'add_new_item'               => __( 'Add New Tag', 'skylearn-flashcards' ),
+				'new_item_name'              => __( 'New Tag Name', 'skylearn-flashcards' ),
+				'separate_items_with_commas' => __( 'Separate tags with commas', 'skylearn-flashcards' ),
+				'add_or_remove_items'        => __( 'Add or remove tags', 'skylearn-flashcards' ),
+				'choose_from_most_used'      => __( 'Choose from the most used tags', 'skylearn-flashcards' ),
+				'not_found'                  => __( 'No tags found.', 'skylearn-flashcards' ),
+				'menu_name'                  => __( 'Tags', 'skylearn-flashcards' ),
 			),
 			'show_ui'           => true,
 			'show_admin_column' => true,
@@ -403,9 +414,9 @@ class SkyLearn_Flashcards_Setup {
 		
 		// Check if demo content already exists
 		$existing_demo = get_posts( array(
-			'post_type'  => 'skylearn_flashcard',
-			'meta_key'   => '_skylearn_demo_content',
-			'meta_value' => '1',
+			'post_type'   => 'flashcard_set',
+			'meta_key'    => '_skylearn_demo_content',
+			'meta_value'  => '1',
 			'numberposts' => 1,
 		) );
 
@@ -415,10 +426,10 @@ class SkyLearn_Flashcards_Setup {
 
 		// Create demo flashcard set
 		$demo_set_id = wp_insert_post( array(
-			'post_title'   => 'Welcome to SkyLearn Flashcards!',
-			'post_content' => 'This is a demo flashcard set to help you get started with SkyLearn Flashcards.',
+			'post_title'   => __( 'Welcome to SkyLearn Flashcards!', 'skylearn-flashcards' ),
+			'post_content' => __( 'This is a demo flashcard set to help you get started with SkyLearn Flashcards.', 'skylearn-flashcards' ),
 			'post_status'  => 'publish',
-			'post_type'    => 'skylearn_flashcard',
+			'post_type'    => 'flashcard_set',
 			'post_author'  => get_current_user_id(),
 		) );
 
@@ -429,24 +440,24 @@ class SkyLearn_Flashcards_Setup {
 			// Add demo flashcards
 			$demo_cards = array(
 				array(
-					'question' => 'What is SkyLearn Flashcards?',
-					'answer'   => 'SkyLearn Flashcards is a premium WordPress plugin for creating interactive flashcard sets for educational purposes.',
+					'front' => __( 'What is SkyLearn Flashcards?', 'skylearn-flashcards' ),
+					'back'  => __( 'SkyLearn Flashcards is a premium WordPress plugin for creating interactive flashcard sets for educational purposes.', 'skylearn-flashcards' ),
 				),
 				array(
-					'question' => 'How do you flip a flashcard?',
-					'answer'   => 'Click on the flashcard or press the spacebar to flip it and reveal the answer.',
+					'front' => __( 'How do you flip a flashcard?', 'skylearn-flashcards' ),
+					'back'  => __( 'Click on the flashcard or press the spacebar to flip it and reveal the answer.', 'skylearn-flashcards' ),
 				),
 				array(
-					'question' => 'What are the main features?',
-					'answer'   => 'Interactive flashcards, LMS integration, analytics, lead collection, and premium reporting features.',
+					'front' => __( 'What are the main features?', 'skylearn-flashcards' ),
+					'back'  => __( 'Interactive flashcards, LMS integration, analytics, lead collection, and premium reporting features.', 'skylearn-flashcards' ),
 				),
 				array(
-					'question' => 'Who can use this plugin?',
-					'answer'   => 'Teachers, students, schools, online academies, and anyone who wants to create educational content.',
+					'front' => __( 'Who can use this plugin?', 'skylearn-flashcards' ),
+					'back'  => __( 'Teachers, students, schools, online academies, and anyone who wants to create educational content.', 'skylearn-flashcards' ),
 				),
 				array(
-					'question' => 'Is it mobile-friendly?',
-					'answer'   => 'Yes! SkyLearn Flashcards is fully responsive and includes touch gesture support for mobile devices.',
+					'front' => __( 'Is it mobile-friendly?', 'skylearn-flashcards' ),
+					'back'  => __( 'Yes! SkyLearn Flashcards is fully responsive and includes touch gesture support for mobile devices.', 'skylearn-flashcards' ),
 				),
 			);
 
