@@ -354,3 +354,105 @@ function skylearn_get_default_settings() {
 		'shuffle_cards'     => false,
 	);
 }
+
+/**
+ * Check if user has access to flashcard set based on LMS enrollment
+ *
+ * @since 1.0.0
+ * @param int $flashcard_set_id Flashcard set ID
+ * @param int $user_id User ID (optional, defaults to current user)
+ * @return bool True if user has access
+ */
+function skylearn_user_has_lms_access( $flashcard_set_id, $user_id = null ) {
+	if ( ! class_exists( 'SkyLearn_Flashcards_LMS_Manager' ) ) {
+		return true; // No LMS integration, allow access
+	}
+	
+	$lms_manager = new SkyLearn_Flashcards_LMS_Manager();
+	return $lms_manager->user_has_access( $flashcard_set_id, $user_id );
+}
+
+/**
+ * Get LMS integrations status
+ *
+ * @since 1.0.0
+ * @return array LMS status information
+ */
+function skylearn_get_lms_status() {
+	if ( ! class_exists( 'SkyLearn_Flashcards_LMS_Manager' ) ) {
+		return array(
+			'enabled'      => false,
+			'detected_lms' => array(),
+		);
+	}
+	
+	$lms_manager = new SkyLearn_Flashcards_LMS_Manager();
+	return array(
+		'enabled'      => $lms_manager->is_lms_integration_enabled(),
+		'detected_lms' => $lms_manager->get_detected_lms(),
+	);
+}
+
+/**
+ * Check if LearnDash is active and available
+ *
+ * @since 1.0.0
+ * @return bool True if LearnDash is available
+ */
+function skylearn_is_learndash_available() {
+	return class_exists( 'SFWD_LMS' );
+}
+
+/**
+ * Check if TutorLMS is active and available
+ *
+ * @since 1.0.0
+ * @return bool True if TutorLMS is available
+ */
+function skylearn_is_tutorlms_available() {
+	return function_exists( 'tutor' );
+}
+
+/**
+ * Track flashcard completion in LMS
+ *
+ * @since 1.0.0
+ * @param int   $flashcard_set_id Flashcard set ID
+ * @param int   $user_id User ID
+ * @param float $accuracy Accuracy percentage
+ */
+function skylearn_track_lms_completion( $flashcard_set_id, $user_id, $accuracy ) {
+	if ( ! class_exists( 'SkyLearn_Flashcards_LMS_Manager' ) ) {
+		return;
+	}
+	
+	$lms_manager = new SkyLearn_Flashcards_LMS_Manager();
+	$lms_manager->track_completion( $flashcard_set_id, $user_id, $accuracy );
+}
+
+/**
+ * Get flashcard sets linked to an LMS course or lesson
+ *
+ * @since 1.0.0
+ * @param int    $lms_content_id Course or lesson ID
+ * @param string $lms_type       LMS type ('learndash' or 'tutorlms')
+ * @param string $content_type   Content type ('course' or 'lesson')
+ * @return array Flashcard set IDs
+ */
+function skylearn_get_lms_linked_sets( $lms_content_id, $lms_type = 'learndash', $content_type = 'lesson' ) {
+	$meta_key = '_skylearn_flashcard_sets';
+	
+	// For courses, we might use a different meta key
+	if ( $content_type === 'course' && $lms_type === 'tutorlms' ) {
+		$meta_key = '_skylearn_flashcard_sets';
+	}
+	
+	$linked_sets = get_post_meta( $lms_content_id, $meta_key, true );
+	
+	if ( ! is_array( $linked_sets ) ) {
+		return array();
+	}
+	
+	// Filter out invalid set IDs
+	return array_filter( array_map( 'absint', $linked_sets ) );
+}
