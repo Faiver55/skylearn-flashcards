@@ -34,6 +34,7 @@ $settings = get_option( 'skylearn_flashcards_settings', skylearn_get_default_set
 			<a href="#general" class="active"><?php esc_html_e( 'General', 'skylearn-flashcards' ); ?></a>
 			<a href="#appearance"><?php esc_html_e( 'Appearance', 'skylearn-flashcards' ); ?></a>
 			<a href="#behavior"><?php esc_html_e( 'Behavior', 'skylearn-flashcards' ); ?></a>
+			<a href="#lms"><?php esc_html_e( 'LMS Integration', 'skylearn-flashcards' ); ?></a>
 			<a href="#analytics"><?php esc_html_e( 'Analytics', 'skylearn-flashcards' ); ?></a>
 			<?php if ( skylearn_is_premium() ) : ?>
 				<a href="#premium"><?php esc_html_e( 'Premium', 'skylearn-flashcards' ); ?></a>
@@ -218,6 +219,14 @@ $settings = get_option( 'skylearn_flashcards_settings', skylearn_get_default_set
 						</tr>
 					</table>
 				</div>
+			</div>
+			
+			<!-- LMS Integration Settings -->
+			<div id="lms" class="skylearn-tab-content" style="display: none;">
+				<?php
+				// Include LMS settings template
+				require_once SKYLEARN_FLASHCARDS_PATH . 'includes/admin/views/lms-settings.php';
+				?>
 			</div>
 			
 			<!-- Analytics Settings -->
