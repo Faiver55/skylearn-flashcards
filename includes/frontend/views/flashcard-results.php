@@ -251,12 +251,89 @@ $completion_rate = $total_cards > 0 ? round( ( $completed_cards / $total_cards )
             </button>
         <?php endif; ?>
         
+        <?php if ( skylearn_is_premium() ) : ?>
+            <button type="button" class="skylearn-btn skylearn-btn-secondary btn-export-results">
+                <span class="dashicons dashicons-download"></span>
+                <?php esc_html_e( 'Export Results', 'skylearn-flashcards' ); ?>
+            </button>
+        <?php endif; ?>
+        
         <button type="button" class="skylearn-btn skylearn-btn-outline btn-share">
             <span class="dashicons dashicons-share"></span>
             <?php esc_html_e( 'Share Results', 'skylearn-flashcards' ); ?>
         </button>
         
     </div>
+
+    <!-- Progress History (Premium) -->
+    <?php if ( skylearn_is_premium() && is_user_logged_in() ) : ?>
+        <?php
+        global $wpdb;
+        $user_id = get_current_user_id();
+        $set_id = isset( $set_data['id'] ) ? $set_data['id'] : 0;
+        $analytics_table = $wpdb->prefix . 'skylearn_flashcard_analytics';
+        
+        $previous_attempts = $wpdb->get_results( $wpdb->prepare(
+            "SELECT accuracy, created_at FROM {$analytics_table} 
+             WHERE user_id = %d AND set_id = %d AND action = 'complete' 
+             ORDER BY created_at DESC LIMIT 6",
+            $user_id,
+            $set_id
+        ), ARRAY_A );
+        ?>
+        
+        <?php if ( ! empty( $previous_attempts ) && count( $previous_attempts ) > 1 ) : ?>
+        <div class="skylearn-progress-history">
+            <h3><?php esc_html_e( 'Your Progress History', 'skylearn-flashcards' ); ?></h3>
+            <div class="progress-chart-container">
+                <canvas id="progress-history-chart" width="600" height="250"></canvas>
+            </div>
+        </div>
+        <?php endif; ?>
+    <?php endif; ?>
+
+    <!-- Export Modal (Premium only) -->
+    <?php if ( skylearn_is_premium() ) : ?>
+    <div id="export-results-modal" class="skylearn-modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><?php esc_html_e( 'Export Study Results', 'skylearn-flashcards' ); ?></h3>
+                <button type="button" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="export-results-form">
+                    <div class="form-group">
+                        <label for="export-results-format"><?php esc_html_e( 'Format:', 'skylearn-flashcards' ); ?></label>
+                        <select id="export-results-format" name="format" class="form-control">
+                            <option value="pdf"><?php esc_html_e( 'PDF Report', 'skylearn-flashcards' ); ?></option>
+                            <option value="csv"><?php esc_html_e( 'CSV Data', 'skylearn-flashcards' ); ?></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" name="include_history" value="1" checked>
+                            <?php esc_html_e( 'Include progress history', 'skylearn-flashcards' ); ?>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" name="include_recommendations" value="1" checked>
+                            <?php esc_html_e( 'Include study recommendations', 'skylearn-flashcards' ); ?>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="skylearn-btn skylearn-btn-primary" id="confirm-export-results">
+                    <?php esc_html_e( 'Export', 'skylearn-flashcards' ); ?>
+                </button>
+                <button type="button" class="skylearn-btn skylearn-btn-secondary modal-close">
+                    <?php esc_html_e( 'Cancel', 'skylearn-flashcards' ); ?>
+                </button>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <!-- Lead Collection (if enabled and completion rate is good) -->
     <?php if ( $completion_rate >= 80 && skylearn_is_premium() ) : ?>
@@ -269,7 +346,6 @@ $completion_rate = $total_cards > 0 ? round( ( $completed_cards / $total_cards )
 
 <script type="text/javascript">
 jQuery(document).ready(function($) {
-    // TODO: Implement results page functionality
     
     var resultsData = {
         completionRate: <?php echo (int) $completion_rate; ?>,
@@ -281,37 +357,181 @@ jQuery(document).ready(function($) {
     
     console.log('Study session results:', resultsData);
     
+    // Initialize progress history chart (Premium)
+    <?php if ( skylearn_is_premium() && ! empty( $previous_attempts ) && count( $previous_attempts ) > 1 ) : ?>
+    if (typeof Chart !== 'undefined') {
+        var ctx = document.getElementById('progress-history-chart');
+        if (ctx) {
+            var historyData = <?php echo wp_json_encode( array_reverse( $previous_attempts ) ); ?>;
+            var labels = historyData.map(function(item) {
+                return new Date(item.created_at).toLocaleDateString();
+            });
+            var scores = historyData.map(function(item) {
+                return parseFloat(item.accuracy) || 0;
+            });
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '<?php esc_js( esc_html_e( 'Accuracy %', 'skylearn-flashcards' ) ); ?>',
+                        data: scores,
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        tension: 0.3,
+                        fill: true,
+                        pointBackgroundColor: '#3498db',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+    <?php endif; ?>
+    
     // Action button handlers
     $('.btn-continue').on('click', function() {
-        // TODO: Continue to next unreviewed card
-        console.log('Continue studying clicked');
+        // Continue to next unreviewed card
+        if (typeof window.skylearn_continue_study === 'function') {
+            window.skylearn_continue_study();
+        } else {
+            location.reload();
+        }
     });
     
     $('.btn-restart').on('click', function() {
-        // TODO: Restart the flashcard set
-        console.log('Restart set clicked');
+        if (confirm('<?php esc_js( esc_html_e( 'Are you sure you want to restart this flashcard set?', 'skylearn-flashcards' ) ); ?>')) {
+            if (typeof window.skylearn_restart_set === 'function') {
+                window.skylearn_restart_set();
+            } else {
+                location.reload();
+            }
+        }
     });
     
     $('.btn-review-difficult').on('click', function() {
-        // TODO: Show only cards marked as difficult
-        console.log('Review difficult cards clicked');
+        // Show only cards marked as difficult
+        if (typeof window.skylearn_review_difficult === 'function') {
+            window.skylearn_review_difficult();
+        } else {
+            console.log('Review difficult cards feature not implemented yet');
+        }
     });
     
+    // Export results (Premium)
+    <?php if ( skylearn_is_premium() ) : ?>
+    $('.btn-export-results').on('click', function() {
+        $('#export-results-modal').show();
+    });
+    
+    $('#confirm-export-results').on('click', function() {
+        var $button = $(this);
+        var originalText = $button.text();
+        
+        $button.prop('disabled', true).text('<?php esc_js( esc_html_e( 'Exporting...', 'skylearn-flashcards' ) ); ?>');
+        
+        var formData = {
+            action: 'skylearn_export_student_results',
+            set_id: <?php echo esc_js( isset( $set_data['id'] ) ? $set_data['id'] : 0 ); ?>,
+            results: resultsData,
+            stats: <?php echo wp_json_encode( $stats ); ?>,
+            format: $('#export-results-format').val(),
+            include_history: $('#export-results-form input[name="include_history"]').is(':checked') ? 1 : 0,
+            include_recommendations: $('#export-results-form input[name="include_recommendations"]').is(':checked') ? 1 : 0,
+            nonce: '<?php echo esc_js( wp_create_nonce( 'skylearn_export_student_results' ) ); ?>'
+        };
+        
+        $.post('<?php echo esc_js( admin_url( 'admin-ajax.php' ) ); ?>', formData)
+            .done(function(response) {
+                if (response.success) {
+                    // Trigger download
+                    var blob = new Blob([response.data.content], { type: response.data.mime_type });
+                    var url = window.URL.createObjectURL(blob);
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.download = response.data.filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    
+                    $('#export-results-modal').hide();
+                } else {
+                    alert(response.data.message || '<?php esc_js( esc_html_e( 'Export failed.', 'skylearn-flashcards' ) ); ?>');
+                }
+            })
+            .fail(function() {
+                alert('<?php esc_js( esc_html_e( 'Export request failed.', 'skylearn-flashcards' ) ); ?>');
+            })
+            .always(function() {
+                $button.prop('disabled', false).text(originalText);
+            });
+    });
+    <?php endif; ?>
+    
     $('.btn-share').on('click', function() {
-        // TODO: Implement sharing functionality
+        var shareText = '<?php echo esc_js( sprintf( esc_html__( 'I just completed %d%% of a flashcard set with %s accuracy using SkyLearn Flashcards!', 'skylearn-flashcards' ), $completion_rate, round( $accuracy, 1 ) ) ); ?>';
+        
         if (navigator.share) {
             navigator.share({
-                title: 'My Study Results',
-                text: 'I just completed ' + resultsData.completionRate + '% of a flashcard set!',
+                title: '<?php echo esc_js( sprintf( esc_html__( 'My Study Results - %s', 'skylearn-flashcards' ), isset( $set_data['title'] ) ? $set_data['title'] : 'Flashcard Set' ) ); ?>',
+                text: shareText,
                 url: window.location.href
             });
         } else {
             // Fallback for browsers without Web Share API
-            alert('<?php esc_js( esc_html_e( 'Sharing functionality will be implemented in a future update.', 'skylearn-flashcards' ) ); ?>');
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(shareText + ' ' + window.location.href).then(function() {
+                    alert('<?php esc_js( esc_html_e( 'Share text copied to clipboard!', 'skylearn-flashcards' ) ); ?>');
+                });
+            } else {
+                prompt('<?php esc_js( esc_html_e( 'Copy this share text:', 'skylearn-flashcards' ) ); ?>', shareText + ' ' + window.location.href);
+            }
         }
     });
     
-    // Track results view
-    // TODO: Send analytics event
+    // Modal functionality
+    $('.modal-close').on('click', function() {
+        $('.skylearn-modal').hide();
+    });
+    
+    $(document).on('click', '.skylearn-modal', function(e) {
+        if (e.target === this) {
+            $(this).hide();
+        }
+    });
+    
+    // Track results view event
+    if (typeof window.skylearn_track_event === 'function') {
+        window.skylearn_track_event('results_viewed', {
+            set_id: <?php echo esc_js( isset( $set_data['id'] ) ? $set_data['id'] : 0 ); ?>,
+            completion_rate: resultsData.completionRate,
+            accuracy: resultsData.accuracy,
+            time_spent: resultsData.timeSpent
+        });
+    }
 });
 </script>

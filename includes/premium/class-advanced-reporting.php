@@ -35,6 +35,9 @@ class SkyLearn_Flashcards_Advanced_Reporting {
 		// Add admin menu hooks
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 		
+		// Enqueue scripts and styles
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_reporting_assets' ) );
+		
 		// AJAX handlers
 		add_action( 'wp_ajax_skylearn_get_report_data', array( $this, 'ajax_get_report_data' ) );
 		add_action( 'wp_ajax_skylearn_export_report', array( $this, 'ajax_export_report' ) );
@@ -66,6 +69,87 @@ class SkyLearn_Flashcards_Advanced_Reporting {
 	 */
 	public function display_reports_page() {
 		include SKYLEARN_FLASHCARDS_PATH . 'includes/premium/views/reporting-page.php';
+	}
+
+	/**
+	 * Enqueue reporting assets
+	 *
+	 * @since    1.0.0
+	 * @param    string   $hook_suffix   Admin page hook suffix
+	 */
+	public function enqueue_reporting_assets( $hook_suffix ) {
+		
+		// Only load on our reporting page
+		if ( $hook_suffix !== 'skylearn-flashcards_page_skylearn-reports' ) {
+			return;
+		}
+		
+		// Enqueue Chart.js from node_modules
+		wp_enqueue_script(
+			'chartjs',
+			SKYLEARN_FLASHCARDS_URL . 'node_modules/chart.js/dist/chart.umd.min.js',
+			array(),
+			'4.3.0',
+			true
+		);
+		
+		// Enqueue reporting CSS
+		wp_enqueue_style(
+			'skylearn-reporting',
+			SKYLEARN_FLASHCARDS_ASSETS . 'css/reporting.css',
+			array(),
+			SKYLEARN_FLASHCARDS_VERSION
+		);
+		
+		// Enqueue reporting JavaScript
+		wp_enqueue_script(
+			'skylearn-reporting',
+			SKYLEARN_FLASHCARDS_ASSETS . 'js/reporting.js',
+			array( 'jquery', 'chartjs' ),
+			SKYLEARN_FLASHCARDS_VERSION,
+			true
+		);
+		
+		// Prepare data for JavaScript
+		$period_days = absint( $_GET['period'] ?? 30 );
+		$analytics_data = $this->get_analytics_data( array(
+			'date_from' => date( 'Y-m-d', strtotime( "-{$period_days} days" ) ),
+			'date_to'   => date( 'Y-m-d' )
+		) );
+		$learning_progress = $this->get_learning_progress();
+		
+		// Localize script with data and translations
+		wp_localize_script( 'skylearn-reporting', 'skylearn_admin', array(
+			'ajaxurl' => admin_url( 'admin-ajax.php' ),
+			'nonces'  => array(
+				'get_report_data' => wp_create_nonce( 'skylearn_reports' ),
+				'export_report'   => wp_create_nonce( 'skylearn_export_report' ),
+			),
+			'i18n'    => array(
+				'views'           => __( 'Views', 'skylearn-flashcards' ),
+				'completions'     => __( 'Completions', 'skylearn-flashcards' ),
+				'study_sessions'  => __( 'Study Sessions', 'skylearn-flashcards' ),
+				'mastered'        => __( 'Mastered', 'skylearn-flashcards' ),
+				'good'            => __( 'Good', 'skylearn-flashcards' ),
+				'learning'        => __( 'Learning', 'skylearn-flashcards' ),
+				'struggling'      => __( 'Struggling', 'skylearn-flashcards' ),
+				'exporting'       => __( 'Exporting...', 'skylearn-flashcards' ),
+				'export_success'  => __( 'Export completed successfully!', 'skylearn-flashcards' ),
+				'export_error'    => __( 'Export request failed.', 'skylearn-flashcards' ),
+				'refreshing'      => __( 'Refreshing data...', 'skylearn-flashcards' ),
+				'refresh_success' => __( 'Data refreshed successfully!', 'skylearn-flashcards' ),
+				'refresh_error'   => __( 'Failed to refresh data.', 'skylearn-flashcards' ),
+				'select_option'   => __( 'Select an option', 'skylearn-flashcards' ),
+			),
+		) );
+		
+		// Add reporting data for charts
+		wp_localize_script( 'skylearn-reporting', 'skylernReportingData', array(
+			'dailyStats'     => $analytics_data['daily_stats'] ?? array(),
+			'studyPatterns'  => $learning_progress['study_patterns'] ?? array(),
+			'masteryLevels'  => $learning_progress['mastery_levels'] ?? array(),
+			'overview'       => $analytics_data['overview'] ?? array(),
+		) );
 	}
 
 	/**
@@ -322,34 +406,52 @@ class SkyLearn_Flashcards_Advanced_Reporting {
 			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'skylearn-flashcards' ) ) );
 		}
 		
-		$export_type = sanitize_text_field( $_POST['export_type'] ?? 'analytics' );
+		$export_type = sanitize_text_field( $_POST['export_type'] ?? 'overview' );
 		$format = sanitize_text_field( $_POST['format'] ?? 'csv' );
+		$date_from = sanitize_text_field( $_POST['date_from'] ?? '' );
+		$date_to = sanitize_text_field( $_POST['date_to'] ?? '' );
+		$set_id = absint( $_POST['set_id'] ?? 0 );
+		
+		// Prepare filter arguments
+		$args = array();
+		if ( $date_from ) $args['date_from'] = $date_from;
+		if ( $date_to ) $args['date_to'] = $date_to;
+		if ( $set_id ) $args['set_id'] = $set_id;
 		
 		// Generate export data
 		$export_data = '';
 		$filename = '';
+		$mime_type = 'text/plain';
 		
 		switch ( $export_type ) {
-			case 'analytics':
-				$data = $this->get_analytics_data();
-				$export_data = $this->format_analytics_export( $data, $format );
-				$filename = 'skylearn-analytics-' . date( 'Y-m-d' ) . '.' . $format;
+			case 'overview':
+			case 'detailed':
+				$data = $this->get_analytics_data( $args );
+				$export_result = $this->format_analytics_export( $data, $format );
+				$export_data = $export_result['content'];
+				$mime_type = $export_result['mime_type'];
+				$filename = 'skylearn-analytics-' . date( 'Y-m-d-H-i-s' ) . '.' . $format;
 				break;
 			case 'progress':
-				$data = $this->get_learning_progress();
-				$export_data = $this->format_progress_export( $data, $format );
-				$filename = 'skylearn-progress-' . date( 'Y-m-d' ) . '.' . $format;
+				$data = $this->get_learning_progress( $args['user_id'] ?? null );
+				$export_result = $this->format_progress_export( $data, $format );
+				$export_data = $export_result['content'];
+				$mime_type = $export_result['mime_type'];
+				$filename = 'skylearn-progress-' . date( 'Y-m-d-H-i-s' ) . '.' . $format;
 				break;
+			default:
+				wp_send_json_error( array( 'message' => __( 'Invalid export type.', 'skylearn-flashcards' ) ) );
 		}
 		
 		if ( $export_data ) {
 			wp_send_json_success( array( 
-				'data' => $export_data,
-				'filename' => $filename,
-				'format' => $format
+				'content'   => $export_data,
+				'filename'  => $filename,
+				'format'    => $format,
+				'mime_type' => $mime_type
 			) );
 		} else {
-			wp_send_json_error( array( 'message' => __( 'Export failed.', 'skylearn-flashcards' ) ) );
+			wp_send_json_error( array( 'message' => __( 'Export failed or no data available.', 'skylearn-flashcards' ) ) );
 		}
 	}
 
@@ -359,26 +461,121 @@ class SkyLearn_Flashcards_Advanced_Reporting {
 	 * @since    1.0.0
 	 * @param    array   $data     Analytics data
 	 * @param    string  $format   Export format
-	 * @return   string            Formatted export data
+	 * @return   array             Array with content and mime_type
 	 */
 	private function format_analytics_export( $data, $format ) {
 		
-		if ( $format === 'csv' ) {
-			$csv = "Date,Views,Completions,Average Accuracy,Total Time (seconds)\n";
-			foreach ( $data['daily_stats'] as $day ) {
-				$csv .= sprintf( 
-					"%s,%d,%d,%.2f,%d\n",
-					$day['date'],
-					$day['views'],
-					$day['completions'],
-					$day['avg_accuracy'] ?: 0,
-					$day['total_time'] ?: 0
-				);
-			}
-			return $csv;
+		switch ( $format ) {
+			case 'csv':
+				return $this->format_analytics_csv( $data );
+			case 'json':
+				return $this->format_analytics_json( $data );
+			default:
+				return array( 'content' => '', 'mime_type' => 'text/plain' );
+		}
+	}
+
+	/**
+	 * Format analytics data as CSV
+	 *
+	 * @since    1.0.0
+	 * @param    array   $data     Analytics data
+	 * @return   array             Array with content and mime_type
+	 */
+	private function format_analytics_csv( $data ) {
+		$csv = '';
+		
+		// Overview section
+		$csv .= "\"SkyLearn Flashcards Analytics Report\"\n";
+		$csv .= "\"Generated: " . current_time( 'Y-m-d H:i:s' ) . "\"\n";
+		$csv .= "\"Period: " . $data['date_range']['from'] . " to " . $data['date_range']['to'] . "\"\n\n";
+		
+		// Overview statistics
+		$csv .= "\"OVERVIEW STATISTICS\"\n";
+		$csv .= "\"Metric\",\"Value\"\n";
+		$csv .= "\"Total Views\"," . $data['overview']['total_views'] . "\n";
+		$csv .= "\"Total Completions\"," . $data['overview']['total_completions'] . "\n";
+		$csv .= "\"Completion Rate\"," . $data['overview']['completion_rate'] . "%\n";
+		$csv .= "\"Average Accuracy\"," . $data['overview']['average_accuracy'] . "%\n";
+		$csv .= "\"Total Time Spent (seconds)\"," . $data['overview']['total_time_spent'] . "\n\n";
+		
+		// Daily statistics
+		$csv .= "\"DAILY STATISTICS\"\n";
+		$csv .= "\"Date\",\"Views\",\"Completions\",\"Average Accuracy (%)\",\"Total Time (seconds)\"\n";
+		foreach ( $data['daily_stats'] as $day ) {
+			$csv .= sprintf( 
+				'"%s",%d,%d,%.2f,%d' . "\n",
+				$day['date'],
+				$day['views'] ?: 0,
+				$day['completions'] ?: 0,
+				$day['avg_accuracy'] ?: 0,
+				$day['total_time'] ?: 0
+			);
 		}
 		
-		return '';
+		// Top performing sets
+		if ( ! empty( $data['top_sets'] ) ) {
+			$csv .= "\n\"TOP PERFORMING SETS\"\n";
+			$csv .= "\"Set Title\",\"Views\",\"Completions\",\"Average Accuracy (%)\"\n";
+			foreach ( $data['top_sets'] as $set ) {
+				$csv .= sprintf(
+					'"%s",%d,%d,%.2f' . "\n",
+					str_replace( '"', '""', $set['title'] ),
+					$set['views'] ?: 0,
+					$set['completions'] ?: 0,
+					$set['avg_accuracy'] ?: 0
+				);
+			}
+		}
+		
+		// User engagement
+		if ( ! empty( $data['user_stats'] ) ) {
+			$csv .= "\n\"USER ENGAGEMENT\"\n";
+			$csv .= "\"Metric\",\"Value\"\n";
+			$csv .= "\"Unique Users\"," . ( $data['user_stats']['unique_users'] ?: 0 ) . "\n";
+			$csv .= "\"Unique Sessions\"," . ( $data['user_stats']['unique_sessions'] ?: 0 ) . "\n";
+			$csv .= "\"Average Session Time (seconds)\"," . ( $data['user_stats']['avg_session_time'] ?: 0 ) . "\n";
+		}
+		
+		// Lead statistics (if available)
+		if ( ! empty( $data['lead_stats'] ) ) {
+			$csv .= "\n\"LEAD CONVERSION\"\n";
+			$csv .= "\"Metric\",\"Value\"\n";
+			$csv .= "\"Total Leads\"," . ( $data['lead_stats']['total_leads'] ?: 0 ) . "\n";
+			$csv .= "\"New Leads\"," . ( $data['lead_stats']['new_leads'] ?: 0 ) . "\n";
+			$csv .= "\"Contacted Leads\"," . ( $data['lead_stats']['contacted_leads'] ?: 0 ) . "\n";
+			$csv .= "\"Converted Leads\"," . ( $data['lead_stats']['converted_leads'] ?: 0 ) . "\n";
+		}
+		
+		return array(
+			'content'   => $csv,
+			'mime_type' => 'text/csv'
+		);
+	}
+
+	/**
+	 * Format analytics data as JSON
+	 *
+	 * @since    1.0.0
+	 * @param    array   $data     Analytics data
+	 * @return   array             Array with content and mime_type
+	 */
+	private function format_analytics_json( $data ) {
+		$export_data = array(
+			'report_type' => 'analytics',
+			'generated_at' => current_time( 'c' ),
+			'date_range' => $data['date_range'],
+			'overview' => $data['overview'],
+			'daily_statistics' => $data['daily_stats'],
+			'top_sets' => $data['top_sets'],
+			'user_engagement' => $data['user_stats'] ?? array(),
+			'lead_conversion' => $data['lead_stats'] ?? array(),
+		);
+		
+		return array(
+			'content'   => wp_json_encode( $export_data, JSON_PRETTY_PRINT ),
+			'mime_type' => 'application/json'
+		);
 	}
 
 	/**
@@ -387,19 +584,77 @@ class SkyLearn_Flashcards_Advanced_Reporting {
 	 * @since    1.0.0
 	 * @param    array   $data     Progress data
 	 * @param    string  $format   Export format
-	 * @return   string            Formatted export data
+	 * @return   array             Array with content and mime_type
 	 */
 	private function format_progress_export( $data, $format ) {
 		
-		if ( $format === 'csv' ) {
-			$csv = "Mastery Level,Count\n";
+		switch ( $format ) {
+			case 'csv':
+				return $this->format_progress_csv( $data );
+			case 'json':
+				return $this->format_progress_json( $data );
+			default:
+				return array( 'content' => '', 'mime_type' => 'text/plain' );
+		}
+	}
+
+	/**
+	 * Format progress data as CSV
+	 *
+	 * @since    1.0.0
+	 * @param    array   $data     Progress data
+	 * @return   array             Array with content and mime_type
+	 */
+	private function format_progress_csv( $data ) {
+		$csv = '';
+		
+		// Header
+		$csv .= "\"SkyLearn Flashcards Learning Progress Report\"\n";
+		$csv .= "\"Generated: " . current_time( 'Y-m-d H:i:s' ) . "\"\n\n";
+		
+		// Mastery levels
+		$csv .= "\"MASTERY LEVELS\"\n";
+		$csv .= "\"Mastery Level\",\"Count\"\n";
+		if ( ! empty( $data['mastery_levels'] ) ) {
 			foreach ( $data['mastery_levels'] as $level ) {
-				$csv .= sprintf( "%s,%d\n", $level['level'], $level['count'] );
+				$csv .= sprintf( '"%s",%d' . "\n", ucfirst( $level['level'] ), $level['count'] );
 			}
-			return $csv;
 		}
 		
-		return '';
+		// Study patterns
+		if ( ! empty( $data['study_patterns'] ) ) {
+			$csv .= "\n\"STUDY PATTERNS (BY HOUR)\"\n";
+			$csv .= "\"Hour\",\"Sessions\"\n";
+			foreach ( $data['study_patterns'] as $pattern ) {
+				$csv .= sprintf( '"%s:00",%d' . "\n", $pattern['hour'], $pattern['sessions'] );
+			}
+		}
+		
+		return array(
+			'content'   => $csv,
+			'mime_type' => 'text/csv'
+		);
+	}
+
+	/**
+	 * Format progress data as JSON
+	 *
+	 * @since    1.0.0
+	 * @param    array   $data     Progress data
+	 * @return   array             Array with content and mime_type
+	 */
+	private function format_progress_json( $data ) {
+		$export_data = array(
+			'report_type' => 'learning_progress',
+			'generated_at' => current_time( 'c' ),
+			'mastery_levels' => $data['mastery_levels'] ?? array(),
+			'study_patterns' => $data['study_patterns'] ?? array(),
+		);
+		
+		return array(
+			'content'   => wp_json_encode( $export_data, JSON_PRETTY_PRINT ),
+			'mime_type' => 'application/json'
+		);
 	}
 
 }

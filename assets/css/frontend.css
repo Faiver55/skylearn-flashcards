@@ -735,6 +735,430 @@
     margin-top: 5px;
 }
 
+/* Enhanced Results Page (Premium) */
+.skylearn-results-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.skylearn-results-header {
+    background: linear-gradient(135deg, var(--skylearn-primary), var(--skylearn-accent));
+    color: white;
+    padding: 2rem;
+    border-radius: var(--skylearn-radius);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.results-icon {
+    font-size: 3rem;
+}
+
+.success-icon {
+    color: #27ae60;
+}
+
+.warning-icon {
+    color: #f39c12;
+}
+
+.info-icon {
+    color: #3498db;
+}
+
+.results-title h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.results-subtitle {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1.125rem;
+}
+
+.skylearn-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.skylearn-stat-card {
+    background: white;
+    border-radius: var(--skylearn-radius);
+    padding: 1.5rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--skylearn-border);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.skylearn-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.skylearn-stat-card.primary {
+    border-left: 4px solid var(--skylearn-primary);
+}
+
+.stat-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.stat-icon {
+    color: var(--skylearn-primary);
+    font-size: 1.5rem;
+}
+
+.stat-header h3 {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--skylearn-text);
+}
+
+.stat-content {
+    margin-bottom: 1rem;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--skylearn-primary);
+    line-height: 1;
+    display: block;
+}
+
+.stat-detail {
+    font-size: 0.875rem;
+    color: #666;
+    margin-top: 0.5rem;
+}
+
+.stat-progress {
+    height: 8px;
+    background: var(--skylearn-border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--skylearn-border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--skylearn-primary), var(--skylearn-accent));
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.knowledge-breakdown {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.knowledge-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.knowledge-count {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.knowledge-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+.knowledge-item.excellent .knowledge-count {
+    color: #27ae60;
+}
+
+.knowledge-item.good .knowledge-count {
+    color: var(--skylearn-primary);
+}
+
+.knowledge-item.poor .knowledge-count {
+    color: #e74c3c;
+}
+
+.skylearn-recommendations {
+    background: white;
+    border-radius: var(--skylearn-radius);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--skylearn-border);
+}
+
+.skylearn-recommendations h3 {
+    margin: 0 0 1rem 0;
+    color: var(--skylearn-text);
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.recommendation-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.recommendation-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--skylearn-background);
+    border-radius: 8px;
+    border-left: 4px solid var(--skylearn-primary);
+}
+
+.recommendation-item .dashicons {
+    color: var(--skylearn-primary);
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+}
+
+.recommendation-content strong {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--skylearn-text);
+    font-weight: 600;
+}
+
+.recommendation-content p {
+    margin: 0;
+    color: #666;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.skylearn-results-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+}
+
+.skylearn-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    line-height: 1;
+}
+
+.skylearn-btn:focus {
+    outline: 2px solid var(--skylearn-primary);
+    outline-offset: 2px;
+}
+
+.skylearn-btn-primary {
+    background: var(--skylearn-primary);
+    color: white;
+}
+
+.skylearn-btn-primary:hover {
+    background: #2980b9;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.skylearn-btn-secondary {
+    background: #f8f9fa;
+    color: #666;
+    border: 1px solid var(--skylearn-border);
+}
+
+.skylearn-btn-secondary:hover {
+    background: #e9ecef;
+    color: #333;
+    transform: translateY(-1px);
+}
+
+.skylearn-btn-outline {
+    background: transparent;
+    color: var(--skylearn-primary);
+    border: 2px solid var(--skylearn-primary);
+}
+
+.skylearn-btn-outline:hover {
+    background: var(--skylearn-primary);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.skylearn-progress-history {
+    background: white;
+    border-radius: var(--skylearn-radius);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--skylearn-border);
+}
+
+.skylearn-progress-history h3 {
+    margin: 0 0 1rem 0;
+    color: var(--skylearn-text);
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.progress-chart-container {
+    height: 250px;
+    position: relative;
+}
+
+/* Modal Styles */
+.skylearn-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.skylearn-modal.show,
+.skylearn-modal[style*="display: block"] {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: white;
+    border-radius: var(--skylearn-radius);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.skylearn-modal.show .modal-content,
+.skylearn-modal[style*="display: block"] .modal-content {
+    transform: scale(1);
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--skylearn-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(90deg, #f8f9fa, #ffffff);
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: var(--skylearn-text);
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+    background: var(--skylearn-border);
+    color: var(--skylearn-text);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--skylearn-border);
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    background: var(--skylearn-background);
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--skylearn-text);
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--skylearn-border);
+    border-radius: 4px;
+    font-size: 0.875rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--skylearn-primary);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.form-group input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .skylearn-flashcard {
