@@ -1,0 +1,25 @@
+# SkyLearn Flashcards Icon Logo Placeholder
+# ==========================================
+# 
+# This is a placeholder for the icon logo image.
+# Replace this file with the actual icon logo:
+# - Format: PNG (recommended) or SVG
+# - Dimensions: 64x64px (square)
+# - Background: Transparent
+# - Colors: Primary #3498db, Accent #f39c12
+# 
+# File should contain:
+# - SkyLearn icon/symbol
+# - Clean, minimal design
+# - Scalable for different sizes
+# 
+# Usage:
+# - WordPress admin menu icon
+# - Favicon
+# - Mobile app icons
+# - Social media profiles
+# 
+# @package SkyLearn_Flashcards
+# @subpackage Assets/Images
+# @author Ferdous Khalifa
+# @copyright 2024 Skyian LLC

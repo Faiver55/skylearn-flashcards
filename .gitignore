@@ -1,10 +1,7 @@
-# Wordpress - ignore core, configuration, examples, uploads and logs.
-# https://github.com/github/gitignore/blob/main/WordPress.gitignore
+# WordPress Plugin Development - SkyLearn Flashcards
+# =================================================
 
-# Core
-#
-# Note: if you want to stage/commit WP core files
-# you can delete this whole section/until Configuration.
+# WordPress Core Files (if developing in WP environment)
 /wp-admin/
 /wp-content/index.php
 /wp-content/languages
@@ -16,33 +13,119 @@
 /readme.html
 /wp-*.php
 /xmlrpc.php
-
-# Configuration
 wp-config.php
-
-# Example themes
-/wp-content/themes/twenty*/
-
-# Example plugin
-/wp-content/plugins/hello.php
-
-# Uploads
-/wp-content/uploads/
-
-# Log files
-*.log
-
-# htaccess
 /.htaccess
 
-# All plugins
-#
-# Note: If you wish to whitelist plugins,
-# uncomment the next line
-#/wp-content/plugins
+# WordPress Themes & Other Plugins (if in WP environment)
+/wp-content/themes/twenty*/
+/wp-content/plugins/hello.php
+/wp-content/uploads/
 
-# All themes
-#
-# Note: If you wish to whitelist themes,
-# uncomment the next line
-#/wp-content/themes
+# Development Dependencies
+# ------------------------
+node_modules/
+vendor/
+.vendor/
+composer.phar
+package-lock.json
+yarn.lock
+composer.lock
+
+# Build & Compiled Files
+# ----------------------
+/dist/
+/build/
+/assets/css/*.min.css
+/assets/js/*.min.js
+*.map
+*.min.css
+*.min.js
+
+# Development Tools
+# -----------------
+.sass-cache/
+.npm/
+.tmp/
+.temp/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE & Editor Files
+# ------------------
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.atom/
+.brackets.json
+
+# OS Generated Files
+# ------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Log Files
+# ---------
+*.log
+error_log
+debug.log
+wp-content/debug.log
+
+# Backup Files
+# ------------
+*.bak
+*.backup
+*.old
+*.orig
+*.tmp
+*.swp
+*~
+
+# Environment & Config Files
+# ---------------------------
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+config.local.php
+local-config.php
+
+# Testing
+# -------
+/tests/coverage/
+/phpunit.xml
+/phpcs.xml
+/.phpunit.result.cache
+/clover.xml
+
+# Documentation
+# -------------
+/docs/api/
+/docs/build/
+
+# Temporary Files
+# ---------------
+/tmp/
+/temp/
+*.cache
+
+# Plugin-Specific
+# ----------------
+# Exclude any sensitive data or keys
+/includes/config/local-*.php
+/premium-keys.php
+/license-keys.txt
+
+# WordPress.org SVN (if submitting to repository)
+/.svn/
+/tags/
+/trunk/
+/branches/

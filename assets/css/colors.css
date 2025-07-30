@@ -1,0 +1,160 @@
+/* SkyLearn Flashcards - Color Scheme */
+/* =================================== */
+
+/**
+ * Color definitions and theme variables for SkyLearn Flashcards
+ * 
+ * @package SkyLearn_Flashcards
+ * @subpackage Assets/CSS
+ * @author Ferdous Khalifa
+ * @copyright 2024 Skyian LLC
+ */
+
+/* Primary Color Palette */
+:root {
+    /* Brand Colors */
+    --skylearn-primary: #3498db;       /* Sky Blue - Main brand color */
+    --skylearn-primary-light: #5dade2; /* Lighter sky blue */
+    --skylearn-primary-dark: #2980b9;  /* Darker sky blue */
+    
+    --skylearn-accent: #f39c12;        /* Soft Orange - Accent color */
+    --skylearn-accent-light: #f5b041;  /* Lighter orange */
+    --skylearn-accent-dark: #e67e22;   /* Darker orange */
+    
+    /* Neutral Colors */
+    --skylearn-background: #f8f9fa;    /* Light Gray - Background */
+    --skylearn-background-dark: #e9ecef; /* Darker background */
+    
+    --skylearn-text: #222831;          /* Dark Slate - Primary text */
+    --skylearn-text-light: #495057;    /* Lighter text */
+    --skylearn-text-muted: #6c757d;    /* Muted text */
+    
+    /* UI Colors */
+    --skylearn-border: #e9ecef;        /* Border color */
+    --skylearn-border-dark: #dee2e6;   /* Darker border */
+    
+    --skylearn-white: #ffffff;         /* Pure white */
+    --skylearn-black: #000000;         /* Pure black */
+    
+    /* Status Colors */
+    --skylearn-success: #27ae60;       /* Success green */
+    --skylearn-success-light: #58d68d;
+    --skylearn-success-dark: #229954;
+    
+    --skylearn-warning: #f1c40f;       /* Warning yellow */
+    --skylearn-warning-light: #f7dc6f;
+    --skylearn-warning-dark: #d4ac0d;
+    
+    --skylearn-error: #e74c3c;         /* Error red */
+    --skylearn-error-light: #ec7063;
+    --skylearn-error-dark: #c0392b;
+    
+    --skylearn-info: #3498db;          /* Info blue (same as primary) */
+    --skylearn-info-light: #5dade2;
+    --skylearn-info-dark: #2980b9;
+}
+
+/* Color Classes */
+.skylearn-color-primary { color: var(--skylearn-primary) !important; }
+.skylearn-color-accent { color: var(--skylearn-accent) !important; }
+.skylearn-color-text { color: var(--skylearn-text) !important; }
+.skylearn-color-success { color: var(--skylearn-success) !important; }
+.skylearn-color-warning { color: var(--skylearn-warning) !important; }
+.skylearn-color-error { color: var(--skylearn-error) !important; }
+
+.skylearn-bg-primary { background-color: var(--skylearn-primary) !important; }
+.skylearn-bg-accent { background-color: var(--skylearn-accent) !important; }
+.skylearn-bg-background { background-color: var(--skylearn-background) !important; }
+.skylearn-bg-success { background-color: var(--skylearn-success) !important; }
+.skylearn-bg-warning { background-color: var(--skylearn-warning) !important; }
+.skylearn-bg-error { background-color: var(--skylearn-error) !important; }
+
+.skylearn-border-primary { border-color: var(--skylearn-primary) !important; }
+.skylearn-border-accent { border-color: var(--skylearn-accent) !important; }
+.skylearn-border-default { border-color: var(--skylearn-border) !important; }
+
+/* Dark Mode Support (Future Enhancement) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --skylearn-background: #212529;
+        --skylearn-background-dark: #343a40;
+        --skylearn-text: #f8f9fa;
+        --skylearn-text-light: #e9ecef;
+        --skylearn-text-muted: #adb5bd;
+        --skylearn-border: #495057;
+        --skylearn-border-dark: #6c757d;
+    }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    :root {
+        --skylearn-primary: #0066cc;
+        --skylearn-accent: #ff6600;
+        --skylearn-text: #000000;
+        --skylearn-background: #ffffff;
+        --skylearn-border: #000000;
+    }
+}
+
+/* Gradients */
+.skylearn-gradient-primary {
+    background: linear-gradient(135deg, var(--skylearn-primary), var(--skylearn-primary-light));
+}
+
+.skylearn-gradient-accent {
+    background: linear-gradient(135deg, var(--skylearn-accent), var(--skylearn-accent-light));
+}
+
+.skylearn-gradient-brand {
+    background: linear-gradient(135deg, var(--skylearn-primary), var(--skylearn-accent));
+}
+
+/* Box Shadows */
+.skylearn-shadow-primary {
+    box-shadow: 0 4px 20px rgba(52, 152, 219, 0.15);
+}
+
+.skylearn-shadow-accent {
+    box-shadow: 0 4px 20px rgba(243, 156, 18, 0.15);
+}
+
+.skylearn-shadow-soft {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.skylearn-shadow-medium {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.skylearn-shadow-strong {
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Opacity Variations */
+.skylearn-opacity-10 { opacity: 0.1; }
+.skylearn-opacity-25 { opacity: 0.25; }
+.skylearn-opacity-50 { opacity: 0.5; }
+.skylearn-opacity-75 { opacity: 0.75; }
+.skylearn-opacity-90 { opacity: 0.9; }
+
+/* Color scheme for different themes (placeholder for future customization) */
+.skylearn-theme-blue {
+    --skylearn-primary: #3498db;
+    --skylearn-accent: #f39c12;
+}
+
+.skylearn-theme-green {
+    --skylearn-primary: #27ae60;
+    --skylearn-accent: #f1c40f;
+}
+
+.skylearn-theme-purple {
+    --skylearn-primary: #9b59b6;
+    --skylearn-accent: #e67e22;
+}
+
+.skylearn-theme-red {
+    --skylearn-primary: #e74c3c;
+    --skylearn-accent: #3498db;
+}
