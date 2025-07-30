@@ -434,6 +434,222 @@ class SkyLearn_Flashcards_Leads {
 		
 		return (int) $wpdb->get_var( $query );
 	}
+
+	/**
+	 * Get lead statistics
+	 *
+	 * @since 1.0.0
+	 * @return array Statistics data
+	 */
+	public function get_lead_statistics() {
+		global $wpdb;
+		
+		$table_name = $wpdb->prefix . 'skylearn_flashcard_leads';
+		$analytics_table = $wpdb->prefix . 'skylearn_flashcard_analytics';
+		
+		// Total leads
+		$total_leads = $this->get_leads_count();
+		
+		// New today
+		$new_today = $this->get_leads_count( array(
+			'date_from' => current_time( 'Y-m-d' ) . ' 00:00:00',
+			'date_to'   => current_time( 'Y-m-d' ) . ' 23:59:59',
+		) );
+		
+		// New this week
+		$week_start = date( 'Y-m-d', strtotime( 'monday this week' ) ) . ' 00:00:00';
+		$week_end = date( 'Y-m-d', strtotime( 'sunday this week' ) ) . ' 23:59:59';
+		$new_this_week = $this->get_leads_count( array(
+			'date_from' => $week_start,
+			'date_to'   => $week_end,
+		) );
+		
+		// Calculate conversion rate (leads / total completions)
+		$total_completions = $wpdb->get_var( $wpdb->prepare(
+			"SELECT COUNT(*) FROM {$analytics_table} WHERE action = %s",
+			'complete'
+		) );
+		
+		$conversion_rate = $total_completions > 0 ? ( $total_leads / $total_completions ) * 100 : 0;
+		
+		return array(
+			'total_leads'     => $total_leads,
+			'new_today'       => $new_today,
+			'new_this_week'   => $new_this_week,
+			'conversion_rate' => $conversion_rate,
+		);
+	}
+
+	/**
+	 * AJAX handler to get lead details
+	 *
+	 * @since 1.0.0
+	 */
+	public function ajax_get_lead_details() {
+		
+		// Verify nonce
+		if ( ! wp_verify_nonce( $_POST['nonce'] ?? '', 'skylearn_lead_details' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'skylearn-flashcards' ) ) );
+		}
+		
+		// Check permissions
+		if ( ! current_user_can( 'manage_skylearn_leads' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'skylearn-flashcards' ) ) );
+		}
+		
+		$lead_id = absint( $_POST['lead_id'] ?? 0 );
+		if ( ! $lead_id ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid lead ID.', 'skylearn-flashcards' ) ) );
+		}
+		
+		$lead = $this->get_lead( $lead_id );
+		if ( ! $lead ) {
+			wp_send_json_error( array( 'message' => __( 'Lead not found.', 'skylearn-flashcards' ) ) );
+		}
+		
+		// Get associated flashcard set
+		$set_title = get_the_title( $lead['set_id'] ) ?: __( 'Unknown Set', 'skylearn-flashcards' );
+		
+		// Build lead details HTML
+		ob_start();
+		?>
+		<table class="form-table">
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Name', 'skylearn-flashcards' ); ?></th>
+				<td><?php echo esc_html( $lead['name'] ?: __( '(No name provided)', 'skylearn-flashcards' ) ); ?></td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Email', 'skylearn-flashcards' ); ?></th>
+				<td><a href="mailto:<?php echo esc_attr( $lead['email'] ); ?>"><?php echo esc_html( $lead['email'] ); ?></a></td>
+			</tr>
+			<?php if ( ! empty( $lead['phone'] ) ) : ?>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Phone', 'skylearn-flashcards' ); ?></th>
+				<td><?php echo esc_html( $lead['phone'] ); ?></td>
+			</tr>
+			<?php endif; ?>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Flashcard Set', 'skylearn-flashcards' ); ?></th>
+				<td>
+					<a href="<?php echo esc_url( admin_url( 'post.php?post=' . $lead['set_id'] . '&action=edit' ) ); ?>">
+						<?php echo esc_html( $set_title ); ?>
+					</a>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Source', 'skylearn-flashcards' ); ?></th>
+				<td><?php echo esc_html( $lead['source'] ); ?></td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Status', 'skylearn-flashcards' ); ?></th>
+				<td>
+					<span class="status-badge status-<?php echo esc_attr( $lead['status'] ); ?>">
+						<?php echo esc_html( ucfirst( $lead['status'] ) ); ?>
+					</span>
+				</td>
+			</tr>
+			<?php if ( ! empty( $lead['tags'] ) ) : ?>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Tags', 'skylearn-flashcards' ); ?></th>
+				<td><?php echo esc_html( $lead['tags'] ); ?></td>
+			</tr>
+			<?php endif; ?>
+			<?php if ( ! empty( $lead['message'] ) ) : ?>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Additional Info', 'skylearn-flashcards' ); ?></th>
+				<td><?php echo esc_html( $lead['message'] ); ?></td>
+			</tr>
+			<?php endif; ?>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'IP Address', 'skylearn-flashcards' ); ?></th>
+				<td><?php echo esc_html( $lead['ip_address'] ); ?></td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Date Created', 'skylearn-flashcards' ); ?></th>
+				<td><?php echo esc_html( date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $lead['created_at'] ) ) ); ?></td>
+			</tr>
+			<tr>
+				<th scope="row"><?php esc_html_e( 'Last Updated', 'skylearn-flashcards' ); ?></th>
+				<td><?php echo esc_html( date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $lead['updated_at'] ) ) ); ?></td>
+			</tr>
+		</table>
+		<?php
+		$html = ob_get_clean();
+		
+		wp_send_json_success( array( 'html' => $html ) );
+		
+	}
+
+	/**
+	 * AJAX handler to update lead status
+	 *
+	 * @since 1.0.0
+	 */
+	public function ajax_update_lead_status() {
+		
+		// Verify nonce
+		if ( ! wp_verify_nonce( $_POST['nonce'] ?? '', 'skylearn_update_lead' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'skylearn-flashcards' ) ) );
+		}
+		
+		// Check permissions
+		if ( ! current_user_can( 'manage_skylearn_leads' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'skylearn-flashcards' ) ) );
+		}
+		
+		$lead_id = absint( $_POST['lead_id'] ?? 0 );
+		$status = sanitize_text_field( $_POST['status'] ?? '' );
+		
+		if ( ! $lead_id ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid lead ID.', 'skylearn-flashcards' ) ) );
+		}
+		
+		$allowed_statuses = array( 'new', 'contacted', 'converted' );
+		if ( ! in_array( $status, $allowed_statuses ) ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid status.', 'skylearn-flashcards' ) ) );
+		}
+		
+		$updated = $this->update_lead( $lead_id, array( 'status' => $status ) );
+		
+		if ( $updated ) {
+			wp_send_json_success( array( 'message' => __( 'Lead status updated successfully.', 'skylearn-flashcards' ) ) );
+		} else {
+			wp_send_json_error( array( 'message' => __( 'Failed to update lead status.', 'skylearn-flashcards' ) ) );
+		}
+		
+	}
+
+	/**
+	 * AJAX handler to delete a lead
+	 *
+	 * @since 1.0.0
+	 */
+	public function ajax_delete_lead() {
+		
+		// Verify nonce
+		if ( ! wp_verify_nonce( $_POST['nonce'] ?? '', 'skylearn_delete_lead' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'skylearn-flashcards' ) ) );
+		}
+		
+		// Check permissions
+		if ( ! current_user_can( 'manage_skylearn_leads' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'skylearn-flashcards' ) ) );
+		}
+		
+		$lead_id = absint( $_POST['lead_id'] ?? 0 );
+		if ( ! $lead_id ) {
+			wp_send_json_error( array( 'message' => __( 'Invalid lead ID.', 'skylearn-flashcards' ) ) );
+		}
+		
+		$deleted = $this->delete_lead( $lead_id );
+		
+		if ( $deleted ) {
+			wp_send_json_success( array( 'message' => __( 'Lead deleted successfully.', 'skylearn-flashcards' ) ) );
+		} else {
+			wp_send_json_error( array( 'message' => __( 'Failed to delete lead.', 'skylearn-flashcards' ) ) );
+		}
+		
+	}
 	}
 
 	/**
