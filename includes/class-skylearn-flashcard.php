@@ -234,6 +234,10 @@ class SkyLearn_Flashcard {
 			$this->loader->add_action( 'wp_ajax_skylearn_get_lead_details', $leads, 'ajax_get_lead_details' );
 			$this->loader->add_action( 'wp_ajax_skylearn_update_lead_status', $leads, 'ajax_update_lead_status' );
 			$this->loader->add_action( 'wp_ajax_skylearn_delete_lead', $leads, 'ajax_delete_lead' );
+			
+			// Advanced reporting AJAX hooks
+			$reporting = new SkyLearn_Flashcards_Advanced_Reporting();
+			$this->loader->add_action( 'wp_ajax_skylearn_export_student_results', $reporting, 'ajax_export_student_results' );
 		}
 		
 		// Add set limit enforcement hook

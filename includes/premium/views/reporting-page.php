@@ -304,6 +304,39 @@ $learning_progress = $reporting_instance->get_learning_progress();
                         <option value="json"><?php esc_html_e( 'JSON', 'skylearn-flashcards' ); ?></option>
                     </select>
                 </div>
+                <div class="form-group">
+                    <label for="export-date-from"><?php esc_html_e( 'Date From (optional):', 'skylearn-flashcards' ); ?></label>
+                    <input type="date" id="export-date-from" name="date_from" class="form-control" 
+                           max="<?php echo esc_attr( date( 'Y-m-d' ) ); ?>">
+                </div>
+                <div class="form-group">
+                    <label for="export-date-to"><?php esc_html_e( 'Date To (optional):', 'skylearn-flashcards' ); ?></label>
+                    <input type="date" id="export-date-to" name="date_to" class="form-control" 
+                           max="<?php echo esc_attr( date( 'Y-m-d' ) ); ?>">
+                </div>
+                <div class="form-group">
+                    <label for="export-set-filter"><?php esc_html_e( 'Specific Set (optional):', 'skylearn-flashcards' ); ?></label>
+                    <select id="export-set-filter" name="set_filter" class="form-control">
+                        <option value=""><?php esc_html_e( 'All Sets', 'skylearn-flashcards' ); ?></option>
+                        <?php
+                        // Get available flashcard sets
+                        $sets = get_posts( array(
+                            'post_type'      => 'flashcard_set',
+                            'post_status'    => 'publish',
+                            'posts_per_page' => -1,
+                            'orderby'        => 'title',
+                            'order'          => 'ASC'
+                        ) );
+                        foreach ( $sets as $set ) {
+                            printf(
+                                '<option value="%d">%s</option>',
+                                esc_attr( $set->ID ),
+                                esc_html( $set->post_title )
+                            );
+                        }
+                        ?>
+                    </select>
+                </div>
             </form>
         </div>
         <div class="modal-footer">
@@ -312,121 +345,3 @@ $learning_progress = $reporting_instance->get_learning_progress();
         </div>
     </div>
 </div>
-
-<script type="text/javascript">
-jQuery(document).ready(function($) {
-    // Initialize charts if Chart.js is available
-    if (typeof Chart !== 'undefined') {
-        
-        // Daily Activity Chart
-        var dailyCtx = document.getElementById('daily-activity-chart');
-        if (dailyCtx) {
-            var dailyData = <?php echo json_encode( $analytics_data['daily_stats'] ); ?>;
-            var labels = dailyData.map(function(item) { return item.date; });
-            var viewsData = dailyData.map(function(item) { return parseInt(item.views) || 0; });
-            var completionsData = dailyData.map(function(item) { return parseInt(item.completions) || 0; });
-            
-            new Chart(dailyCtx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: '<?php esc_js( esc_html_e( 'Views', 'skylearn-flashcards' ) ); ?>',
-                        data: viewsData,
-                        borderColor: '<?php echo esc_js( SKYLEARN_FLASHCARDS_COLOR_PRIMARY ); ?>',
-                        backgroundColor: '<?php echo esc_js( SKYLEARN_FLASHCARDS_COLOR_PRIMARY ); ?>20',
-                        tension: 0.4
-                    }, {
-                        label: '<?php esc_js( esc_html_e( 'Completions', 'skylearn-flashcards' ) ); ?>',
-                        data: completionsData,
-                        borderColor: '<?php echo esc_js( SKYLEARN_FLASHCARDS_COLOR_ACCENT ); ?>',
-                        backgroundColor: '<?php echo esc_js( SKYLEARN_FLASHCARDS_COLOR_ACCENT ); ?>20',
-                        tension: 0.4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
-        
-        // Study Pattern Chart
-        var patternCtx = document.getElementById('study-pattern-chart');
-        if (patternCtx && <?php echo ! empty( $learning_progress['study_patterns'] ) ? 'true' : 'false'; ?>) {
-            var patternData = <?php echo json_encode( $learning_progress['study_patterns'] ?? array() ); ?>;
-            var hourLabels = patternData.map(function(item) { return item.hour + ':00'; });
-            var sessionData = patternData.map(function(item) { return parseInt(item.sessions) || 0; });
-            
-            new Chart(patternCtx, {
-                type: 'bar',
-                data: {
-                    labels: hourLabels,
-                    datasets: [{
-                        label: '<?php esc_js( esc_html_e( 'Study Sessions', 'skylearn-flashcards' ) ); ?>',
-                        data: sessionData,
-                        backgroundColor: '<?php echo esc_js( SKYLEARN_FLASHCARDS_COLOR_PRIMARY ); ?>60'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
-    }
-    
-    // Export functionality
-    $('#export-report').on('click', function() {
-        $('#export-modal').show();
-    });
-    
-    $('#confirm-export').on('click', function() {
-        var formData = {
-            action: 'skylearn_export_report',
-            export_type: $('#export-type').val(),
-            format: $('#export-format').val(),
-            nonce: '<?php echo esc_js( wp_create_nonce( 'skylearn_export_report' ) ); ?>'
-        };
-        
-        $.post(ajaxurl, formData, function(response) {
-            if (response.success) {
-                // Trigger download
-                var blob = new Blob([response.data.data], { type: 'text/plain' });
-                var url = window.URL.createObjectURL(blob);
-                var a = document.createElement('a');
-                a.href = url;
-                a.download = response.data.filename;
-                a.click();
-                window.URL.revokeObjectURL(url);
-                
-                $('#export-modal').hide();
-            } else {
-                alert(response.data.message || '<?php esc_js( esc_html_e( 'Export failed.', 'skylearn-flashcards' ) ); ?>');
-            }
-        }).fail(function() {
-            alert('<?php esc_js( esc_html_e( 'Export request failed.', 'skylearn-flashcards' ) ); ?>');
-        });
-    });
-    
-    // Modal close functionality
-    $('.modal-close').on('click', function() {
-        $('.skylearn-modal').hide();
-    });
-    
-    // Refresh data
-    $('#refresh-data').on('click', function() {
-        location.reload();
-    });
-    
-    console.log('Advanced Reporting page loaded with real data');
-});
-</script>
