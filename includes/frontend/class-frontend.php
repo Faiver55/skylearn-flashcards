@@ -799,46 +799,6 @@ class SkyLearn_Flashcards_Frontend {
 		
 	}
 
-		if ( ! is_email( $email ) ) {
-			wp_send_json_error( array( 'message' => __( 'Please enter a valid email address.', 'skylearn-flashcards' ) ) );
-		}
-
-		global $wpdb;
-
-		$table_name = $wpdb->prefix . 'skylearn_flashcard_leads';
-
-		$result = $wpdb->insert(
-			$table_name,
-			array(
-				'set_id'     => $set_id,
-				'name'       => $name,
-				'email'      => $email,
-				'phone'      => $phone,
-				'message'    => $message,
-				'source'     => 'flashcard_set',
-				'status'     => 'new',
-				'ip_address' => skylearn_get_user_ip(),
-				'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? '',
-				'created_at' => current_time( 'mysql' ),
-			),
-			array( '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
-		);
-
-		if ( $result ) {
-			
-			// Send to email marketing service if configured
-			$this->send_to_email_service( $email, $name );
-			
-			wp_send_json_success( array( 
-				'message' => __( 'Thank you! Your information has been submitted successfully.', 'skylearn-flashcards' )
-			) );
-			
-		} else {
-			wp_send_json_error( array( 'message' => __( 'Failed to submit your information. Please try again.', 'skylearn-flashcards' ) ) );
-		}
-
-	}
-
 	/**
 	 * Send lead to configured email marketing service
 	 *

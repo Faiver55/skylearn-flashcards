@@ -648,27 +648,6 @@ class SkyLearn_Flashcards_Leads {
 		} else {
 			wp_send_json_error( array( 'message' => __( 'Failed to delete lead.', 'skylearn-flashcards' ) ) );
 		}
-		
-	}
-	}
-
-	/**
-	 * Get lead statistics
-	 *
-	 * @since 1.0.0
-	 * @param array $args Statistics arguments
-	 * @return array Lead statistics
-	 */
-	public function get_lead_statistics( $args = array() ) {
-		// TODO: Implement lead statistics calculation
-		return array(
-			'total_leads'       => 0,
-			'new_today'         => 0,
-			'new_this_week'     => 0,
-			'new_this_month'    => 0,
-			'conversion_rate'   => 0,
-			'top_sources'       => array(),
-		);
 	}
 
 	/**

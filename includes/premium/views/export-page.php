@@ -199,6 +199,15 @@ $recent_exports = array(); // Would come from database in real implementation
                                 </div>
                             </label>
                             
+                            <label class="format-option">
+                                <input type="radio" name="export_format" value="xlsx">
+                                <div class="format-content">
+                                    <span class="dashicons dashicons-media-spreadsheet"></span>
+                                    <span class="format-name">Excel</span>
+                                    <small><?php esc_html_e( 'Microsoft Excel format', 'skylearn-flashcards' ); ?></small>
+                                </div>
+                            </label>
+                            
                             <label class="format-option" id="scorm-option" style="display: none;">
                                 <input type="radio" name="export_format" value="scorm">
                                 <div class="format-content">
@@ -246,6 +255,62 @@ $recent_exports = array(); // Would come from database in real implementation
                     <!-- Hidden fields -->
                     <input type="hidden" name="action" value="skylearn_bulk_export">
                     <input type="hidden" name="nonce" value="<?php echo esc_attr( wp_create_nonce( 'skylearn_bulk_export' ) ); ?>">
+                </form>
+            </div>
+
+            <!-- Import Configuration -->
+            <div class="skylearn-panel two-thirds import-section">
+                <div class="panel-header">
+                    <h2><?php esc_html_e( 'Bulk Import', 'skylearn-flashcards' ); ?></h2>
+                </div>
+                
+                <form id="import-form" class="skylearn-import-form" enctype="multipart/form-data">
+                    
+                    <!-- File Upload -->
+                    <div class="form-section">
+                        <h3><?php esc_html_e( 'Upload File', 'skylearn-flashcards' ); ?></h3>
+                        <div class="file-drop-zone">
+                            <span class="dashicons dashicons-cloud-upload"></span>
+                            <p><?php esc_html_e( 'Drag and drop your file here, or click to browse', 'skylearn-flashcards' ); ?></p>
+                            <small><?php esc_html_e( 'Supported formats: CSV, JSON, Excel (.xlsx)', 'skylearn-flashcards' ); ?></small>
+                            <input type="file" id="import-file" name="import_file" class="file-input" accept=".csv,.json,.xlsx">
+                        </div>
+                    </div>
+
+                    <!-- Import Options -->
+                    <div class="form-section">
+                        <h3><?php esc_html_e( 'Import Options', 'skylearn-flashcards' ); ?></h3>
+                        <div class="import-options">
+                            <div class="checkbox-option">
+                                <label>
+                                    <input type="checkbox" name="update_existing" value="1">
+                                    <span><?php esc_html_e( 'Update existing flashcard sets', 'skylearn-flashcards' ); ?></span>
+                                </label>
+                            </div>
+                            <div class="checkbox-option">
+                                <label>
+                                    <input type="checkbox" name="skip_duplicates" value="1" checked>
+                                    <span><?php esc_html_e( 'Skip duplicate sets (recommended)', 'skylearn-flashcards' ); ?></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Import Actions -->
+                    <div class="form-actions">
+                        <button type="submit" class="button button-secondary button-large" disabled>
+                            <span class="dashicons dashicons-upload"></span>
+                            <?php esc_html_e( 'Start Import', 'skylearn-flashcards' ); ?>
+                        </button>
+                        <button type="button" class="button" id="validate-import" disabled>
+                            <span class="dashicons dashicons-yes-alt"></span>
+                            <?php esc_html_e( 'Validate File', 'skylearn-flashcards' ); ?>
+                        </button>
+                    </div>
+
+                    <!-- Hidden fields -->
+                    <input type="hidden" name="action" value="skylearn_bulk_import">
+                    <input type="hidden" name="nonce" value="<?php echo esc_attr( wp_create_nonce( 'skylearn_bulk_import' ) ); ?>">
                 </form>
             </div>
 
@@ -299,14 +364,17 @@ $recent_exports = array(); // Would come from database in real implementation
                     </div>
                 </div>
 
-                <!-- Export Tips -->
+                <!-- Export & Import Tips -->
                 <div class="export-tips">
-                    <h4><?php esc_html_e( 'Export Tips', 'skylearn-flashcards' ); ?></h4>
+                    <h4><?php esc_html_e( 'Export & Import Tips', 'skylearn-flashcards' ); ?></h4>
                     <ul>
                         <li><?php esc_html_e( 'CSV format is best for spreadsheet applications', 'skylearn-flashcards' ); ?></li>
                         <li><?php esc_html_e( 'JSON format preserves all data structures', 'skylearn-flashcards' ); ?></li>
+                        <li><?php esc_html_e( 'Excel format provides the best compatibility', 'skylearn-flashcards' ); ?></li>
                         <li><?php esc_html_e( 'Use SCORM for LMS integration', 'skylearn-flashcards' ); ?></li>
-                        <li><?php esc_html_e( 'Large exports may take several minutes', 'skylearn-flashcards' ); ?></li>
+                        <li><?php esc_html_e( 'Always validate import files before processing', 'skylearn-flashcards' ); ?></li>
+                        <li><?php esc_html_e( 'Large exports/imports may take several minutes', 'skylearn-flashcards' ); ?></li>
+                        <li><?php esc_html_e( 'Backup your data before importing', 'skylearn-flashcards' ); ?></li>
                     </ul>
                 </div>
 
@@ -437,6 +505,11 @@ jQuery(document).ready(function($) {
                 previewHtml += '<div class="preview-sample">';
                 previewHtml += '<h4><?php esc_js( esc_html_e( 'Sample Output:', 'skylearn-flashcards' ) ); ?></h4>';
                 previewHtml += '<pre>Set ID,Set Title,Card Front,Card Back,Card Index\n1,"Sample Set","What is...","The answer is...",0</pre>';
+                previewHtml += '</div>';
+            } else if (format === 'xlsx') {
+                previewHtml += '<div class="preview-sample">';
+                previewHtml += '<h4><?php esc_js( esc_html_e( 'Excel Format:', 'skylearn-flashcards' ) ); ?></h4>';
+                previewHtml += '<p><?php esc_js( esc_html_e( 'Data will be exported in Microsoft Excel format with UTF-8 encoding.', 'skylearn-flashcards' ) ); ?></p>';
                 previewHtml += '</div>';
             }
             
