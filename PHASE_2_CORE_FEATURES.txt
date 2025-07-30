@@ -1,0 +1,91 @@
+SkyLearn Flashcards - Phase 2: Core Features (Free Version)
+===========================================================
+
+Objectives:
+-----------
+- Implement the essential flashcard and set management features for free users.
+- Enforce the limit of 5 flashcard sets, but allow unlimited cards per set.
+- Provide a beautiful, responsive frontend flashcard UI with navigation, flip, shuffle, and performance tracking.
+- Integrate a shortcode for easy set embedding.
+- Build a simple backend interface for creating/editing sets and cards.
+
+Technical Tasks:
+----------------
+
+1. Custom Post Type: Flashcard Sets
+   - Register a custom post type `flashcard_set` (public, supports title, custom fields).
+   - Add custom admin menu "Flashcards" for managing sets.
+   - Add capability checks so only admins/teachers can create/edit sets.
+
+2. Flashcard Set Editor (Backend)
+   - Custom meta box or React-based editor in the post edit screen:
+     - Add/remove/reorder cards within a set.
+     - Each card: "Front" (term/question), "Back" (definition/answer).
+     - AJAX save for better UX.
+     - Enforce set limit (show message if max reached).
+   - Use color scheme for UI consistency.
+   - Save cards as structured post meta (array of card objects).
+
+3. Frontend Display: Shortcode & Block
+   - Register `[skylearn_flashcard_set id="123"]` shortcode.
+   - Provide Gutenberg block for embedding sets in posts/pages.
+   - Frontend renderer loads cards, applies styles, and supports:
+     - Card flip animation (JS/CSS)
+     - Next/previous navigation
+     - Shuffle/randomize cards
+     - Responsive layout for desktop/mobile
+   - Show set title and progress indicator.
+
+4. Card Interaction & Performance Tracking
+   - Track correct/incorrect answers per card (simple self-mark for free).
+   - Show summary after set completion:
+     - Number correct/incorrect
+     - Time taken (optional, using JS timer)
+     - Option to retry/shuffle
+   - Store performance in session/localStorage for free users.
+
+5. Core Styling
+   - Use color scheme:
+     - Primary: #3498db (buttons, highlights)
+     - Accent: #f39c12 (active card border, icons)
+     - Background: #f8f9fa (container background)
+     - Text: #222831 (titles, card text)
+   - Import logo (image1/image2) for branding on admin/editor screens.
+
+6. Accessibility & Internationalization
+   - ARIA roles/labels for cards and navigation buttons.
+   - All UI text run through translation functions.
+
+7. Security & Data Validation
+   - Sanitize and validate all card data before saving.
+   - Escape output on frontend.
+
+8. Free/Premium Gating
+   - If user tries to create more than 5 sets, show upsell message (with link to premium).
+   - All premium features (lead collection, advanced reporting, export, unlimited sets) are disabled or hidden in free version.
+
+Code Structure:
+---------------
+- `includes/admin/class-editor.php`        # Set/card editor logic
+- `includes/admin/views/editor-page.php`   # Editor UI
+- `includes/frontend/class-shortcode.php`  # Shortcode/block registration
+- `includes/frontend/class-renderer.php`   # Frontend card rendering/logic
+- `includes/frontend/views/flashcard-set.php`    # Set HTML
+- `includes/frontend/views/flashcard-card.php`   # Card HTML
+- `assets/js/flashcard.js`                 # Flip, navigation, shuffle
+- `assets/css/frontend.css`                # Core styles
+
+AI Agent Instructions:
+----------------------
+- Scaffold all files/folders listed in "Code Structure".
+- Implement CPT, editor, frontend renderer, and shortcode/block with described features.
+- Use provided color scheme and logo assets in admin/editor screens.
+- All UI must be responsive and accessible.
+- Enforce set limit and display upsell if exceeded.
+- Test with 5 sets, each with unlimited cards (stress test for performance).
+- Make sure data is validated/sanitized.
+- All code must be well-commented and internationalized.
+
+-------------------------------------
+Continue with Phase 3 (LMS Integration) in next response...
+-------------------------------------

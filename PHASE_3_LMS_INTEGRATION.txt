@@ -1,0 +1,63 @@
+SkyLearn Flashcards - Phase 3: LMS Integration
+==============================================
+
+Objectives:
+-----------
+- Seamlessly integrate SkyLearn Flashcards with leading LMS platforms (LearnDash, TutorLMS).
+- Enable progress tracking, grading, and reporting to the LMS when users complete flashcard sets.
+- Make flashcard activities "first-class" learning events within the LMS ecosystem.
+
+Technical Tasks:
+----------------
+
+1. LMS Detection
+   - On plugin init, check if LearnDash or TutorLMS is active.
+   - Provide admin notice or settings toggle for LMS integration.
+
+2. Progress Tracking & Lesson/Topic Completion
+   - When a user completes a flashcard set, trigger LMS "mark complete" for an associated lesson/topic.
+   - Use LMS APIs/hooks:
+     - LearnDash: `learndash_process_mark_complete($user_id, $lesson_id)`
+     - TutorLMS: `tutor_utils()->update_quiz_attempt($attempt_id, $marks_obtained)`
+   - Map each flashcard set to an LMS lesson or topic via meta or settings.
+
+3. Grading Integration
+   - Calculate a score for completed sets (correct/incorrect, percentage).
+   - Submit the score to LMS gradebook (as a quiz/assignment or custom activity).
+   - Display flashcard grades alongside other LMS grades for the user.
+
+4. Reporting Integration
+   - Push flashcard activity/results to LMS reporting screens for teachers/admins.
+   - Add a "Flashcard Results" tab or section in LMS reports.
+   - Show per-user and per-set stats (performance, completion, engagement).
+
+5. Admin Settings for LMS Integration
+   - Settings page toggle for enabling/disabling LMS integration.
+   - Mapping UI for linking flashcard sets to LMS lessons/topics.
+   - Option to choose which LMS grade/reporting features are enabled.
+
+6. Compatibility/Failover
+   - Graceful fallback if LMS is disabled/uninstalled.
+   - All integration code wrapped in checks for LMS plugin existence.
+
+Code Structure:
+---------------
+- `includes/lms/class-learndash.php`      # LearnDash integration logic
+- `includes/lms/class-tutorlms.php`       # TutorLMS integration logic
+- `includes/lms/class-lms-manager.php`    # LMS detection, settings, hooks
+- `includes/admin/views/lms-settings.php` # LMS integration settings UI
+
+AI Agent Instructions:
+----------------------
+- Scaffold all files/folders listed under Code Structure.
+- Implement LMS detection, progress tracking, grading, and reporting integration.
+- Use official LMS plugin APIs/hooks for all actions; do not hard-code DB queries.
+- Provide admin UI for mapping flashcard sets to LMS lessons/topics.
+- Ensure all features are toggleable in settings.
+- All code must be compatible with both LearnDash and TutorLMS (abstract common features).
+- Document integration points (comments and README).
+- Test with multiple users and sets for reporting accuracy.
+
+-------------------------------------
+Continue with Phase 4 (Lead Collection: Premium) in next response...
+-------------------------------------

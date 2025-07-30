@@ -1,0 +1,62 @@
+SkyLearn Flashcards - Recommended Plugin File Structure
+======================================================
+
+skylearn-flashcards/
+├── skylearn-flashcards.php               # Main plugin entry file
+├── README.md                             # Project overview & usage
+├── LICENSE                               # GPL license
+├── uninstall.php                         # Uninstall clean-up script
+├── languages/                            # .pot/.po/.mo translation files
+│   └── skylearn-flashcards.pot
+├── assets/
+│   ├── img/
+│   │   ├── logo-horiz.png                # ![image1](image1)
+│   │   ├── logo-icon.png                 # ![image2](image2)
+│   ├── css/
+│   │   ├── admin.css
+│   │   ├── frontend.css
+│   │   ├── colors.css
+│   ├── js/
+│       ├── admin.js
+│       ├── frontend.js
+│       ├── flashcard.js                  # Card flip logic, navigation
+├── includes/
+│   ├── class-skylearn-flashcard.php      # Main plugin class
+│   ├── helpers.php                       # Utility functions (sanitize, wrappers)
+│   ├── setup/                            # Setup, activation, uninstall logic
+│   │   ├── class-setup.php
+│   ├── admin/
+│   │   ├── class-admin.php               # Admin dashboard
+│   │   ├── class-settings.php            # Settings page logic
+│   │   ├── class-editor.php              # Flashcard set editor
+│   │   ├── class-leads.php               # Lead management (premium)
+│   │   ├── views/
+│   │       ├── settings-page.php         # Settings page HTML
+│   │       ├── editor-page.php           # Card editor UI
+│   │       ├── leads-page.php            # Leads dashboard
+│   ├── frontend/
+│   │   ├── class-frontend.php            # Frontend logic
+│   │   ├── class-shortcode.php           # Shortcode/block registration
+│   │   ├── class-renderer.php            # Card rendering logic
+│   │   ├── views/
+│   │       ├── flashcard-set.php         # Main set display
+│   │       ├── flashcard-card.php        # Card HTML
+│   │       ├── flashcard-results.php     # Results/performance summary
+│   │       ├── lead-capture.php          # Lead collection form
+│   ├── lms/
+│   │   ├── class-learndash.php           # LearnDash integration
+│   │   ├── class-tutorlms.php            # TutorLMS integration
+│   ├── integrations/
+│   │   ├── class-mailchimp.php           # Mailchimp API
+│   │   ├── class-vbout.php               # Vbout API
+│   │   ├── class-sendfox.php             # SendFox API
+│   ├── premium/
+│   │   ├── class-premium.php             # Premium gating
+│   │   ├── class-advanced-reporting.php  # Advanced analytics/reporting
+│   │   ├── class-export.php              # Bulk export logic
+│   │   ├── views/
+│   │       ├── reporting-page.php        # Analytics dashboard
+│   │       ├── export-page.php           # Export UI
+├── .gitignore                            # Ignore node_modules, vendor, etc.
+├── package.json                          # For build tools (if any)
+├── composer.json                         # For PHP autoloading (if any)

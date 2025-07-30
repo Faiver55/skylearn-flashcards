@@ -1,0 +1,67 @@
+SkyLearn Flashcards - Phase 4: Lead Collection (Premium)
+========================================================
+
+Objectives:
+-----------
+- Enable lead capture after flashcard set completion, before showing user results.
+- Integrate with Mailchimp, Vbout, and SendFox via API.
+- Store leads in WordPress and/or sync to selected CRM.
+- Provide admin UI for viewing/exporting leads.
+- Only available to premium plugin users.
+
+Technical Tasks:
+----------------
+
+1. Lead Capture Form (Frontend)
+   - After user finishes a flashcard set, display a modal or inline form.
+   - Form fields: Email (required), Name (optional), custom fields (admin configurable).
+   - Prevent results from displaying until form is submitted.
+   - Responsive design, branded with color scheme and logo.
+
+2. Integration with Email/CRM Services
+   - Add settings page for Mailchimp, Vbout, SendFox API keys.
+   - On form submission, send lead data to selected service.
+     - Mailchimp: Add to list/audience via API.
+     - Vbout: Add contact via API (API key: 5367231302826837517588041).
+     - SendFox: Add contact via API (API key provided).
+   - Store lead data locally in custom database table or user meta for backup.
+
+3. Admin Lead Management UI
+   - New menu item: "Flashcard Leads" (premium only).
+   - List all leads: email, name, set completed, source, date/time.
+   - Filter by set, date, status (synced/pending).
+   - Export leads to CSV.
+
+4. Privacy & Compliance
+   - Include checkbox for user consent (GDPR/Privacy Policy link).
+   - Store timestamp and consent status.
+   - Only collect fields configured in admin.
+
+5. Premium Gating
+   - All lead capture and CRM integration code gated by premium activation.
+   - In free version, show upsell modal if user tries to submit the form.
+
+Code Structure:
+---------------
+- `includes/admin/class-leads.php`              # Lead management logic
+- `includes/admin/views/leads-page.php`         # Admin lead listing UI
+- `includes/frontend/views/lead-capture.php`    # Lead form frontend
+- `includes/integrations/class-mailchimp.php`   # Mailchimp API integration
+- `includes/integrations/class-vbout.php`       # Vbout API integration
+- `includes/integrations/class-sendfox.php`     # SendFox API integration
+- `includes/premium/class-premium.php`          # Premium gating
+
+AI Agent Instructions:
+----------------------
+- Scaffold all files/folders listed in Code Structure.
+- Implement modal/inline lead form, only shown after set completion and before results.
+- Form must validate email and show error if not provided.
+- Integrate with Mailchimp, Vbout, SendFox using admin API keys.
+- Store all leads in local database table for admin management.
+- Admin UI must allow search, filter, export.
+- All features gated so only premium users can use lead capture; show upsell otherwise.
+- All code must be documented, secure, and privacy-compliant.
+
+-------------------------------------
+Continue with Phase 5 (Advanced Reporting: Premium) in next response...
+-------------------------------------

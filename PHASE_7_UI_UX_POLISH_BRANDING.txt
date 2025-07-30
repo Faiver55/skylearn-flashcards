@@ -1,0 +1,71 @@
+SkyLearn Flashcards - Phase 7: UI/UX Polish & Branding
+======================================================
+
+Objectives:
+-----------
+- Apply finalized color scheme, logo, and branding assets throughout plugin frontend and backend.
+- Ensure all interfaces are responsive, accessible, and visually consistent.
+- Polish UI for premium features, admin settings, and user-facing screens.
+
+Technical Tasks:
+----------------
+
+1. Apply Color Scheme Consistently
+   - Use Primary (#3498db), Accent (#f39c12), Background (#f8f9fa), and Text (#222831) colors in all CSS files.
+   - Ensure buttons, inputs, navigation, and highlights use the correct palette.
+   - Create a `colors.css` file for easy global updates.
+
+2. Logo and Branding Integration
+   - Display logo (image1/image2) in admin dashboard, editor, and frontend flashcard screens.
+   - Add favicon/logo to plugin settings and public flashcard pages.
+   - Reference logos from `/assets/img/` for all branding needs.
+
+3. Responsive Design
+   - Test all screens on desktop, tablet, and mobile.
+   - Use CSS media queries and flexible layouts for cards, dashboards, forms, modals.
+
+4. Accessibility (A11y)
+   - Add ARIA labels and roles to interactive elements (cards, buttons, forms).
+   - Ensure keyboard navigation for flashcard interactions.
+   - High-contrast mode support for accessibility.
+   - Text alternatives for images/logos.
+
+5. Polish Admin Screens
+   - Refine admin menu, settings pages, editors, lead management, reporting, and export/import UIs.
+   - Group related settings, add tooltips/help text.
+   - Use branded headers, icons, and visual cues.
+
+6. Polish Frontend Screens
+   - Refine flashcard set display and interaction for users.
+   - Add progress indicators, animated transitions, and feedback messages.
+   - Ensure consistent use of color, logo, and typography.
+
+7. Internationalization and Localization
+   - Wrap all UI text in translation functions.
+   - Provide starter `.pot` file for translators.
+
+8. Final QA for UI/UX
+   - Review all screens for consistency and usability.
+   - Get feedback from internal testers and iterate.
+
+Code Structure:
+---------------
+- `assets/css/colors.css`                 # Color palette definitions
+- `assets/css/admin.css`                  # Admin dashboard styles
+- `assets/css/frontend.css`               # Frontend user styles
+- `assets/img/logo-horiz.png`             # ![image1](image1)
+- `assets/img/logo-icon.png`              # ![image2](image2)
+- All views files across backend/frontend
+
+AI Agent Instructions:
+----------------------
+- Apply branding and color scheme in all CSS and views.
+- Reference logo assets wherever appropriate.
+- Ensure all screens are responsive and accessible.
+- Polish admin and user UIs for clarity, consistency, and usability.
+- All UI text must be internationalized.
+- Document UI/UX decisions in README.
+
+-------------------------------------
+Continue with Phase 8 (Testing & QA) in next response...
+-------------------------------------

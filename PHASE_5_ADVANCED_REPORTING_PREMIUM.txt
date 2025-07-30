@@ -1,0 +1,73 @@
+SkyLearn Flashcards - Phase 5: Advanced Reporting (Premium)
+===========================================================
+
+Objectives:
+-----------
+- Provide in-depth analytics and reporting for flashcard performance, usable by teachers, admins, and students.
+- Enable export of results (CSV, PDF).
+- Make analytics available in both the plugin dashboard and LMS reporting area (if integrated).
+- Only available to premium plugin users.
+
+Technical Tasks:
+----------------
+
+1. Data Capture & Storage
+   - Capture per-user, per-set performance data:
+     - Cards answered correctly/incorrectly
+     - Completion time
+     - Attempts per set
+     - Progress trends
+   - Store performance data in custom database tables for scalable reporting.
+
+2. Analytics Dashboard (Admin/Teacher)
+   - New menu item: "Flashcard Reporting" (premium only).
+   - Dashboard widgets:
+     - User performance charts (bar, pie, line)
+     - Set summaries (average score, completion rates)
+     - Recent activity (last 10 completions)
+     - Filter by user, set, date range
+   - View individual user history and set trends.
+
+3. Student Reporting
+   - On set completion, show detailed results:
+     - Cards missed (with review option)
+     - Score breakdown
+     - Completion history for each set
+   - Option for students to export their own results (CSV/PDF).
+
+4. Export Features
+   - Admin can export full performance dataset (user, set, scores, dates) to CSV or PDF.
+   - Student-facing export for their personal results.
+   - Use PHP libraries for PDF generation (e.g., TCPDF, DomPDF).
+
+5. LMS Reporting Integration
+   - If LMS integration is active, push summarized analytics to LMS reporting screens.
+   - Show flashcard activity alongside quizzes/assignments.
+
+6. Premium Gating
+   - All reporting features gated by premium activation.
+   - In free version, show upsell messages in reporting screens.
+
+Code Structure:
+---------------
+- `includes/premium/class-advanced-reporting.php`      # Main analytics logic
+- `includes/premium/views/reporting-page.php`          # Analytics dashboard UI
+- `includes/premium/class-export.php`                  # CSV/PDF export logic
+- `includes/premium/views/export-page.php`             # Export UI
+- `includes/frontend/views/flashcard-results.php`      # Student results summary (premium)
+- `assets/js/reporting.js`                             # Charts, filters, AJAX
+- `assets/css/reporting.css`                           # Dashboard styles
+
+AI Agent Instructions:
+----------------------
+- Scaffold all files/folders listed in Code Structure.
+- Implement DB schema for per-user, per-set tracking.
+- Build analytics dashboard with charts and filters.
+- Implement CSV/PDF export using proven libraries.
+- Integrate reporting with LMS dashboards if possible.
+- All reporting features must be responsive, branded, and premium-gated.
+- Document all database, API, and frontend logic thoroughly.
+
+-------------------------------------
+Continue with Phase 6 (Bulk Export & Unlimited Sets: Premium) in next response...
+-------------------------------------

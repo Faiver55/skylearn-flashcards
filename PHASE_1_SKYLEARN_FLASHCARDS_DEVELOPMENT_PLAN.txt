@@ -1,0 +1,102 @@
+SkyLearn Flashcards - Technical Development Plan
+===============================================
+
+![image1](image1)
+![image2](image2)
+
+A premium WordPress flashcard plugin by Skyian LLC
+Company: Skyian LLC
+Author: Ferdous Khalifa
+Website: https://skyian.com/
+Support: support@skyian.com
+
+Plugin Name: SkyLearn Flashcards
+Main Coding Class: SkyLearn_Flashcard
+
+Color Scheme:
+- Primary: #3498db (Sky Blue)
+- Accent: #f39c12 (Soft Orange)
+- Background: #f8f9fa (Light Gray)
+- Text: #222831 (Dark Slate)
+
+Logo Assets:
+- Horizontal logo: ![image1](image1)
+- Icon logo: ![image2](image2)
+
+Target Audience:
+- Teachers, students, schools, online academies
+
+Top LMS Compatibility:
+- LearnDash
+- TutorLMS
+
+Marketplace Availability:
+- WordPress.org Plugin Repository
+- Envato Market
+- Official Website
+
+License: GPLv3
+Privacy Policy: https://skyian.com/skylearn-flashcards/privacy-policy/
+Terms of Service: https://skyian.com/skylearn-flashcards/tos/
+
+-------------------------------------
+Phase-by-Phase Technical Development Plan
+-------------------------------------
+
+Phase 1: Plugin Skeleton & Initial Setup
+----------------------------------------
+Objectives:
+- Establish the foundational structure for the plugin in WordPress.
+- Prepare core files, constants, base classes, and initial documentation.
+
+Technical Tasks:
+1. Create plugin folder `skylearn-flashcards` and main entry file `skylearn-flashcards.php`.
+2. Add WordPress plugin headers to main file:
+   - Plugin Name, Description, Version, Author, Text Domain, License, etc.
+3. Define constants:
+   - SKYLEARN_FLASHCARDS_VERSION
+   - SKYLEARN_FLASHCARDS_PATH
+   - SKYLEARN_FLASHCARDS_URL
+   - SKYLEARN_FLASHCARDS_ASSETS
+   - SKYLEARN_FLASHCARDS_LOGO (path to branding assets)
+   - SKYLEARN_FLASHCARDS_COLOR_PRIMARY, etc.
+4. Create main plugin class: `SkyLearn_Flashcard`
+   - Class should instantiate on plugin load.
+   - Set up autoload for classes (using PSR-4 or simple file includes).
+5. Setup plugin activation/deactivation/uninstall hooks:
+   - Flush rewrite rules on activation/deactivation.
+   - Clean up options, custom tables, and meta on uninstall.
+6. Prepare basic README.md and LICENSE file (GPLv3).
+7. Add internationalization support (`load_plugin_textdomain`).
+8. Place logo assets in `/assets/img/`.
+
+Example directory structure:
+skylearn-flashcards/
+  ├── skylearn-flashcards.php
+  ├── README.md
+  ├── LICENSE
+  ├── assets/
+  │    ├── img/
+  │    │    ├── logo-horiz.png
+  │    │    ├── logo-icon.png
+  │    ├── css/
+  │    ├── js/
+  ├── includes/
+  │    ├── class-skylearn-flashcard.php
+  │    ├── admin/
+  │    ├── frontend/
+  │    ├── lms/
+  │    ├── premium/
+  ├── languages/
+
+Phase 1 AI Agent Instructions:
+- Create all listed files and folders.
+- Populate main plugin file with proper headers and constants.
+- Create empty main class and include internationalization.
+- Add logo assets using provided images.
+- Prepare README.md with branding and basic usage.
+- Implement activation/deactivation/uninstall hooks as described.
+
+-------------------------------------
+Continue with Phase 2 (Core Features: Free Version) in next response...
+-------------------------------------

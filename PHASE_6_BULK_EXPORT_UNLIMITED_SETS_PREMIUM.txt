@@ -1,0 +1,64 @@
+SkyLearn Flashcards - Phase 6: Bulk Export & Unlimited Sets (Premium)
+=====================================================================
+
+Objectives:
+-----------
+- Remove the limit of 5 flashcard sets for premium users, allowing unlimited sets and cards.
+- Enable bulk export and import of flashcard sets and cards for easy migration, sharing, and backup.
+- Provide admin UI for managing exports/imports with clear feedback and error handling.
+- Only available to premium plugin users.
+
+Technical Tasks:
+----------------
+
+1. Unlimited Sets for Premium Users
+   - Remove enforcement of the set creation limit when premium is active.
+   - Adjust admin/editor UI to reflect unlimited set capability.
+   - All gating handled in `includes/premium/class-premium.php`.
+
+2. Bulk Export Functionality
+   - Enable exporting all sets or selected sets/cards as CSV and JSON.
+   - Export includes all card data (front/back, meta), set metadata, and optional user performance data.
+   - Provide export options in admin dashboard (“Export All”, “Export Selected”, “Export with User Data”).
+
+3. Bulk Import Functionality
+   - Allow import of sets/cards from CSV and JSON files.
+   - Map fields and validate data before import (conflict resolution for existing sets).
+   - Provide preview and confirmation step before final import.
+
+4. Export/Import UI
+   - New “Bulk Export/Import” page in admin (premium only).
+   - Simple drag-and-drop or file-select interface for import.
+   - Export/download button for export actions.
+   - Show success, error, and progress messages throughout process.
+
+5. Security & Data Validation
+   - Validate all import data (sanitize fields, check for malicious content).
+   - Only allow admins/teachers to perform export/import.
+   - Log import/export events for auditing.
+
+6. Premium Gating
+   - All bulk export/import features gated by premium activation.
+   - In free version, show upsell messages on export/import pages.
+
+Code Structure:
+---------------
+- `includes/premium/class-export.php`            # Bulk export/import logic
+- `includes/premium/views/export-page.php`       # Admin export/import UI
+- `includes/premium/class-premium.php`           # Premium gating
+- `assets/js/export.js`                          # Export/import frontend logic
+- `assets/css/export.css`                        # UI styles
+
+AI Agent Instructions:
+----------------------
+- Scaffold all files/folders listed in Code Structure.
+- Implement UI and backend logic for bulk export/import (CSV and JSON).
+- Remove set limit for premium users; ensure gating logic is robust.
+- Validate all input/output data for security.
+- All features must be well-documented and responsive.
+- Provide helpful messages on success/failure.
+- Test with large datasets for performance.
+
+-------------------------------------
+Continue with Phase 7 (UI/UX Polish & Branding) in next response...
+-------------------------------------

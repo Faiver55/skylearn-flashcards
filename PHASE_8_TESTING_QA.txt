@@ -1,0 +1,70 @@
+SkyLearn Flashcards - Phase 8: Testing & QA
+===========================================
+
+Objectives:
+-----------
+- Ensure all plugin features work as intended, are secure, and deliver a seamless user experience.
+- Validate compatibility with supported LMS platforms (LearnDash, TutorLMS) and major WordPress versions.
+- Confirm accessibility, performance, and privacy compliance.
+
+Technical Tasks:
+----------------
+
+1. Automated Testing
+   - Implement unit tests for PHP logic using PHPUnit.
+   - Write integration tests for flashcard creation, editing, display, and user performance tracking.
+   - Add JavaScript tests (using Jest or similar) for frontend card interaction (flip, navigation, shuffle).
+
+2. Manual Testing
+   - Test all admin screens: set editor, settings, leads, reporting, export/import.
+   - Test all frontend features: flashcard display, interaction, lead capture (premium), results summary, reporting.
+   - Stress-test with large numbers of cards/sets and heavy user activity.
+   - Test premium gating and upsell flows.
+
+3. LMS Compatibility Testing
+   - Install and activate LearnDash and TutorLMS in local/staging environments.
+   - Test flashcard set mapping, progress tracking, grading, and reporting with both LMS plugins.
+   - Verify fallback and error handling when LMS plugins are deactivated.
+
+4. Accessibility Review
+   - Use automated tools (axe, Lighthouse) and manual keyboard navigation to verify accessibility compliance.
+   - Confirm ARIA roles, labels, and alt text for all interactive elements.
+
+5. Cross-Device & Browser Testing
+   - Test all screens on desktop, tablet, and mobile.
+   - Test on major browsers (Chrome, Firefox, Safari, Edge).
+
+6. GDPR & Privacy Compliance
+   - Review data collection, consent, and storage for lead capture and reporting.
+   - Confirm privacy policy and terms links are displayed as required.
+   - Test data deletion on uninstall.
+
+7. Bug Tracking & Issue Management
+   - Log all discovered bugs and UI/UX issues.
+   - Create GitHub issues for all defects, assign and prioritize.
+   - Track test results and regression cases.
+
+8. Final Code Review & Optimization
+   - Review code for security (sanitize/escape, nonce checks, capability checks).
+   - Optimize database queries and frontend performance.
+   - Confirm internationalization of all UI text.
+
+Code Structure:
+---------------
+- `tests/phpunit/`                        # Unit/integration tests for PHP
+- `tests/js/`                             # Frontend JS tests
+- `assets/css/testing.css`                # Visual cues for test builds
+- `docs/TEST_PLAN.md`                     # Manual and automated test procedures
+
+AI Agent Instructions:
+----------------------
+- Scaffold all files/folders listed in Code Structure.
+- Implement tests for all core, premium, and integration features.
+- Run manual and automated tests as described.
+- Log all bugs and create GitHub issues for triage.
+- Document test procedures and results in `TEST_PLAN.md`.
+- Ensure plugin meets accessibility and privacy standards before release.
+
+-------------------------------------
+Continue with Phase 9 (Beta Launch) in next response...
+-------------------------------------
