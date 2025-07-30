@@ -59,9 +59,11 @@ class SkyLearn_Flashcards_Premium {
 		
 		// Advanced reporting
 		require_once SKYLEARN_FLASHCARDS_PATH . 'includes/premium/class-advanced-reporting.php';
+		new SkyLearn_Flashcards_Advanced_Reporting();
 		
 		// Export functionality
 		require_once SKYLEARN_FLASHCARDS_PATH . 'includes/premium/class-export.php';
+		new SkyLearn_Flashcards_Export();
 		
 		// LMS integrations (premium features)
 		$this->load_lms_integrations();
