@@ -133,6 +133,11 @@ class SkyLearn_Flashcard {
 		require_once SKYLEARN_FLASHCARDS_PATH . 'includes/admin/class-admin.php';
 
 		/**
+		 * The flashcard editor functionality.
+		 */
+		require_once SKYLEARN_FLASHCARDS_PATH . 'includes/admin/class-editor.php';
+
+		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
@@ -186,11 +191,17 @@ class SkyLearn_Flashcard {
 		$this->loader->add_action( 'admin_menu', $this->admin, 'add_admin_menu' );
 		$this->loader->add_action( 'admin_init', $this->admin, 'admin_init' );
 
+		// Initialize editor functionality
+		$editor = new SkyLearn_Flashcards_Editor( $this->get_plugin_name(), $this->get_version() );
+
 		// AJAX hooks for admin functionality
 		$this->loader->add_action( 'wp_ajax_skylearn_save_settings', $this->admin, 'save_settings' );
 		$this->loader->add_action( 'wp_ajax_skylearn_export_flashcards', $this->admin, 'export_flashcards' );
 		$this->loader->add_action( 'wp_ajax_skylearn_import_flashcards', $this->admin, 'import_flashcards' );
 		$this->loader->add_action( 'wp_ajax_skylearn_bulk_action', $this->admin, 'handle_bulk_action' );
+		
+		// Add set limit enforcement hook
+		$this->loader->add_action( 'wp_insert_post', $this, 'enforce_set_limit', 10, 3 );
 	}
 
 	/**
@@ -289,5 +300,40 @@ class SkyLearn_Flashcard {
 		}
 		
 		return $instance;
+	}
+	
+	/**
+	 * Enforce flashcard set limit for free users
+	 *
+	 * @since     1.0.0
+	 * @param     int      $post_id   Post ID
+	 * @param     WP_Post  $post      Post object
+	 * @param     bool     $update    Whether this is an update
+	 */
+	public function enforce_set_limit( $post_id, $post, $update ) {
+		// Only check for new flashcard sets
+		if ( $update || $post->post_type !== 'flashcard_set' || $post->post_status === 'auto-draft' ) {
+			return;
+		}
+		
+		// Skip if premium
+		if ( skylearn_is_premium() ) {
+			return;
+		}
+		
+		// Check if user has exceeded set limit
+		if ( ! skylearn_user_can_create_set( $post->post_author ) ) {
+			// Prevent saving and show error
+			wp_delete_post( $post_id, true );
+			
+			wp_die(
+				__( 'You have reached the maximum number of flashcard sets (5) for the free version. Please upgrade to Premium for unlimited sets and advanced features.', 'skylearn-flashcards' ),
+				__( 'Set Limit Reached', 'skylearn-flashcards' ),
+				array(
+					'back_link' => true,
+					'response'  => 403,
+				)
+			);
+		}
 	}
 }
