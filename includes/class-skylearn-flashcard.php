@@ -228,6 +228,14 @@ class SkyLearn_Flashcard {
 		$this->loader->add_action( 'wp_ajax_skylearn_import_flashcards', $this->admin, 'import_flashcards' );
 		$this->loader->add_action( 'wp_ajax_skylearn_bulk_action', $this->admin, 'handle_bulk_action' );
 		
+		// Lead management AJAX hooks (premium only)
+		if ( skylearn_is_premium() ) {
+			$leads = new SkyLearn_Flashcards_Leads( $this->get_plugin_name(), $this->get_version() );
+			$this->loader->add_action( 'wp_ajax_skylearn_get_lead_details', $leads, 'ajax_get_lead_details' );
+			$this->loader->add_action( 'wp_ajax_skylearn_update_lead_status', $leads, 'ajax_update_lead_status' );
+			$this->loader->add_action( 'wp_ajax_skylearn_delete_lead', $leads, 'ajax_delete_lead' );
+		}
+		
 		// Add set limit enforcement hook
 		$this->loader->add_action( 'wp_insert_post', $this, 'enforce_set_limit', 10, 3 );
 	}

@@ -330,7 +330,19 @@ function skylearn_log( $message, $level = 'info' ) {
  * @return bool True if premium features are available
  */
 function skylearn_is_premium() {
-	// TODO: Implement premium license checking logic
+	$license_status = get_option( 'skylearn_flashcards_license_status', 'inactive' );
+	$license_key = get_option( 'skylearn_flashcards_license_key', '' );
+	
+	// Check if we have a valid license
+	if ( $license_status === 'valid' && ! empty( $license_key ) ) {
+		return true;
+	}
+	
+	// Allow developers to override for testing
+	if ( defined( 'SKYLEARN_FORCE_PREMIUM' ) && SKYLEARN_FORCE_PREMIUM ) {
+		return true;
+	}
+	
 	return false;
 }
 
