@@ -1,0 +1,320 @@
+name: SkyLearn Flashcards Test Suite
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  php-tests:
+    name: PHP Tests
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        php-version: ['7.4', '8.0', '8.1', '8.2']
+        wordpress-version: ['5.0', '5.9', '6.0', '6.4']
+        exclude:
+          # Exclude incompatible combinations
+          - php-version: '8.2'
+            wordpress-version: '5.0'
+    
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: wp_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
+        coverage: xdebug
+
+    - name: Setup WordPress test environment
+      run: |
+        bash bin/install-wp-tests.sh wp_test root password localhost ${{ matrix.wordpress-version }}
+      env:
+        WP_VERSION: ${{ matrix.wordpress-version }}
+
+    - name: Get Composer cache directory
+      id: composer-cache
+      run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+    - name: Cache Composer dependencies
+      uses: actions/cache@v3
+      with:
+        path: ${{ steps.composer-cache.outputs.dir }}
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: ${{ runner.os }}-composer-
+
+    - name: Install Composer dependencies
+      run: composer install --prefer-dist --no-progress --no-suggest
+
+    - name: Run PHP linting
+      run: composer run-script lint
+
+    - name: Run PHP unit tests
+      run: composer run-script test
+
+    - name: Run PHP code analysis
+      run: composer run-script analyze
+      continue-on-error: true
+
+    - name: Generate coverage report
+      run: composer run-script test:coverage
+      if: matrix.php-version == '8.1' && matrix.wordpress-version == '6.4'
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      if: matrix.php-version == '8.1' && matrix.wordpress-version == '6.4'
+      with:
+        file: ./coverage/clover.xml
+        flags: php
+        name: php-tests
+
+  javascript-tests:
+    name: JavaScript Tests
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: ['16', '18', '20']
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install Node.js dependencies
+      run: npm ci
+
+    - name: Run JavaScript linting
+      run: npm run lint:js
+
+    - name: Run CSS linting
+      run: npm run lint:css
+
+    - name: Run JavaScript tests
+      run: npm test
+
+    - name: Generate JavaScript coverage
+      run: npm run test:coverage
+      if: matrix.node-version == '18'
+
+    - name: Upload JavaScript coverage to Codecov
+      uses: codecov/codecov-action@v3
+      if: matrix.node-version == '18'
+      with:
+        file: ./coverage/js/lcov.info
+        flags: javascript
+        name: javascript-tests
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+
+    - name: Install Composer dependencies
+      run: composer install --prefer-dist --no-progress
+
+    - name: Run security analysis
+      run: |
+        # Install security checker
+        wget -O security-checker https://github.com/fabpot/local-php-security-checker/releases/download/v2.0.6/local-php-security-checker_2.0.6_linux_amd64
+        chmod +x security-checker
+        ./security-checker --format=sarif > security-report.sarif
+      continue-on-error: true
+
+    - name: Upload security scan results
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: security-report.sarif
+
+  build-test:
+    name: Build Test
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build assets
+      run: npm run build
+
+    - name: Test minification
+      run: npm run minify
+
+    - name: Create distribution package
+      run: npm run zip
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: plugin-build
+        path: skylearn-flashcards.zip
+        retention-days: 7
+
+  accessibility-test:
+    name: Accessibility Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install axe-core CLI
+      run: npm install -g @axe-core/cli
+
+    - name: Start local server
+      run: |
+        # Start a simple HTTP server for testing
+        python3 -m http.server 8000 &
+        sleep 5
+
+    - name: Run accessibility audit
+      run: |
+        # Run axe-core against test pages
+        axe http://localhost:8000 --exit --reporter json > accessibility-report.json
+      continue-on-error: true
+
+    - name: Upload accessibility report
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: accessibility-report
+        path: accessibility-report.json
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: [php-tests, javascript-tests]
+    
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: wp_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+        extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: |
+        composer install --prefer-dist --no-progress
+        npm ci
+
+    - name: Setup WordPress environment
+      run: |
+        # Download and setup WordPress
+        wget https://wordpress.org/latest.tar.gz
+        tar xzf latest.tar.gz
+        
+        # Configure WordPress
+        cp wordpress/wp-config-sample.php wordpress/wp-config.php
+        sed -i 's/database_name_here/wp_test/' wordpress/wp-config.php
+        sed -i 's/username_here/root/' wordpress/wp-config.php
+        sed -i 's/password_here/password/' wordpress/wp-config.php
+        sed -i 's/localhost/127.0.0.1/' wordpress/wp-config.php
+
+    - name: Install WordPress
+      run: |
+        cd wordpress
+        php -S localhost:8080 &
+        sleep 5
+        
+        # Install WordPress via WP-CLI
+        curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+        chmod +x wp-cli.phar
+        ./wp-cli.phar core install --url=http://localhost:8080 --title="Test Site" --admin_user=admin --admin_password=admin --admin_email=test@example.com --allow-root
+
+    - name: Install plugin
+      run: |
+        cd wordpress
+        cp -r ../. wp-content/plugins/skylearn-flashcards/
+        ./wp-cli.phar plugin activate skylearn-flashcards --allow-root
+
+    - name: Run integration tests
+      run: |
+        # Run comprehensive integration tests
+        ./vendor/bin/phpunit --testsuite="SkyLearn Flashcards Integration Tests"
+
+  notification:
+    name: Notification
+    runs-on: ubuntu-latest
+    needs: [php-tests, javascript-tests, security-scan, build-test, accessibility-test, integration-tests]
+    if: always()
+    
+    steps:
+    - name: Notify on success
+      if: needs.php-tests.result == 'success' && needs.javascript-tests.result == 'success'
+      run: |
+        echo "✅ All tests passed successfully!"
+        
+    - name: Notify on failure
+      if: needs.php-tests.result == 'failure' || needs.javascript-tests.result == 'failure'
+      run: |
+        echo "❌ Some tests failed. Please check the logs."
+        exit 1
