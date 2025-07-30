@@ -142,6 +142,7 @@ class SkyLearn_Flashcard {
 		 * Helper functions and utilities
 		 */
 		require_once SKYLEARN_FLASHCARDS_PATH . 'includes/helpers/functions.php';
+		require_once SKYLEARN_FLASHCARDS_PATH . 'includes/helpers.php';
 
 		/**
 		 * Premium functionality (if enabled)
