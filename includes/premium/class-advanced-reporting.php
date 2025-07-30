@@ -331,12 +331,13 @@ class SkyLearn_Flashcards_Advanced_Reporting {
 		), ARRAY_A );
 		
 		// Get study patterns
+		$study_patterns_where = $user_id ? 'WHERE action = \'complete\' AND user_id = %d' : 'WHERE action = \'complete\'';
 		$study_patterns = $wpdb->get_results( $wpdb->prepare(
 			"SELECT 
 				HOUR(created_at) as hour,
 				COUNT(*) as sessions
 			FROM {$analytics_table} 
-			WHERE action = 'complete' {$user_id ? 'AND user_id = %d' : ''}
+			{$study_patterns_where}
 			GROUP BY HOUR(created_at)
 			ORDER BY hour",
 			$query_values
@@ -653,6 +654,368 @@ class SkyLearn_Flashcards_Advanced_Reporting {
 		
 		return array(
 			'content'   => wp_json_encode( $export_data, JSON_PRETTY_PRINT ),
+			'mime_type' => 'application/json'
+		);
+	}
+
+	/**
+	 * AJAX handler for student results export
+	 *
+	 * @since    1.0.0
+	 */
+	public function ajax_export_student_results() {
+		
+		// Verify nonce
+		if ( ! wp_verify_nonce( $_POST['nonce'] ?? '', 'skylearn_export_student_results' ) ) {
+			wp_send_json_error( array( 'message' => __( 'Security check failed.', 'skylearn-flashcards' ) ) );
+		}
+		
+		// Check if premium and user is logged in
+		if ( ! skylearn_is_premium() || ! is_user_logged_in() ) {
+			wp_send_json_error( array( 'message' => __( 'This feature requires a premium license and user account.', 'skylearn-flashcards' ) ) );
+		}
+		
+		$set_id = absint( $_POST['set_id'] ?? 0 );
+		$results = $_POST['results'] ?? array();
+		$stats = $_POST['stats'] ?? array();
+		$format = sanitize_text_field( $_POST['format'] ?? 'pdf' );
+		$include_history = absint( $_POST['include_history'] ?? 1 );
+		$include_recommendations = absint( $_POST['include_recommendations'] ?? 1 );
+		
+		// Get flashcard set data
+		$flashcard_set = skylearn_get_flashcard_set( $set_id );
+		if ( ! $flashcard_set ) {
+			wp_send_json_error( array( 'message' => __( 'Flashcard set not found.', 'skylearn-flashcards' ) ) );
+		}
+		
+		// Generate export data
+		$export_result = $this->format_student_results_export( 
+			$flashcard_set, 
+			$results, 
+			$stats, 
+			$format, 
+			$include_history, 
+			$include_recommendations 
+		);
+		
+		if ( $export_result['content'] ) {
+			wp_send_json_success( array( 
+				'content'   => $export_result['content'],
+				'filename'  => $export_result['filename'],
+				'format'    => $format,
+				'mime_type' => $export_result['mime_type']
+			) );
+		} else {
+			wp_send_json_error( array( 'message' => __( 'Export failed or no data available.', 'skylearn-flashcards' ) ) );
+		}
+	}
+
+	/**
+	 * Format student results for export
+	 *
+	 * @since    1.0.0
+	 * @param    array   $flashcard_set        Flashcard set data
+	 * @param    array   $results              Study results
+	 * @param    array   $stats                Performance statistics  
+	 * @param    string  $format               Export format
+	 * @param    bool    $include_history      Include progress history
+	 * @param    bool    $include_recommendations Include study recommendations
+	 * @return   array                         Array with content, filename, and mime_type
+	 */
+	private function format_student_results_export( $flashcard_set, $results, $stats, $format, $include_history, $include_recommendations ) {
+		
+		$user = wp_get_current_user();
+		$timestamp = current_time( 'Y-m-d-H-i-s' );
+		
+		switch ( $format ) {
+			case 'csv':
+				return $this->format_student_results_csv( $flashcard_set, $results, $stats, $user, $timestamp );
+			case 'pdf':
+				// For now, return HTML that can be converted to PDF
+				return $this->format_student_results_html( $flashcard_set, $results, $stats, $user, $timestamp, $include_history, $include_recommendations );
+			default:
+				return array( 'content' => '', 'filename' => '', 'mime_type' => 'text/plain' );
+		}
+	}
+
+	/**
+	 * Format student results as CSV
+	 *
+	 * @since    1.0.0
+	 * @param    array    $flashcard_set   Flashcard set data
+	 * @param    array    $results         Study results
+	 * @param    array    $stats           Performance statistics
+	 * @param    WP_User  $user            Current user
+	 * @param    string   $timestamp       Export timestamp
+	 * @return   array                     Array with content, filename, and mime_type
+	 */
+	private function format_student_results_csv( $flashcard_set, $results, $stats, $user, $timestamp ) {
+		$csv = '';
+		
+		// Header
+		$csv .= "\"SkyLearn Flashcards - Student Results\"\n";
+		$csv .= "\"Generated: " . current_time( 'Y-m-d H:i:s' ) . "\"\n";
+		$csv .= "\"Student: " . $user->display_name . "\"\n";
+		$csv .= "\"Email: " . $user->user_email . "\"\n";
+		$csv .= "\"Flashcard Set: " . $flashcard_set['title'] . "\"\n\n";
+		
+		// Performance Summary
+		$csv .= "\"PERFORMANCE SUMMARY\"\n";
+		$csv .= "\"Metric\",\"Value\"\n";
+		$csv .= "\"Completion Rate\"," . ( $results['completionRate'] ?? 0 ) . "%\n";
+		$csv .= "\"Time Spent\"," . gmdate( 'H:i:s', $results['timeSpent'] ?? 0 ) . "\n";
+		$csv .= "\"Accuracy Score\"," . ( $results['accuracy'] ?? 0 ) . "/5.0\n";
+		$csv .= "\"Total Cards\"," . ( $results['totalCards'] ?? 0 ) . "\n";
+		$csv .= "\"Completed Cards\"," . ( $results['completedCards'] ?? 0 ) . "\n\n";
+		
+		// Knowledge Breakdown
+		$csv .= "\"KNOWLEDGE BREAKDOWN\"\n";
+		$csv .= "\"Level\",\"Count\"\n";
+		$csv .= "\"Excellent\"," . ( $stats['excellent_cards'] ?? 0 ) . "\n";
+		$csv .= "\"Good\"," . ( $stats['good_cards'] ?? 0 ) . "\n";
+		$csv .= "\"Poor\"," . ( $stats['poor_cards'] ?? 0 ) . "\n";
+		
+		return array(
+			'content'   => $csv,
+			'filename'  => "skylearn-results-{$user->user_login}-{$timestamp}.csv",
+			'mime_type' => 'text/csv'
+		);
+	}
+
+	/**
+	 * Format student results as HTML (for PDF conversion)
+	 *
+	 * @since    1.0.0
+	 * @param    array    $flashcard_set           Flashcard set data
+	 * @param    array    $results                 Study results
+	 * @param    array    $stats                   Performance statistics
+	 * @param    WP_User  $user                    Current user
+	 * @param    string   $timestamp               Export timestamp
+	 * @param    bool     $include_history         Include progress history
+	 * @param    bool     $include_recommendations Include study recommendations
+	 * @return   array                             Array with content, filename, and mime_type
+	 */
+	private function format_student_results_html( $flashcard_set, $results, $stats, $user, $timestamp, $include_history, $include_recommendations ) {
+		ob_start();
+		?>
+		<!DOCTYPE html>
+		<html>
+		<head>
+			<meta charset="UTF-8">
+			<title>SkyLearn Flashcards - Study Results</title>
+			<style>
+				body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
+				.header { background: linear-gradient(135deg, #3498db, #f39c12); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+				.header h1 { margin: 0 0 10px 0; }
+				.summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 20px 0; }
+				.stat-card { background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; border-left: 4px solid #3498db; }
+				.stat-value { font-size: 2em; font-weight: bold; color: #3498db; }
+				.stat-label { font-size: 0.9em; color: #666; margin-top: 5px; }
+				.section { margin: 20px 0; padding: 15px; background: #fff; border: 1px solid #ddd; border-radius: 8px; }
+				.section h2 { margin-top: 0; color: #3498db; }
+				.knowledge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; text-align: center; }
+				.knowledge-item { padding: 10px; border-radius: 8px; }
+				.excellent { background: #d5f4e6; color: #27ae60; }
+				.good { background: #d6eaf8; color: #3498db; }
+				.poor { background: #fadbd8; color: #e74c3c; }
+				@media print { body { margin: 0; } .header { background: #3498db !important; } }
+			</style>
+		</head>
+		<body>
+			<div class="header">
+				<h1>SkyLearn Flashcards - Study Results</h1>
+				<p><strong>Student:</strong> <?php echo esc_html( $user->display_name ); ?> (<?php echo esc_html( $user->user_email ); ?>)</p>
+				<p><strong>Flashcard Set:</strong> <?php echo esc_html( $flashcard_set['title'] ); ?></p>
+				<p><strong>Date:</strong> <?php echo esc_html( current_time( 'F j, Y g:i A' ) ); ?></p>
+			</div>
+
+			<div class="section">
+				<h2>Performance Summary</h2>
+				<div class="summary">
+					<div class="stat-card">
+						<div class="stat-value"><?php echo esc_html( $results['completionRate'] ?? 0 ); ?>%</div>
+						<div class="stat-label">Completion Rate</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-value"><?php echo esc_html( gmdate( 'i:s', $results['timeSpent'] ?? 0 ) ); ?></div>
+						<div class="stat-label">Time Spent</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-value"><?php echo esc_html( round( $results['accuracy'] ?? 0, 1 ) ); ?>/5.0</div>
+						<div class="stat-label">Knowledge Score</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-value"><?php echo esc_html( $results['completedCards'] ?? 0 ); ?>/<?php echo esc_html( $results['totalCards'] ?? 0 ); ?></div>
+						<div class="stat-label">Cards Completed</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="section">
+				<h2>Knowledge Breakdown</h2>
+				<div class="knowledge-grid">
+					<div class="knowledge-item excellent">
+						<div class="stat-value"><?php echo esc_html( $stats['excellent_cards'] ?? 0 ); ?></div>
+						<div class="stat-label">Excellent</div>
+					</div>
+					<div class="knowledge-item good">
+						<div class="stat-value"><?php echo esc_html( $stats['good_cards'] ?? 0 ); ?></div>
+						<div class="stat-label">Good</div>
+					</div>
+					<div class="knowledge-item poor">
+						<div class="stat-value"><?php echo esc_html( $stats['poor_cards'] ?? 0 ); ?></div>
+						<div class="stat-label">Needs Work</div>
+					</div>
+				</div>
+			</div>
+
+			<?php if ( $include_recommendations ) : ?>
+			<div class="section">
+				<h2>Study Recommendations</h2>
+				<ul>
+					<?php if ( ( $results['completionRate'] ?? 0 ) < 100 ) : ?>
+						<li><strong>Continue Studying:</strong> You have more cards to review. Keep going to complete the set!</li>
+					<?php endif; ?>
+					
+					<?php if ( ( $stats['poor_cards'] ?? 0 ) > 0 ) : ?>
+						<li><strong>Review Difficult Cards:</strong> Focus on the <?php echo esc_html( $stats['poor_cards'] ); ?> cards you found challenging.</li>
+					<?php endif; ?>
+					
+					<?php if ( ( $results['accuracy'] ?? 0 ) >= 4.0 && ( $results['completionRate'] ?? 0 ) >= 100 ) : ?>
+						<li><strong>Excellent Work!</strong> You've mastered this set. Consider reviewing it periodically to maintain your knowledge.</li>
+					<?php endif; ?>
+					
+					<li><strong>Schedule Regular Review:</strong> Spaced repetition helps improve long-term retention. Review this set again in a few days.</li>
+				</ul>
+			</div>
+			<?php endif; ?>
+
+			<div class="section">
+				<p><em>Generated by SkyLearn Flashcards on <?php echo esc_html( current_time( 'F j, Y \a\t g:i A' ) ); ?></em></p>
+			</div>
+		</body>
+		</html>
+		<?php
+		$html = ob_get_clean();
+		
+		return array(
+			'content'   => $html,
+			'filename'  => "skylearn-results-{$user->user_login}-{$timestamp}.html",
+			'mime_type' => 'text/html'
+		);
+	}
+
+	/**
+	 * Get LMS integration data for reporting
+	 *
+	 * @since    1.0.0
+	 * @param    array   $args   Query arguments
+	 * @return   array           LMS integration data
+	 */
+	public function get_lms_integration_data( $args = array() ) {
+		
+		// Check if LMS integration is available
+		if ( ! class_exists( 'SkyLearn_Flashcards_LMS_Manager' ) ) {
+			return array();
+		}
+		
+		$lms_manager = new SkyLearn_Flashcards_LMS_Manager();
+		$lms_status = skylearn_get_lms_status();
+		
+		if ( ! $lms_status['enabled'] || empty( $lms_status['detected_lms'] ) ) {
+			return array();
+		}
+		
+		global $wpdb;
+		$analytics_table = $wpdb->prefix . 'skylearn_flashcard_analytics';
+		
+		$defaults = array(
+			'date_from' => date( 'Y-m-d', strtotime( '-30 days' ) ),
+			'date_to'   => date( 'Y-m-d' ),
+		);
+		
+		$args = wp_parse_args( $args, $defaults );
+		
+		// Get flashcard completion data with LMS course correlation
+		$lms_completion_data = $wpdb->get_results( $wpdb->prepare(
+			"SELECT 
+				a.set_id,
+				COUNT(CASE WHEN a.action = 'complete' THEN 1 END) as completions,
+				AVG(CASE WHEN a.action = 'complete' THEN a.accuracy END) as avg_accuracy,
+				pm.meta_value as lms_course_id
+			FROM {$analytics_table} a
+			LEFT JOIN {$wpdb->postmeta} pm ON a.set_id = pm.post_id AND pm.meta_key = '_lms_course_id'
+			WHERE a.created_at BETWEEN %s AND %s
+			GROUP BY a.set_id, pm.meta_value
+			HAVING pm.meta_value IS NOT NULL
+			ORDER BY completions DESC",
+			$args['date_from'] . ' 00:00:00',
+			$args['date_to'] . ' 23:59:59'
+		), ARRAY_A );
+		
+		// Get LMS course titles
+		foreach ( $lms_completion_data as &$data ) {
+			$course_title = get_the_title( $data['lms_course_id'] );
+			$data['course_title'] = $course_title ?: __( 'Unknown Course', 'skylearn-flashcards' );
+			$data['set_title'] = get_the_title( $data['set_id'] ) ?: __( 'Unknown Set', 'skylearn-flashcards' );
+		}
+		
+		return array(
+			'lms_platform'     => $lms_status['detected_lms'],
+			'course_performance' => $lms_completion_data,
+			'integration_active' => true
+		);
+	}
+
+	/**
+	 * Export LMS integration report
+	 *
+	 * @since    1.0.0
+	 * @param    array   $args    Query arguments
+	 * @param    string  $format  Export format
+	 * @return   array            Export data
+	 */
+	public function export_lms_integration_report( $args = array(), $format = 'csv' ) {
+		
+		$lms_data = $this->get_lms_integration_data( $args );
+		
+		if ( empty( $lms_data['course_performance'] ) ) {
+			return array(
+				'content'   => '',
+				'filename'  => '',
+				'mime_type' => 'text/plain'
+			);
+		}
+		
+		if ( $format === 'csv' ) {
+			$csv = '';
+			$csv .= "\"SkyLearn Flashcards - LMS Integration Report\"\n";
+			$csv .= "\"Generated: " . current_time( 'Y-m-d H:i:s' ) . "\"\n";
+			$csv .= "\"LMS Platform: " . implode( ', ', $lms_data['lms_platform'] ) . "\"\n\n";
+			
+			$csv .= "\"COURSE PERFORMANCE\"\n";
+			$csv .= "\"Course Title\",\"Flashcard Set\",\"Completions\",\"Average Accuracy (%)\"\n";
+			
+			foreach ( $lms_data['course_performance'] as $course ) {
+				$csv .= sprintf(
+					'"%s","%s",%d,%.2f' . "\n",
+					str_replace( '"', '""', $course['course_title'] ),
+					str_replace( '"', '""', $course['set_title'] ),
+					$course['completions'],
+					$course['avg_accuracy'] ?: 0
+				);
+			}
+			
+			return array(
+				'content'   => $csv,
+				'filename'  => 'skylearn-lms-integration-' . date( 'Y-m-d-H-i-s' ) . '.csv',
+				'mime_type' => 'text/csv'
+			);
+		}
+		
+		return array(
+			'content'   => wp_json_encode( $lms_data, JSON_PRETTY_PRINT ),
+			'filename'  => 'skylearn-lms-integration-' . date( 'Y-m-d-H-i-s' ) . '.json',
 			'mime_type' => 'application/json'
 		);
 	}
