@@ -89,6 +89,14 @@ class SkyLearn_Flashcards_Shortcode {
 			return $this->render_error( __( 'This flashcard set is not available.', 'skylearn-flashcards' ) );
 		}
 		
+		// Check LMS access restrictions
+		if ( class_exists( 'SkyLearn_Flashcards_LMS_Manager' ) ) {
+			$lms_manager = new SkyLearn_Flashcards_LMS_Manager();
+			if ( ! $lms_manager->user_has_access( $set_id ) ) {
+				return $this->render_error( __( 'You do not have access to this flashcard set. Please check your course enrollment.', 'skylearn-flashcards' ) );
+			}
+		}
+		
 		// Enqueue necessary scripts and styles
 		$this->enqueue_frontend_assets();
 		

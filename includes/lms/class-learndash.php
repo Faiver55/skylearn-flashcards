@@ -217,6 +217,48 @@ class SkyLearn_Flashcards_LearnDash {
 			'default'
 		);
 		
+		// Add save hook
+		add_action( 'save_post', array( $this, 'save_lesson_meta' ) );
+		
+	}
+
+	/**
+	 * Save lesson meta data
+	 *
+	 * @since    1.0.0
+	 * @param    int  $post_id  Post ID
+	 */
+	public function save_lesson_meta( $post_id ) {
+		
+		// Check nonce
+		if ( ! isset( $_POST['skylearn_lesson_nonce'] ) || ! wp_verify_nonce( $_POST['skylearn_lesson_nonce'], 'skylearn_lesson_flashcards' ) ) {
+			return;
+		}
+		
+		// Check permissions
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+		
+		// Check post type
+		if ( get_post_type( $post_id ) !== 'sfwd-lessons' ) {
+			return;
+		}
+		
+		// Save flashcard sets
+		if ( isset( $_POST['skylearn_flashcard_sets'] ) ) {
+			$sets = array_map( 'absint', $_POST['skylearn_flashcard_sets'] );
+			update_post_meta( $post_id, '_skylearn_flashcard_sets', $sets );
+		} else {
+			delete_post_meta( $post_id, '_skylearn_flashcard_sets' );
+		}
+		
+		// Save required accuracy
+		if ( isset( $_POST['skylearn_required_accuracy'] ) ) {
+			$accuracy = absint( $_POST['skylearn_required_accuracy'] );
+			update_post_meta( $post_id, '_skylearn_required_accuracy', $accuracy );
+		}
+		
 	}
 
 	/**

@@ -75,6 +75,15 @@ class SkyLearn_Flashcard {
 	protected $frontend;
 
 	/**
+	 * The LMS Manager instance.
+	 *
+	 * @since    1.0.0
+	 * @access   protected
+	 * @var      SkyLearn_Flashcards_LMS_Manager    $lms_manager    LMS integration manager.
+	 */
+	protected $lms_manager;
+
+	/**
 	 * Define the core functionality of the plugin.
 	 *
 	 * Set the plugin name and the plugin version that can be used throughout the plugin.
@@ -93,6 +102,7 @@ class SkyLearn_Flashcard {
 
 		$this->load_dependencies();
 		$this->set_locale();
+		$this->init_lms_integration();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
 	}
@@ -173,6 +183,24 @@ class SkyLearn_Flashcard {
 		$plugin_i18n = new SkyLearn_Flashcards_i18n();
 
 		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
+	}
+
+	/**
+	 * Initialize LMS integration.
+	 *
+	 * Loads and initializes the LMS Manager for integration with supported LMS platforms.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 */
+	private function init_lms_integration() {
+
+		/**
+		 * Load LMS Manager
+		 */
+		require_once SKYLEARN_FLASHCARDS_PATH . 'includes/lms/class-lms-manager.php';
+
+		$this->lms_manager = new SkyLearn_Flashcards_LMS_Manager();
 	}
 
 	/**
@@ -284,6 +312,16 @@ class SkyLearn_Flashcard {
 		// Check for premium license or setting
 		$premium_license = get_option( 'skylearn_flashcards_premium_license', false );
 		return !empty( $premium_license );
+	}
+
+	/**
+	 * Get LMS Manager instance.
+	 *
+	 * @since     1.0.0
+	 * @return    SkyLearn_Flashcards_LMS_Manager    The LMS Manager instance.
+	 */
+	public function get_lms_manager() {
+		return $this->lms_manager;
 	}
 
 	/**

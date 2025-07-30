@@ -475,6 +475,15 @@ class SkyLearn_Flashcards_Frontend {
 		);
 
 		if ( $result ) {
+			// Track completion in LMS if enabled
+			if ( class_exists( 'SkyLearn_Flashcards_LMS_Manager' ) ) {
+				$lms_manager = new SkyLearn_Flashcards_LMS_Manager();
+				$lms_manager->track_completion( $set_id, get_current_user_id(), $accuracy );
+			}
+			
+			// Fire action hook for other integrations
+			do_action( 'skylearn_flashcard_completed', get_current_user_id(), $set_id, $accuracy );
+			
 			wp_send_json_success();
 		} else {
 			wp_send_json_error( array( 'message' => __( 'Failed to track completion.', 'skylearn-flashcards' ) ) );
