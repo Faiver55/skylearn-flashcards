@@ -24,7 +24,17 @@ $settings = get_option( 'skylearn_flashcards_settings', skylearn_get_default_set
 <div class="skylearn-admin-wrap">
 	
 	<div class="skylearn-admin-header">
-		<h1><?php esc_html_e( 'SkyLearn Flashcards Settings', 'skylearn-flashcards' ); ?></h1>
+		<div class="skylearn-header-content">
+			<div class="skylearn-header-logo">
+				<img src="<?php echo esc_url( SKYLEARN_FLASHCARDS_LOGO . 'logo-horiz.png' ); ?>" 
+					 alt="<?php esc_attr_e( 'SkyLearn Flashcards', 'skylearn-flashcards' ); ?>" 
+					 class="skylearn-logo-horizontal">
+			</div>
+			<div class="skylearn-header-text">
+				<h1><?php esc_html_e( 'SkyLearn Flashcards Settings', 'skylearn-flashcards' ); ?></h1>
+				<p class="skylearn-header-tagline"><?php esc_html_e( 'Configure your flashcard settings and preferences', 'skylearn-flashcards' ); ?></p>
+			</div>
+		</div>
 	</div>
 	
 	<div class="skylearn-admin-content">

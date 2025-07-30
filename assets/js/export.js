@@ -607,7 +607,7 @@
             // Validate file type
             const allowedTypes = ['text/csv', 'application/json', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
             if (!allowedTypes.includes(file.type)) {
-                alert('Please select a CSV, JSON, or Excel file.');
+                alert(skylearn_export.strings.invalid_file_type || 'Please select a CSV, JSON, or Excel file.');
                 return;
             }
 
@@ -664,7 +664,7 @@
                     
                     this.showImportPreview(data, file.type);
                 } catch (error) {
-                    alert('Error parsing file: ' + error.message);
+                    alert((skylearn_export.strings.parse_error || 'Error parsing file: ') + error.message);
                 }
             };
             

@@ -33,25 +33,55 @@
     border-radius: 8px 8px 0 0;
     margin-bottom: 0;
     position: relative;
+    overflow: hidden;
 }
 
 .skylearn-admin-header::before {
     content: '';
     position: absolute;
-    top: 10px;
-    right: 20px;
-    width: 100px;
-    height: 40px;
-    background: url('../img/logo-horiz.png') no-repeat center;
-    background-size: contain;
-    opacity: 0.8;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="80" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="60" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
+    animation: skylearn-float 20s infinite linear;
 }
 
-.skylearn-admin-header h1 {
+@keyframes skylearn-float {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-100px); }
+}
+
+.skylearn-header-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.skylearn-header-logo {
+    flex-shrink: 0;
+}
+
+.skylearn-logo-horizontal {
+    height: 50px;
+    width: auto;
+    filter: brightness(0) invert(1);
+}
+
+.skylearn-header-text h1 {
     color: white;
     margin: 0;
     font-size: 24px;
     font-weight: 600;
+}
+
+.skylearn-header-tagline {
+    color: rgba(255, 255, 255, 0.9);
+    margin: 5px 0 0 0;
+    font-size: 14px;
+    font-weight: 400;
 }
 
 .skylearn-admin-content {
@@ -95,13 +125,36 @@
     color: white;
     padding: 8px 16px;
     border-radius: 6px;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+#add-new-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
 }
 
 #add-new-card:hover {
     background: #2980b9;
     border-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+#add-new-card:hover::before {
+    left: 100%;
+}
+
+#add-new-card:active {
     transform: translateY(-1px);
+    transition: all 0.1s ease;
 }
 
 /* Cards Container */
@@ -133,13 +186,41 @@
     border: 1px solid var(--skylearn-border);
     border-radius: 8px;
     margin-bottom: 15px;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: move;
+    position: relative;
+    overflow: hidden;
+}
+
+.skylearn-card-editor::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--skylearn-primary), var(--skylearn-accent));
+    transition: left 0.3s ease;
 }
 
 .skylearn-card-editor:hover {
     border-color: var(--skylearn-primary);
-    box-shadow: 0 2px 10px rgba(52, 152, 219, 0.1);
+    box-shadow: 0 4px 20px rgba(52, 152, 219, 0.15);
+    transform: translateY(-2px);
+}
+
+.skylearn-card-editor:hover::before {
+    left: 0;
+}
+
+.skylearn-card-editor:focus-within {
+    border-color: var(--skylearn-primary);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    transform: translateY(-2px);
+}
+
+.skylearn-card-editor:focus-within::before {
+    left: 0;
 }
 
 .card-header {
@@ -213,7 +294,8 @@
     font-size: 14px;
     line-height: 1.4;
     resize: vertical;
-    transition: border-color 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
 }
 
 .card-front:focus,
@@ -221,6 +303,13 @@
     border-color: var(--skylearn-primary);
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
     outline: none;
+    transform: scale(1.02);
+}
+
+.card-front:hover,
+.card-back:hover {
+    border-color: var(--skylearn-primary);
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.1);
 }
 
 /* Editor Actions */
@@ -240,13 +329,49 @@
     color: white;
     padding: 10px 20px;
     border-radius: 6px;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+#save-cards::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
 }
 
 #save-cards:hover {
     background: #219a52;
     border-color: #219a52;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(39, 174, 96, 0.3);
+}
+
+#save-cards:hover::before {
+    left: 100%;
+}
+
+#save-cards:active {
     transform: translateY(-1px);
+    transition: all 0.1s ease;
+}
+
+#save-cards:disabled {
+    background: #ccc;
+    border-color: #ccc;
+    transform: none;
+    box-shadow: none;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+#save-cards:disabled::before {
+    display: none;
 }
 
 .save-status {
@@ -351,30 +476,121 @@
     border-radius: 8px;
     margin: 20px 0;
     text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.skylearn-upsell::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+    animation: skylearn-shine 3s infinite;
+}
+
+@keyframes skylearn-shine {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
 }
 
 .skylearn-upsell h3 {
     color: white;
     margin-top: 0;
+    position: relative;
+    z-index: 1;
 }
 
 .skylearn-upsell .button {
     background: white;
     color: var(--skylearn-primary);
     border: none;
-    padding: 10px 20px;
+    padding: 12px 24px;
     font-weight: 600;
     border-radius: 6px;
     text-decoration: none;
     display: inline-block;
     margin-top: 10px;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    z-index: 1;
 }
 
 .skylearn-upsell .button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
     color: var(--skylearn-primary);
+}
+
+/* Premium Badges */
+.skylearn-premium-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    color: #333;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+    animation: skylearn-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes skylearn-glow {
+    from { box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3); }
+    to { box-shadow: 0 2px 12px rgba(255, 215, 0, 0.5); }
+}
+
+.skylearn-premium-badge::before {
+    content: '⭐';
+    font-size: 10px;
+}
+
+/* Premium Feature Containers */
+.skylearn-premium-feature {
+    position: relative;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(135deg, #ffd700, #ffed4e) border-box;
+}
+
+.skylearn-premium-feature::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    right: -1px;
+    bottom: -1px;
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    border-radius: 8px;
+    z-index: -1;
+    opacity: 0.1;
+}
+
+/* Premium Locked State */
+.skylearn-premium-locked {
+    position: relative;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.skylearn-premium-locked::after {
+    content: '🔒';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 16px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 5px 8px;
+    border-radius: 4px;
+    z-index: 10;
 }
 
 /* Responsive Design */
@@ -546,7 +762,101 @@
     to { transform: rotate(360deg); }
 }
 
+/* Enhanced Loading States */
+.skylearn-loading-dots {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.skylearn-loading-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--skylearn-primary);
+    animation: skylearn-pulse 1.4s ease-in-out infinite both;
+}
+
+.skylearn-loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.skylearn-loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+.skylearn-loading-dots span:nth-child(3) { animation-delay: 0; }
+
+@keyframes skylearn-pulse {
+    0%, 80%, 100% { 
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    40% { 
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Skeleton Loading */
+.skylearn-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skylearn-skeleton 1.5s infinite;
+    border-radius: 4px;
+}
+
+@keyframes skylearn-skeleton {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Progress Bar Enhancements */
+.skylearn-progress-bar {
+    background: var(--skylearn-border);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    height: 8px;
+}
+
+.skylearn-progress-fill {
+    background: linear-gradient(90deg, var(--skylearn-primary), var(--skylearn-accent));
+    height: 100%;
+    border-radius: 8px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.skylearn-progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0) 100%
+    );
+    animation: skylearn-shimmer 2s infinite;
+}
+
+@keyframes skylearn-shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
 /* Responsive Design */
+@media (max-width: 1200px) {
+    .skylearn-header-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .skylearn-logo-horizontal {
+        height: 40px;
+    }
+}
+
 @media (max-width: 768px) {
     .skylearn-admin-wrap {
         margin: 20px 10px 0 0;
@@ -561,6 +871,52 @@
     .skylearn-form-table td {
         display: block;
         padding-top: 5px;
+    }
+    
+    .skylearn-nav-tabs {
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .skylearn-nav-tabs a {
+        display: inline-block;
+        min-width: 100px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .skylearn-admin-header {
+        padding: 15px;
+    }
+    
+    .skylearn-admin-content {
+        padding: 15px;
+    }
+    
+    .skylearn-card-editor {
+        margin-bottom: 20px;
+    }
+    
+    .card-content {
+        padding: 10px;
+        gap: 10px;
+    }
+    
+    .card-front,
+    .card-back {
+        min-height: 60px;
+        font-size: 13px;
+    }
+    
+    .skylearn-upsell {
+        padding: 15px;
+        text-align: left;
+    }
+    
+    .skylearn-upsell h3 {
+        font-size: 18px;
     }
 }
 

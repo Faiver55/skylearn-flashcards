@@ -30,21 +30,30 @@ $is_first = $index === 0;
 
 <div class="skylearn-flashcard <?php echo $is_first ? 'active' : ''; ?>" 
      data-card-id="<?php echo esc_attr( $card_id ); ?>"
-     data-card-index="<?php echo esc_attr( $index ); ?>">
+     data-card-index="<?php echo esc_attr( $index ); ?>"
+     role="button"
+     tabindex="0"
+     aria-label="<?php printf( esc_attr__( 'Flashcard %d, click or press space to flip', 'skylearn-flashcards' ), $index + 1 ); ?>"
+     aria-expanded="false"
+     aria-describedby="flashcard-instructions-<?php echo esc_attr( $card_id ); ?>">
      
     <div class="skylearn-card-inner">
         
         <!-- Front Side (Question) -->
-        <div class="skylearn-card-front">
+        <div class="skylearn-card-front" aria-hidden="false">
             <div class="skylearn-card-content">
                 <div class="skylearn-card-header">
-                    <span class="skylearn-card-type"><?php esc_html_e( 'Question', 'skylearn-flashcards' ); ?></span>
-                    <span class="skylearn-card-number"><?php echo esc_html( $index + 1 ); ?></span>
+                    <span class="skylearn-card-type" aria-label="<?php esc_attr_e( 'Question side', 'skylearn-flashcards' ); ?>">
+                        <?php esc_html_e( 'Question', 'skylearn-flashcards' ); ?>
+                    </span>
+                    <span class="skylearn-card-number" aria-label="<?php printf( esc_attr__( 'Card %d', 'skylearn-flashcards' ), $index + 1 ); ?>">
+                        <?php echo esc_html( $index + 1 ); ?>
+                    </span>
                 </div>
                 
                 <div class="skylearn-card-body">
                     <?php if ( ! empty( $question ) ) : ?>
-                        <div class="skylearn-question">
+                        <div class="skylearn-question" role="heading" aria-level="3">
                             <?php echo wp_kses_post( $question ); ?>
                         </div>
                     <?php else : ?>
@@ -73,21 +82,25 @@ $is_first = $index === 0;
         </div>
         
         <!-- Back Side (Answer) -->
-        <div class="skylearn-card-back">
+        <div class="skylearn-card-back" aria-hidden="true">
             <div class="skylearn-card-content">
                 <div class="skylearn-card-header">
-                    <span class="skylearn-card-type"><?php esc_html_e( 'Answer', 'skylearn-flashcards' ); ?></span>
-                    <span class="skylearn-card-number"><?php echo esc_html( $index + 1 ); ?></span>
+                    <span class="skylearn-card-type" aria-label="<?php esc_attr_e( 'Answer side', 'skylearn-flashcards' ); ?>">
+                        <?php esc_html_e( 'Answer', 'skylearn-flashcards' ); ?>
+                    </span>
+                    <span class="skylearn-card-number" aria-label="<?php printf( esc_attr__( 'Card %d', 'skylearn-flashcards' ), $index + 1 ); ?>">
+                        <?php echo esc_html( $index + 1 ); ?>
+                    </span>
                 </div>
                 
                 <div class="skylearn-card-body">
                     <?php if ( ! empty( $answer ) ) : ?>
-                        <div class="skylearn-answer">
+                        <div class="skylearn-answer" role="heading" aria-level="3">
                             <?php echo wp_kses_post( $answer ); ?>
                         </div>
                     <?php else : ?>
-                        <div class="skylearn-placeholder">
-                            <span class="dashicons dashicons-editor-help"></span>
+                        <div class="skylearn-placeholder" role="alert">
+                            <span class="dashicons dashicons-editor-help" aria-hidden="true"></span>
                             <p><?php esc_html_e( 'No answer available', 'skylearn-flashcards' ); ?></p>
                         </div>
                     <?php endif; ?>
@@ -195,3 +208,8 @@ jQuery(document).ready(function($) {
     });
 });
 </script>
+
+<!-- Accessibility Instructions -->
+<div id="flashcard-instructions-<?php echo esc_attr( $card_id ); ?>" class="skylearn-sr-only">
+    <?php esc_html_e( 'Use arrow keys to navigate between cards, space bar to flip cards, and tab to access interactive elements.', 'skylearn-flashcards' ); ?>
+</div>

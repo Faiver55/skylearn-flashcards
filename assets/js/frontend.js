@@ -236,7 +236,7 @@
         resetProgress: function(e) {
             e.preventDefault();
             
-            if (!confirm('Are you sure you want to reset your progress?')) {
+            if (!confirm(skylearn_frontend.strings.confirm_reset_progress || 'Are you sure you want to reset your progress?')) {
                 return;
             }
             
@@ -378,7 +378,8 @@
             // Add ARIA labels
             $('.skylearn-flashcard').attr('role', 'button')
                 .attr('tabindex', '0')
-                .attr('aria-label', 'Click to flip flashcard');
+                .attr('aria-label', 'Click to flip flashcard')
+                .attr('aria-expanded', 'false');
             
             // Add keyboard support for card flipping
             $('.skylearn-flashcard').on('keydown', function(e) {
@@ -387,6 +388,36 @@
                     $(this).click();
                 }
             });
+            
+            // Manage focus indicators
+            $(document).on('focusin', '.skylearn-flashcard', function() {
+                $(this).attr('data-keyboard-focused', 'true');
+            });
+            
+            $(document).on('focusout', '.skylearn-flashcard', function() {
+                $(this).removeAttr('data-keyboard-focused');
+            });
+            
+            // Update ARIA states on flip
+            $(document).on('click', '.skylearn-flashcard', function() {
+                const $card = $(this);
+                const isFlipped = $card.hasClass('flipped');
+                
+                $card.attr('aria-expanded', isFlipped ? 'true' : 'false');
+                
+                // Update card side visibility for screen readers
+                $card.find('.skylearn-card-front').attr('aria-hidden', isFlipped ? 'true' : 'false');
+                $card.find('.skylearn-card-back').attr('aria-hidden', isFlipped ? 'false' : 'true');
+            });
+            
+            // Add skip link for keyboard navigation
+            if ($('.skylearn-skip-link').length === 0) {
+                $('body').prepend(`
+                    <a href="#skylearn-main-content" class="skylearn-skip-link skylearn-sr-only">
+                        ${skylearn_frontend.strings.skip_to_content || 'Skip to main content'}
+                    </a>
+                `);
+            }
         },
 
         /**
