@@ -183,7 +183,7 @@
         removeFlashcard: function(e) {
             e.preventDefault();
             
-            if (confirm('Are you sure you want to remove this flashcard?')) {
+            if (confirm(skylearn_admin.strings.confirm_remove_card || 'Are you sure you want to remove this flashcard?')) {
                 $(this).closest('.skylearn-flashcard-item').remove();
                 SkyLearnAdmin.updateCardIndexes();
             }
@@ -306,7 +306,7 @@
                 return;
             }
             
-            if (!confirm('Are you sure you want to perform this action?')) {
+            if (!confirm(skylearn_admin.strings.confirm_bulk_action || 'Are you sure you want to perform this action?')) {
                 return;
             }
             

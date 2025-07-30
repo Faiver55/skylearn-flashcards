@@ -96,7 +96,9 @@ class SkyLearn_Flashcards_Renderer {
 			 data-shuffle="<?php echo esc_attr( $settings['shuffle'] ); ?>"
 			 data-show-progress="<?php echo esc_attr( $settings['show_progress'] ); ?>"
 			 data-autoplay="<?php echo esc_attr( $settings['autoplay'] ); ?>"
-			 data-autoplay-delay="<?php echo esc_attr( $settings['autoplay_delay'] * 1000 ); ?>">
+			 data-autoplay-delay="<?php echo esc_attr( $settings['autoplay_delay'] * 1000 ); ?>"
+			 role="main"
+			 aria-label="<?php esc_attr_e( 'Flashcard study session', 'skylearn-flashcards' ); ?>">
 			
 			<!-- Header -->
 			<div class="skylearn-header">
@@ -113,7 +115,7 @@ class SkyLearn_Flashcards_Renderer {
 			</div>
 			
 			<!-- Cards Container -->
-			<div class="skylearn-cards-wrapper">
+			<div id="skylearn-main-content" class="skylearn-cards-wrapper">
 				<?php foreach ( $cards as $index => $card ) : ?>
 					<?php $this->render_flashcard( $card, $index, $index === 0 ); ?>
 				<?php endforeach; ?>

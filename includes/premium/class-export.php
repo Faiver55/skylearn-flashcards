@@ -525,11 +525,13 @@ class SkyLearn_Flashcards_Export {
 			'ajaxurl' => admin_url( 'admin-ajax.php' ),
 			'nonce'   => wp_create_nonce( 'skylearn_bulk_export' ),
 			'strings' => array(
-				'export_error'     => __( 'Export failed. Please try again.', 'skylearn-flashcards' ),
-				'import_error'     => __( 'Import failed. Please try again.', 'skylearn-flashcards' ),
-				'invalid_file'     => __( 'Please select a valid CSV, JSON, or Excel file.', 'skylearn-flashcards' ),
-				'no_sets_selected' => __( 'Please select at least one flashcard set to export.', 'skylearn-flashcards' ),
-				'confirm_import'   => __( 'This will import the selected data. Continue?', 'skylearn-flashcards' ),
+				'export_error'      => __( 'Export failed. Please try again.', 'skylearn-flashcards' ),
+				'import_error'      => __( 'Import failed. Please try again.', 'skylearn-flashcards' ),
+				'invalid_file'      => __( 'Please select a valid CSV, JSON, or Excel file.', 'skylearn-flashcards' ),
+				'invalid_file_type' => __( 'Please select a CSV, JSON, or Excel file.', 'skylearn-flashcards' ),
+				'parse_error'       => __( 'Error parsing file: ', 'skylearn-flashcards' ),
+				'no_sets_selected'  => __( 'Please select at least one flashcard set to export.', 'skylearn-flashcards' ),
+				'confirm_import'    => __( 'This will import the selected data. Continue?', 'skylearn-flashcards' ),
 			),
 		) );
 	}

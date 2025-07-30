@@ -595,6 +595,27 @@
     border: 0 !important;
 }
 
+/* Skip Link */
+.skylearn-skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: var(--skylearn-primary);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 600;
+    z-index: 10000;
+    transition: top 0.3s;
+}
+
+.skylearn-skip-link:focus {
+    top: 6px;
+    color: white;
+    text-decoration: none;
+}
+
 /* Focus Indicators */
 .skylearn-flashcard:focus {
     outline: 3px solid var(--skylearn-accent);

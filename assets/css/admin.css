@@ -845,6 +845,18 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1200px) {
+    .skylearn-header-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+    }
+    
+    .skylearn-logo-horizontal {
+        height: 40px;
+    }
+}
+
 @media (max-width: 768px) {
     .skylearn-admin-wrap {
         margin: 20px 10px 0 0;
@@ -859,6 +871,52 @@
     .skylearn-form-table td {
         display: block;
         padding-top: 5px;
+    }
+    
+    .skylearn-nav-tabs {
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .skylearn-nav-tabs a {
+        display: inline-block;
+        min-width: 100px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .skylearn-admin-header {
+        padding: 15px;
+    }
+    
+    .skylearn-admin-content {
+        padding: 15px;
+    }
+    
+    .skylearn-card-editor {
+        margin-bottom: 20px;
+    }
+    
+    .card-content {
+        padding: 10px;
+        gap: 10px;
+    }
+    
+    .card-front,
+    .card-back {
+        min-height: 60px;
+        font-size: 13px;
+    }
+    
+    .skylearn-upsell {
+        padding: 15px;
+        text-align: left;
+    }
+    
+    .skylearn-upsell h3 {
+        font-size: 18px;
     }
 }
 
