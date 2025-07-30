@@ -1,0 +1,24 @@
+# SkyLearn Flashcards Logo Placeholder
+# ====================================
+# 
+# This is a placeholder for the horizontal logo image.
+# Replace this file with the actual logo image:
+# - Format: PNG (recommended) or SVG
+# - Dimensions: 300x80px (or similar aspect ratio)
+# - Background: Transparent
+# - Colors: Primary #3498db, Accent #f39c12
+# 
+# File should contain:
+# - SkyLearn Flashcards branding
+# - Skyian LLC company branding
+# - Professional, educational design
+# 
+# Usage:
+# - WordPress admin header
+# - Plugin documentation
+# - Marketing materials
+# 
+# @package SkyLearn_Flashcards
+# @subpackage Assets/Images
+# @author Ferdous Khalifa
+# @copyright 2024 Skyian LLC

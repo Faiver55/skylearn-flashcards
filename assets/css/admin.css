@@ -1,0 +1,190 @@
+/* SkyLearn Flashcards - Admin Styles */
+/* ================================== */
+
+/**
+ * Admin interface styles for SkyLearn Flashcards plugin
+ * 
+ * @package SkyLearn_Flashcards
+ * @subpackage Assets/CSS
+ * @author Ferdous Khalifa
+ * @copyright 2024 Skyian LLC
+ */
+
+:root {
+    --skylearn-primary: #3498db;     /* Sky Blue */
+    --skylearn-accent: #f39c12;      /* Soft Orange */
+    --skylearn-background: #f8f9fa;  /* Light Gray */
+    --skylearn-text: #222831;        /* Dark Slate */
+    --skylearn-border: #e9ecef;
+    --skylearn-success: #27ae60;
+    --skylearn-warning: #f1c40f;
+    --skylearn-error: #e74c3c;
+}
+
+/* Admin Dashboard Styles */
+.skylearn-admin-wrap {
+    margin: 20px 20px 0 0;
+}
+
+.skylearn-admin-header {
+    background: var(--skylearn-primary);
+    color: white;
+    padding: 20px;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 0;
+}
+
+.skylearn-admin-header h1 {
+    color: white;
+    margin: 0;
+    font-size: 24px;
+}
+
+.skylearn-admin-content {
+    background: white;
+    border: 1px solid var(--skylearn-border);
+    border-top: none;
+    padding: 20px;
+    border-radius: 0 0 8px 8px;
+}
+
+/* Navigation Tabs */
+.skylearn-nav-tabs {
+    border-bottom: 1px solid var(--skylearn-border);
+    margin-bottom: 20px;
+}
+
+.skylearn-nav-tabs a {
+    display: inline-block;
+    padding: 12px 20px;
+    text-decoration: none;
+    color: var(--skylearn-text);
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.skylearn-nav-tabs a:hover,
+.skylearn-nav-tabs a.active {
+    color: var(--skylearn-primary);
+    border-bottom-color: var(--skylearn-primary);
+}
+
+/* Forms */
+.skylearn-form-table {
+    width: 100%;
+}
+
+.skylearn-form-table th {
+    width: 200px;
+    text-align: left;
+    vertical-align: top;
+    padding: 15px 10px 15px 0;
+}
+
+.skylearn-form-table td {
+    padding: 15px 0;
+}
+
+/* Buttons */
+.skylearn-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: var(--skylearn-primary);
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.skylearn-btn:hover {
+    background: var(--skylearn-accent);
+    color: white;
+}
+
+.skylearn-btn-secondary {
+    background: var(--skylearn-border);
+    color: var(--skylearn-text);
+}
+
+.skylearn-btn-secondary:hover {
+    background: #ddd;
+}
+
+/* Cards and Panels */
+.skylearn-card {
+    background: white;
+    border: 1px solid var(--skylearn-border);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.skylearn-card-header {
+    border-bottom: 1px solid var(--skylearn-border);
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+
+.skylearn-card-title {
+    margin: 0;
+    font-size: 18px;
+    color: var(--skylearn-text);
+}
+
+/* Alerts and Notices */
+.skylearn-notice {
+    padding: 15px;
+    margin: 20px 0;
+    border-left: 4px solid var(--skylearn-primary);
+    background: var(--skylearn-background);
+}
+
+.skylearn-notice-success {
+    border-left-color: var(--skylearn-success);
+}
+
+.skylearn-notice-warning {
+    border-left-color: var(--skylearn-warning);
+}
+
+.skylearn-notice-error {
+    border-left-color: var(--skylearn-error);
+}
+
+/* Loading and Progress */
+.skylearn-loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid var(--skylearn-border);
+    border-radius: 50%;
+    border-top-color: var(--skylearn-primary);
+    animation: skylearn-spin 1s ease-in-out infinite;
+}
+
+@keyframes skylearn-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .skylearn-admin-wrap {
+        margin: 20px 10px 0 0;
+    }
+    
+    .skylearn-form-table th {
+        width: auto;
+        display: block;
+        padding-bottom: 5px;
+    }
+    
+    .skylearn-form-table td {
+        display: block;
+        padding-top: 5px;
+    }
+}
+
+/* Placeholder for future admin styles */

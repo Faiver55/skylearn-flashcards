@@ -1,0 +1,102 @@
+{
+    "name": "skyian/skylearn-flashcards",
+    "description": "Premium WordPress flashcard plugin for interactive learning experiences",
+    "type": "wordpress-plugin",
+    "keywords": ["wordpress", "plugin", "flashcards", "education", "learning", "lms"],
+    "homepage": "https://skyian.com/skylearn-flashcards/",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "Ferdous Khalifa",
+            "email": "support@skyian.com",
+            "homepage": "https://skyian.com/",
+            "role": "Developer"
+        },
+        {
+            "name": "Skyian LLC",
+            "email": "support@skyian.com",
+            "homepage": "https://skyian.com/",
+            "role": "Company"
+        }
+    ],
+    "support": {
+        "email": "support@skyian.com",
+        "issues": "https://github.com/Faiver55/skylearn-flashcards/issues",
+        "forum": "https://skyian.com/support/",
+        "docs": "https://skyian.com/skylearn-flashcards/docs/",
+        "source": "https://github.com/Faiver55/skylearn-flashcards"
+    },
+    "require": {
+        "php": ">=7.4",
+        "ext-json": "*",
+        "ext-mbstring": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.0",
+        "squizlabs/php_codesniffer": "^3.5",
+        "phpmd/phpmd": "^2.8",
+        "wp-coding-standards/wpcs": "^2.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "SkyLearn\\Flashcards\\": "includes/"
+        },
+        "files": [
+            "includes/helpers/functions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SkyLearn\\Flashcards\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test:coverage": "phpunit --coverage-html coverage",
+        "lint": "phpcs --standard=WordPress includes/ skylearn-flashcards.php",
+        "lint:fix": "phpcbf --standard=WordPress includes/ skylearn-flashcards.php",
+        "analyze": "phpmd includes/ text cleancode,codesize,controversial,design,naming,unusedcode",
+        "build": [
+            "@lint",
+            "@test",
+            "@analyze"
+        ],
+        "post-install-cmd": [
+            "php -r \"copy('.env.example', '.env');\""
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "extra": {
+        "wordpress-install-dir": "wordpress",
+        "installer-paths": {
+            "wordpress/wp-content/plugins/{$name}/": ["type:wordpress-plugin"],
+            "wordpress/wp-content/themes/{$name}/": ["type:wordpress-theme"]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "archive": {
+        "exclude": [
+            "/tests",
+            "/docs",
+            "/.github",
+            "/.git",
+            "/.gitignore",
+            "/phpunit.xml",
+            "/phpcs.xml",
+            "/.env.example",
+            "/composer.json",
+            "/composer.lock",
+            "/package.json",
+            "/package-lock.json",
+            "/webpack.config.js",
+            "/README.md"
+        ]
+    }
+}
