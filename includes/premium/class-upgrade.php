@@ -345,7 +345,7 @@ class SkyLearn_Flashcards_Upgrade {
 		
 		$count = $wpdb->get_var( $wpdb->prepare(
 			"SELECT COUNT(*) FROM {$wpdb->posts} 
-			WHERE post_type = 'skylearn_flashcard_set' 
+			WHERE post_type = 'flashcard_set' 
 			AND post_author = %d 
 			AND post_status = 'publish'",
 			$user_id

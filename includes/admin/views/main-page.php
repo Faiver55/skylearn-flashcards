@@ -21,7 +21,7 @@ $is_welcome = isset( $_GET['skylearn_welcome'] ) && $_GET['skylearn_welcome'] ==
 
 // Get flashcard sets
 $flashcard_sets = get_posts( array(
-	'post_type'      => 'skylearn_flashcard',
+	'post_type'      => 'flashcard_set',
 	'post_status'    => array( 'publish', 'draft', 'private' ),
 	'numberposts'    => 20,
 	'orderby'        => 'date',

@@ -82,17 +82,22 @@ function deactivate_skylearn_flashcards() {
  * Ensure admin capability is assigned during activation.
  * 
  * This function provides a safety net to ensure that the administrator role has 
- * the required capability to access the Flashcards admin pages. While the main
+ * the required capabilities to access the Flashcards admin pages. While the main
  * activation process in SkyLearn_Flashcards_Setup::add_capabilities() also adds
- * this capability, this dedicated hook ensures it's present even if there were
+ * these capabilities, this dedicated hook ensures they're present even if there were
  * issues during the main activation process.
  *
  * @since    1.0.0
  */
 function skylearn_flashcards_add_caps() {
 	$role = get_role( 'administrator' );
-	if ( $role && ! $role->has_cap( 'edit_skylearn_flashcards' ) ) {
-		$role->add_cap( 'edit_skylearn_flashcards' );
+	if ( $role ) {
+		if ( ! $role->has_cap( 'edit_skylearn_flashcards' ) ) {
+			$role->add_cap( 'edit_skylearn_flashcards' );
+		}
+		if ( ! $role->has_cap( 'read_skylearn_flashcards' ) ) {
+			$role->add_cap( 'read_skylearn_flashcards' );
+		}
 	}
 }
 

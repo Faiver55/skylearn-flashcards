@@ -57,7 +57,7 @@ function skylearn_flashcards_uninstall() {
 	
 	// Get all flashcard posts and delete them
 	$flashcard_posts = get_posts( array(
-		'post_type'      => 'skylearn_flashcard',
+		'post_type'      => 'flashcard_set',
 		'post_status'    => 'any',
 		'numberposts'    => -1,
 		'fields'         => 'ids'

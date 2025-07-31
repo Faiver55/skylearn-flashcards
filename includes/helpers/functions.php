@@ -62,7 +62,7 @@ function skylearn_get_flashcard_set( $set_id ) {
 
 	$post = get_post( $set_id );
 	
-	if ( ! $post || $post->post_type !== 'skylearn_flashcard' ) {
+	if ( ! $post || $post->post_type !== 'flashcard_set' ) {
 		return false;
 	}
 

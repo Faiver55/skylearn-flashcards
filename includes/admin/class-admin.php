@@ -553,7 +553,7 @@ class SkyLearn_Flashcards_Admin {
 		// Create new flashcard set
 		$post_id = wp_insert_post( array(
 			'post_title'  => sanitize_text_field( $_POST['set_title'] ?? 'Imported Flashcard Set' ),
-			'post_type'   => 'skylearn_flashcard',
+			'post_type'   => 'flashcard_set',
 			'post_status' => 'draft',
 			'post_author' => get_current_user_id(),
 		) );
