@@ -1,6 +1,6 @@
 {
   "name": "skylearn-flashcards",
-  "version": "1.0.0-beta",
+  "version": "1.0.0",
   "description": "Premium WordPress flashcard plugin for interactive learning experiences",
   "main": "assets/js/frontend.js",
   "scripts": {
@@ -21,7 +21,9 @@
     "zip": "npm run build && zip -r skylearn-flashcards.zip . -x 'node_modules/*' '*.json' '*.md' '.git*' 'tests/*' 'docs/*' 'webpack.config.js'",
     "zip:beta": "zip -r skylearn-flashcards-beta.zip . -x 'node_modules/*' '*.json' '*.md' '.git*' 'tests/*' 'webpack.config.js' '.github/*' 'bin/*'",
     "release": "npm run build && npm run test && npm run zip",
-    "release:beta": "npm run build && npm run zip:beta"
+    "release:beta": "npm run build && npm run zip:beta",
+    "build:marketplace": "./build-marketplace.sh",
+    "package:wordpress": "npm run build && ./build-marketplace.sh"
   },
   "keywords": [
     "wordpress",
