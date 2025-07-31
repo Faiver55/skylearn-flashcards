@@ -50,6 +50,17 @@ define( 'SKYLEARN_FLASHCARDS_COLOR_BACKGROUND', '#f8f9fa' ); // Light Gray
 define( 'SKYLEARN_FLASHCARDS_COLOR_TEXT', '#222831' ); // Dark Slate
 
 /**
+ * Beta-specific constants
+ */
+if ( strpos( SKYLEARN_FLASHCARDS_VERSION, 'beta' ) !== false ) {
+	define( 'SKYLEARN_FLASHCARDS_IS_BETA', true );
+	define( 'SKYLEARN_FLASHCARDS_BETA_SUPPORT_EMAIL', 'support@skyian.com' );
+	define( 'SKYLEARN_FLASHCARDS_BETA_REPO_URL', 'https://github.com/Faiver55/skylearn-flashcards' );
+} else {
+	define( 'SKYLEARN_FLASHCARDS_IS_BETA', false );
+}
+
+/**
  * The code that runs during plugin activation.
  * This action is documented in includes/setup/class-setup.php
  */
@@ -91,3 +102,70 @@ function run_skylearn_flashcards() {
 }
 
 run_skylearn_flashcards();
+
+/**
+ * Beta-specific helper functions
+ */
+if ( SKYLEARN_FLASHCARDS_IS_BETA ) {
+	
+	/**
+	 * Check if current install is beta version
+	 *
+	 * @since 1.0.0-beta
+	 * @return bool
+	 */
+	function skylearn_is_beta() {
+		return SKYLEARN_FLASHCARDS_IS_BETA;
+	}
+	
+	/**
+	 * Get beta support email
+	 *
+	 * @since 1.0.0-beta
+	 * @return string
+	 */
+	function skylearn_get_beta_support_email() {
+		return SKYLEARN_FLASHCARDS_BETA_SUPPORT_EMAIL;
+	}
+	
+	/**
+	 * Get beta repository URL
+	 *
+	 * @since 1.0.0-beta
+	 * @return string
+	 */
+	function skylearn_get_beta_repo_url() {
+		return SKYLEARN_FLASHCARDS_BETA_REPO_URL;
+	}
+	
+	/**
+	 * Log beta event
+	 *
+	 * @since 1.0.0-beta
+	 * @param string $message
+	 * @param array $context
+	 */
+	function skylearn_log_beta_event( $message, $context = array() ) {
+		if ( class_exists( 'SkyLearn_Flashcards_Beta' ) ) {
+			$beta = new SkyLearn_Flashcards_Beta();
+			$beta->log_beta_event( $message, $context );
+		}
+	}
+	
+	/**
+	 * Show beta admin notice
+	 *
+	 * @since 1.0.0-beta
+	 * @param string $message
+	 * @param string $type
+	 */
+	function skylearn_show_beta_notice( $message, $type = 'info' ) {
+		add_action( 'admin_notices', function() use ( $message, $type ) {
+			$class = 'notice notice-' . $type . ' skylearn-beta-notice';
+			printf( '<div class="%1$s"><p>🧪 <strong>Beta:</strong> %2$s</p></div>', 
+				esc_attr( $class ), 
+				esc_html( $message ) 
+			);
+		} );
+	}
+}

@@ -36,6 +36,7 @@ class SkyLearn_Flashcards_Beta {
 		add_action( 'wp_ajax_skylearn_beta_feedback', array( $this, 'handle_beta_feedback' ) );
 		add_action( 'wp_ajax_skylearn_dismiss_beta_notice', array( $this, 'dismiss_beta_notice' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_beta_scripts' ) );
+		add_action( 'wp_dashboard_setup', array( $this, 'add_beta_dashboard_widget' ) );
 	}
 
 	/**
@@ -508,5 +509,183 @@ class SkyLearn_Flashcards_Beta {
 		);
 
 		error_log( '[SkyLearn Beta] ' . wp_json_encode( $log_entry ) );
+	}
+
+	/**
+	 * Add beta dashboard widget.
+	 *
+	 * @since 1.0.0-beta
+	 */
+	public function add_beta_dashboard_widget() {
+		if ( ! $this->is_beta_version() ) {
+			return;
+		}
+
+		wp_add_dashboard_widget(
+			'skylearn_beta_widget',
+			'🧪 SkyLearn Flashcards Beta Testing',
+			array( $this, 'beta_dashboard_widget' )
+		);
+	}
+
+	/**
+	 * Beta dashboard widget content.
+	 *
+	 * @since 1.0.0-beta
+	 */
+	public function beta_dashboard_widget() {
+		$beta_settings = get_option( 'skylearn_flashcards_beta_settings', array() );
+		$feedback_entries = get_option( 'skylearn_flashcards_beta_feedback', array() );
+		$feedback_count = count( $feedback_entries );
+		
+		// Calculate testing progress
+		$checklist_items = array(
+			'plugin_activated' => true, // If we're here, it's activated
+			'first_set_created' => $this->has_created_flashcard_sets(),
+			'settings_configured' => $this->has_configured_settings(),
+			'frontend_tested' => $this->has_tested_frontend(),
+			'feedback_provided' => $feedback_count > 0,
+		);
+		
+		$completed_items = array_filter( $checklist_items );
+		$progress_percentage = round( ( count( $completed_items ) / count( $checklist_items ) ) * 100 );
+		
+		?>
+		<div class="skylearn-beta-dashboard-widget">
+			<div style="display: flex; align-items: center; margin-bottom: 15px;">
+				<div style="flex: 1;">
+					<h4 style="margin: 0; color: var(--skylearn-beta);">
+						Welcome, Beta Tester!
+					</h4>
+					<p style="margin: 5px 0 0 0; color: #666;">
+						Version: <?php echo esc_html( SKYLEARN_FLASHCARDS_VERSION ); ?>
+					</p>
+				</div>
+				<div style="text-align: right;">
+					<span class="skylearn-beta-badge">BETA</span>
+				</div>
+			</div>
+
+			<div style="margin-bottom: 15px;">
+				<h5 style="margin: 0 0 8px 0;">Testing Progress</h5>
+				<div class="skylearn-progress-bar">
+					<div class="skylearn-progress-fill" style="width: <?php echo esc_attr( $progress_percentage ); ?>%;"></div>
+				</div>
+				<small style="color: #666;"><?php echo esc_html( $progress_percentage ); ?>% complete</small>
+			</div>
+
+			<div style="margin-bottom: 15px;">
+				<h5 style="margin: 0 0 8px 0;">Beta Checklist</h5>
+				<ul class="beta-checklist" style="font-size: 13px;">
+					<li class="<?php echo $checklist_items['plugin_activated'] ? 'completed' : ''; ?>">
+						Plugin activated and running
+					</li>
+					<li class="<?php echo $checklist_items['first_set_created'] ? 'completed' : ''; ?>">
+						Created your first flashcard set
+					</li>
+					<li class="<?php echo $checklist_items['settings_configured'] ? 'completed' : ''; ?>">
+						Configured plugin settings
+					</li>
+					<li class="<?php echo $checklist_items['frontend_tested'] ? 'completed' : ''; ?>">
+						Tested flashcards on frontend
+					</li>
+					<li class="<?php echo $checklist_items['feedback_provided'] ? 'completed' : ''; ?>">
+						Provided beta feedback
+					</li>
+				</ul>
+			</div>
+
+			<div style="margin-bottom: 15px;">
+				<h5 style="margin: 0 0 8px 0;">Quick Stats</h5>
+				<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px;">
+					<div>
+						<strong>Feedback Submitted:</strong><br>
+						<?php echo esc_html( $feedback_count ); ?> entries
+					</div>
+					<div>
+						<strong>Debug Mode:</strong><br>
+						<?php echo $beta_settings['debug_mode'] ? '✅ Enabled' : '❌ Disabled'; ?>
+					</div>
+				</div>
+			</div>
+
+			<div style="display: flex; gap: 8px; flex-wrap: wrap;">
+				<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=skylearn_flashcard&page=skylearn-beta-feedback' ) ); ?>" 
+				   class="button button-primary button-small">
+					📝 Feedback
+				</a>
+				<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=skylearn_flashcard&page=skylearn-beta-settings' ) ); ?>" 
+				   class="button button-small">
+					⚙️ Settings
+				</a>
+				<a href="https://github.com/Faiver55/skylearn-flashcards/blob/main/docs/ONBOARDING.md" 
+				   target="_blank" class="button button-small">
+					📖 Guide
+				</a>
+			</div>
+
+			<?php if ( $progress_percentage < 100 ) : ?>
+				<div class="beta-warning" style="margin-top: 15px; padding: 10px; font-size: 12px;">
+					<h4 style="margin: 0 0 5px 0; font-size: 13px;">Next Steps</h4>
+					<p style="margin: 0;">
+						<?php if ( ! $checklist_items['first_set_created'] ) : ?>
+							Create your first flashcard set to test core functionality.
+						<?php elseif ( ! $checklist_items['settings_configured'] ) : ?>
+							Explore the settings to customize the plugin for your needs.
+						<?php elseif ( ! $checklist_items['frontend_tested'] ) : ?>
+							Test your flashcards on the frontend using shortcodes or blocks.
+						<?php elseif ( ! $checklist_items['feedback_provided'] ) : ?>
+							Share your experience using our feedback form!
+						<?php endif; ?>
+					</p>
+				</div>
+			<?php else : ?>
+				<div class="beta-success" style="margin-top: 15px; padding: 10px; font-size: 12px;">
+					<h4 style="margin: 0 0 5px 0; font-size: 13px;">🎉 Great Job!</h4>
+					<p style="margin: 0;">
+						You've completed the basic beta testing checklist. Keep exploring and providing feedback!
+					</p>
+				</div>
+			<?php endif; ?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Check if user has created flashcard sets.
+	 *
+	 * @since 1.0.0-beta
+	 * @return bool
+	 */
+	private function has_created_flashcard_sets() {
+		$sets = get_posts( array(
+			'post_type' => 'skylearn_flashcard',
+			'post_status' => array( 'publish', 'draft', 'private' ),
+			'numberposts' => 1,
+		) );
+		return ! empty( $sets );
+	}
+
+	/**
+	 * Check if user has configured settings.
+	 *
+	 * @since 1.0.0-beta
+	 * @return bool
+	 */
+	private function has_configured_settings() {
+		$settings = get_option( 'skylearn_flashcards_settings', array() );
+		return ! empty( $settings );
+	}
+
+	/**
+	 * Check if user has tested frontend.
+	 *
+	 * @since 1.0.0-beta
+	 * @return bool
+	 */
+	private function has_tested_frontend() {
+		// This could check for shortcode usage, page views, etc.
+		// For now, we'll check if settings have been saved (indicating exploration)
+		return $this->has_configured_settings();
 	}
 }
