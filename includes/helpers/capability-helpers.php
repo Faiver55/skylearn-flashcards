@@ -176,6 +176,7 @@ function skylearn_current_user_can_delete_post( $post_id = 0, $post_type = '' ) 
  * @param    int      $user_id    User ID to check (optional, defaults to current user)
  * @return   bool                 True if user can create sets, false otherwise
  */
+if ( ! function_exists( 'skylearn_user_can_create_set' ) ) {
 function skylearn_user_can_create_set( $user_id = 0 ) {
 	if ( ! $user_id ) {
 		$user_id = get_current_user_id();
@@ -194,29 +195,9 @@ function skylearn_user_can_create_set( $user_id = 0 ) {
 	// Check set limit for free users
 	return skylearn_get_user_set_count( $user_id ) < 5;
 }
-
-/**
- * Get count of flashcard sets for a user
- *
- * @since    1.0.0
- * @param    int      $user_id    User ID (optional, defaults to current user)
- * @return   int                  Number of flashcard sets owned by user
- */
-function skylearn_get_user_set_count( $user_id = 0 ) {
-	if ( ! $user_id ) {
-		$user_id = get_current_user_id();
-	}
-
-	$count = get_posts( array(
-		'post_type'      => 'flashcard_set',
-		'post_status'    => array( 'publish', 'draft', 'private' ),
-		'author'         => $user_id,
-		'posts_per_page' => -1,
-		'fields'         => 'ids',
-	) );
-
-	return is_array( $count ) ? count( $count ) : 0;
 }
+
+
 
 /**
  * Prevent dangerous capability checks that could break in WP 6.1+
