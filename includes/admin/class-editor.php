@@ -339,10 +339,10 @@ class SkyLearn_Flashcards_Editor {
 			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'skylearn-flashcards' ) ) );
 		}
 		
-		// Check if user owns this set or can edit others' posts
+		// Simple existence check - all logged-in users can edit any flashcard set
 		$post = get_post( $set_id );
-		if ( ! $post || ( $post->post_author != get_current_user_id() && ! current_user_can( 'edit_others_posts' ) ) ) {
-			wp_send_json_error( array( 'message' => __( 'Permission denied.', 'skylearn-flashcards' ) ) );
+		if ( ! $post ) {
+			wp_send_json_error( array( 'message' => __( 'Flashcard set not found.', 'skylearn-flashcards' ) ) );
 		}
 		
 		$sanitized_cards = skylearn_sanitize_flashcard_data( $cards );

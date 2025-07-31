@@ -78,110 +78,32 @@ function skylearn_current_user_can_export() {
 }
 
 /**
- * Safely check if user can edit a specific post
- *
- * This function provides WordPress 6.1+ compatibility by properly handling
- * the edit_post capability with post ID validation.
+ * Check if user can edit posts (simplified - no post-specific capability checks)
  *
  * @since    1.0.0
- * @param    int      $post_id    Post ID to check (optional)
- * @param    string   $post_type  Expected post type (optional)
- * @return   bool                 True if user can edit the post, false otherwise
+ * @param    int      $post_id    Post ID (ignored, for backward compatibility)
+ * @param    string   $post_type  Post type (ignored, for backward compatibility)
+ * @return   bool                 True if user is logged in, false otherwise
  */
 if ( ! function_exists( 'skylearn_current_user_can_edit_post' ) ) {
 function skylearn_current_user_can_edit_post( $post_id = 0, $post_type = '' ) {
-	// Must be logged in
-	if ( ! is_user_logged_in() ) {
-		return false;
-	}
-
-	// If no post ID provided, return true for logged-in users
-	if ( empty( $post_id ) ) {
-		return true;
-	}
-
-	$post_id = absint( $post_id );
-	if ( ! $post_id ) {
-		skylearn_log_capability_warning( "skylearn_current_user_can_edit_post called with invalid post ID: {$post_id}" );
-		return false;
-	}
-
-	$post = get_post( $post_id );
-	if ( ! $post ) {
-		skylearn_log_capability_warning( "skylearn_current_user_can_edit_post called with non-existent post ID: {$post_id}" );
-		return false;
-	}
-
-	// If post type specified, validate it matches
-	if ( ! empty( $post_type ) && $post->post_type !== $post_type ) {
-		skylearn_log_capability_warning( "skylearn_current_user_can_edit_post: expected post type '{$post_type}', got '{$post->post_type}'" );
-		return false;
-	}
-
-	// For flashcard sets, check if user owns the post or use standard WordPress capability
-	if ( $post->post_type === 'flashcard_set' ) {
-		// Check if user owns the post or has edit capability
-		if ( $post->post_author == get_current_user_id() || current_user_can( 'edit_others_posts' ) ) {
-			return true;
-		}
-		
-		// Fall back to standard capability check with post ID
-		return current_user_can( 'edit_post', $post_id );
-	}
-
-	// For other post types, use standard WordPress capability check
-	return current_user_can( 'edit_post', $post_id );
+	// Simply check if user is logged in - no post-specific capability checks
+	return is_user_logged_in();
 }
 }
 
 /**
- * Safely check if user can delete a specific post
+ * Check if user can delete posts (simplified - no post-specific capability checks)
  *
  * @since    1.0.0
- * @param    int      $post_id    Post ID to check
- * @param    string   $post_type  Expected post type (optional)
- * @return   bool                 True if user can delete the post, false otherwise
+ * @param    int      $post_id    Post ID (ignored, for backward compatibility)
+ * @param    string   $post_type  Post type (ignored, for backward compatibility)
+ * @return   bool                 True if user is logged in, false otherwise
  */
 if ( ! function_exists( 'skylearn_current_user_can_delete_post' ) ) {
 function skylearn_current_user_can_delete_post( $post_id = 0, $post_type = '' ) {
-	// Must be logged in
-	if ( ! is_user_logged_in() ) {
-		return false;
-	}
-
-	// If no post ID provided, return true for logged-in users
-	if ( empty( $post_id ) ) {
-		return true;
-	}
-
-	$post_id = absint( $post_id );
-	if ( ! $post_id ) {
-		return false;
-	}
-
-	$post = get_post( $post_id );
-	if ( ! $post ) {
-		return false;
-	}
-
-	// If post type specified, validate it matches
-	if ( ! empty( $post_type ) && $post->post_type !== $post_type ) {
-		return false;
-	}
-
-	// For flashcard sets, check if user owns the post or use standard WordPress capability
-	if ( $post->post_type === 'flashcard_set' ) {
-		// Check if user owns the post or has delete capability
-		if ( $post->post_author == get_current_user_id() || current_user_can( 'delete_others_posts' ) ) {
-			return true;
-		}
-		
-		// Fall back to standard capability check with post ID
-		return current_user_can( 'delete_post', $post_id );
-	}
-
-	// For other post types, use standard WordPress capability check
-	return current_user_can( 'delete_post', $post_id );
+	// Simply check if user is logged in - no post-specific capability checks
+	return is_user_logged_in();
 }
 }
 

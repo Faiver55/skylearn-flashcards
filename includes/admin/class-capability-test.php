@@ -202,23 +202,36 @@ class SkyLearn_Flashcards_Capability_Test {
 	 */
 	private function render_current_user_capabilities() {
 		$current_user = wp_get_current_user();
-		$plugin_capabilities = skylearn_get_plugin_capabilities();
 
 		?>
 		<p><strong><?php esc_html_e( 'Current User:', 'skylearn-flashcards' ); ?></strong> 
 		   <?php echo esc_html( $current_user->display_name ); ?> (<?php echo esc_html( implode( ', ', $current_user->roles ) ); ?>)</p>
 
+		<div class="notice notice-info">
+			<p><strong><?php esc_html_e( 'Simplified Access Model', 'skylearn-flashcards' ); ?></strong></p>
+			<p><?php esc_html_e( 'SkyLearn Flashcards now uses a simplified access model where all logged-in users can access and edit flashcard sets. Premium features are controlled by license status only.', 'skylearn-flashcards' ); ?></p>
+		</div>
+
+		<h4><?php esc_html_e( 'Basic Access Status', 'skylearn-flashcards' ); ?></h4>
 		<div class="capability-grid">
-			<?php foreach ( $plugin_capabilities as $cap => $description ) : ?>
-				<?php $has_cap = current_user_can( $cap ); ?>
-				<div class="capability-item <?php echo $has_cap ? 'has-capability' : 'no-capability'; ?>">
-					<strong><?php echo esc_html( $cap ); ?></strong>
-					<div class="capability-status <?php echo $has_cap ? 'has-cap' : 'no-cap'; ?>">
-						<?php echo $has_cap ? esc_html__( 'Yes', 'skylearn-flashcards' ) : esc_html__( 'No', 'skylearn-flashcards' ); ?>
-					</div>
-					<p><small><?php echo esc_html( $description ); ?></small></p>
+			<?php 
+			$is_logged_in = is_user_logged_in();
+			$is_premium = skylearn_is_premium();
+			?>
+			<div class="capability-item <?php echo $is_logged_in ? 'has-capability' : 'no-capability'; ?>">
+				<strong><?php esc_html_e( 'Logged In User', 'skylearn-flashcards' ); ?></strong>
+				<div class="capability-status <?php echo $is_logged_in ? 'has-cap' : 'no-cap'; ?>">
+					<?php echo $is_logged_in ? esc_html__( 'Yes', 'skylearn-flashcards' ) : esc_html__( 'No', 'skylearn-flashcards' ); ?>
 				</div>
-			<?php endforeach; ?>
+				<p><small><?php esc_html_e( 'Can access all basic flashcard features', 'skylearn-flashcards' ); ?></small></p>
+			</div>
+			<div class="capability-item <?php echo $is_premium ? 'has-capability' : 'no-capability'; ?>">
+				<strong><?php esc_html_e( 'Premium License', 'skylearn-flashcards' ); ?></strong>
+				<div class="capability-status <?php echo $is_premium ? 'has-cap' : 'no-cap'; ?>">
+					<?php echo $is_premium ? esc_html__( 'Yes', 'skylearn-flashcards' ) : esc_html__( 'No', 'skylearn-flashcards' ); ?>
+				</div>
+				<p><small><?php esc_html_e( 'Can access premium features like advanced reporting and unlimited sets', 'skylearn-flashcards' ); ?></small></p>
+			</div>
 		</div>
 
 		<h4><?php esc_html_e( 'General WordPress Capabilities', 'skylearn-flashcards' ); ?></h4>
@@ -295,32 +308,38 @@ class SkyLearn_Flashcards_Capability_Test {
 	 * @since    1.0.0
 	 */
 	private function render_role_capabilities() {
-		global $wp_roles;
-		$plugin_capabilities = array_keys( skylearn_get_plugin_capabilities() );
-
 		?>
+		<div class="notice notice-info">
+			<p><strong><?php esc_html_e( 'No Role-Based Restrictions', 'skylearn-flashcards' ); ?></strong></p>
+			<p><?php esc_html_e( 'All logged-in users, regardless of their WordPress role, can access and edit flashcard sets. The plugin no longer uses custom capabilities or role-based restrictions.', 'skylearn-flashcards' ); ?></p>
+		</div>
+		
+		<h4><?php esc_html_e( 'Access Summary by Role', 'skylearn-flashcards' ); ?></h4>
 		<table class="wp-list-table widefat fixed striped">
 			<thead>
 				<tr>
 					<th><?php esc_html_e( 'Role', 'skylearn-flashcards' ); ?></th>
-					<?php foreach ( $plugin_capabilities as $cap ) : ?>
-						<th><small><?php echo esc_html( str_replace( 'skylearn_', '', $cap ) ); ?></small></th>
-					<?php endforeach; ?>
+					<th><?php esc_html_e( 'Basic Features', 'skylearn-flashcards' ); ?></th>
+					<th><?php esc_html_e( 'Premium Features', 'skylearn-flashcards' ); ?></th>
 				</tr>
 			</thead>
 			<tbody>
-				<?php foreach ( $wp_roles->roles as $role_name => $role_info ) : ?>
-					<?php $role = get_role( $role_name ); ?>
+				<?php 
+				global $wp_roles;
+				foreach ( $wp_roles->roles as $role_name => $role_info ) : 
+				?>
 					<tr>
 						<td><strong><?php echo esc_html( $role_info['name'] ); ?></strong></td>
-						<?php foreach ( $plugin_capabilities as $cap ) : ?>
-							<?php $has_cap = $role && $role->has_cap( $cap ); ?>
-							<td>
-								<span class="capability-status <?php echo $has_cap ? 'has-cap' : 'no-cap'; ?>">
-									<?php echo $has_cap ? '✓' : '✗'; ?>
-								</span>
-							</td>
-						<?php endforeach; ?>
+						<td>
+							<span class="capability-status has-cap">
+								<?php esc_html_e( 'Full Access', 'skylearn-flashcards' ); ?>
+							</span>
+						</td>
+						<td>
+							<span class="capability-status <?php echo skylearn_is_premium() ? 'has-cap' : 'no-cap'; ?>">
+								<?php echo skylearn_is_premium() ? esc_html__( 'Available', 'skylearn-flashcards' ) : esc_html__( 'License Required', 'skylearn-flashcards' ); ?>
+							</span>
+						</td>
 					</tr>
 				<?php endforeach; ?>
 			</tbody>
@@ -335,15 +354,15 @@ class SkyLearn_Flashcards_Capability_Test {
 	 */
 	private function render_menu_access_test() {
 		$menu_items = array(
-			'skylearn-flashcards' => 'edit_skylearn_flashcards',
-			'skylearn-flashcards-new' => 'edit_skylearn_flashcards',
-			'skylearn-flashcards-analytics' => 'view_skylearn_analytics',
-			'skylearn-flashcards-settings' => 'manage_skylearn_flashcards',
+			'skylearn-flashcards' => 'read',
+			'skylearn-flashcards-new' => 'read',
+			'skylearn-flashcards-analytics' => 'read',
+			'skylearn-flashcards-settings' => 'read',
 		);
 
 		if ( skylearn_is_premium() ) {
-			$menu_items['skylearn-flashcards-leads'] = 'manage_skylearn_leads';
-			$menu_items['skylearn-flashcards-reports'] = 'view_skylearn_analytics';
+			$menu_items['skylearn-flashcards-leads'] = 'read';
+			$menu_items['skylearn-flashcards-reports'] = 'read';
 		}
 
 		?>
@@ -390,21 +409,17 @@ class SkyLearn_Flashcards_Capability_Test {
 	 */
 	private function render_fix_tools() {
 		?>
-		<p><?php esc_html_e( 'Use these tools to fix capability issues:', 'skylearn-flashcards' ); ?></p>
+		<div class="notice notice-info">
+			<p><strong><?php esc_html_e( 'No Custom Capabilities Used', 'skylearn-flashcards' ); ?></strong></p>
+			<p><?php esc_html_e( 'The plugin now uses WordPress\'s standard "read" capability for all admin menu access. All logged-in users can access the plugin features.', 'skylearn-flashcards' ); ?></p>
+		</div>
 		
-		<p>
-			<button type="button" id="fix-admin-capabilities" class="button button-primary">
-				<?php esc_html_e( 'Fix Admin Capabilities', 'skylearn-flashcards' ); ?>
-			</button>
-			<span class="description"><?php esc_html_e( 'Ensures administrator role has all required plugin capabilities.', 'skylearn-flashcards' ); ?></span>
-		</p>
-
-		<h4><?php esc_html_e( 'Manual Steps', 'skylearn-flashcards' ); ?></h4>
+		<h4><?php esc_html_e( 'Troubleshooting Steps', 'skylearn-flashcards' ); ?></h4>
 		<ol>
-			<li><?php esc_html_e( 'Deactivate and reactivate the plugin to run setup again.', 'skylearn-flashcards' ); ?></li>
-			<li><?php esc_html_e( 'Check if your user role is "administrator" - other roles may have limited access.', 'skylearn-flashcards' ); ?></li>
+			<li><?php esc_html_e( 'Ensure the user is logged in to WordPress.', 'skylearn-flashcards' ); ?></li>
 			<li><?php esc_html_e( 'Clear any caching plugins that might be affecting admin pages.', 'skylearn-flashcards' ); ?></li>
-			<li><?php esc_html_e( 'Check error logs for any WordPress capability errors.', 'skylearn-flashcards' ); ?></li>
+			<li><?php esc_html_e( 'Check browser console for JavaScript errors.', 'skylearn-flashcards' ); ?></li>
+			<li><?php esc_html_e( 'Check server error logs for any PHP errors.', 'skylearn-flashcards' ); ?></li>
 		</ol>
 		<?php
 	}
