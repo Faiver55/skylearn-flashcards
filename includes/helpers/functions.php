@@ -21,6 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param    array    $flashcard_data    Raw flashcard data
  * @return   array                       Sanitized flashcard data
  */
+if ( ! function_exists( 'skylearn_sanitize_flashcard_data' ) ) {
 function skylearn_sanitize_flashcard_data( $flashcard_data ) {
 	
 	if ( ! is_array( $flashcard_data ) ) {
@@ -41,6 +42,7 @@ function skylearn_sanitize_flashcard_data( $flashcard_data ) {
 
 	return $sanitized;
 }
+}
 
 /**
  * Get flashcard set data
@@ -49,6 +51,7 @@ function skylearn_sanitize_flashcard_data( $flashcard_data ) {
  * @param    int      $set_id    Flashcard set ID
  * @return   array               Flashcard set data
  */
+if ( ! function_exists( 'skylearn_get_flashcard_set' ) ) {
 function skylearn_get_flashcard_set( $set_id ) {
 	
 	$set_id = absint( $set_id );
@@ -78,6 +81,7 @@ function skylearn_get_flashcard_set( $set_id ) {
 		'categories'  => wp_get_post_terms( $set_id, 'flashcard_category', array( 'fields' => 'names' ) ),
 		'tags'        => wp_get_post_terms( $set_id, 'flashcard_tag', array( 'fields' => 'names' ) ),
 	);
+}
 }
 
 /**
@@ -112,10 +116,12 @@ function skylearn_get_default_set_settings() {
  * @since    1.0.0
  * @return   bool    True if premium is active, false otherwise
  */
+if ( ! function_exists( 'skylearn_is_premium' ) ) {
 function skylearn_is_premium() {
 	
 	$license_status = get_option( 'skylearn_flashcards_license_status', 'inactive' );
 	return $license_status === 'valid';
+}
 }
 
 /**
@@ -126,6 +132,7 @@ function skylearn_is_premium() {
  * @param    mixed    $default   Default value if key not found
  * @return   mixed               Setting value or all settings
  */
+if ( ! function_exists( 'skylearn_get_setting' ) ) {
 function skylearn_get_setting( $key = '', $default = null ) {
 	
 	$settings = get_option( 'skylearn_flashcards_settings', array() );
@@ -135,6 +142,7 @@ function skylearn_get_setting( $key = '', $default = null ) {
 	}
 	
 	return $settings[ $key ] ?? $default;
+}
 }
 
 /**
@@ -222,9 +230,11 @@ function skylearn_calculate_accuracy( $correct, $total ) {
  * @since    1.0.0
  * @return   string    Random session ID
  */
+if ( ! function_exists( 'skylearn_generate_session_id' ) ) {
 function skylearn_generate_session_id() {
 	
 	return wp_generate_uuid4();
+}
 }
 
 /**
@@ -233,6 +243,7 @@ function skylearn_generate_session_id() {
  * @since    1.0.0
  * @return   string    User's IP address
  */
+if ( ! function_exists( 'skylearn_get_user_ip' ) ) {
 function skylearn_get_user_ip() {
 	
 	$ip_keys = array( 'HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR' );
@@ -250,6 +261,7 @@ function skylearn_get_user_ip() {
 	
 	return $_SERVER['REMOTE_ADDR'] ?? '';
 }
+}
 
 /**
  * Check if current user can manage flashcards
@@ -257,9 +269,11 @@ function skylearn_get_user_ip() {
  * @since    1.0.0
  * @return   bool    True if user can manage flashcards, false otherwise
  */
+if ( ! function_exists( 'skylearn_current_user_can_manage' ) ) {
 function skylearn_current_user_can_manage() {
 	
 	return current_user_can( 'manage_skylearn_flashcards' ) || current_user_can( 'manage_options' );
+}
 }
 
 /**
@@ -268,9 +282,11 @@ function skylearn_current_user_can_manage() {
  * @since    1.0.0
  * @return   bool    True if user can edit flashcards, false otherwise
  */
+if ( ! function_exists( 'skylearn_current_user_can_edit' ) ) {
 function skylearn_current_user_can_edit() {
 	
 	return current_user_can( 'edit_skylearn_flashcards' ) || skylearn_current_user_can_manage();
+}
 }
 
 /**
@@ -328,6 +344,7 @@ function skylearn_get_template_path( $template, $type = 'frontend' ) {
  * @param    string   $type        Template type (admin, frontend)
  * @return   void
  */
+if ( ! function_exists( 'skylearn_load_template' ) ) {
 function skylearn_load_template( $template, $args = array(), $type = 'frontend' ) {
 	
 	$template_path = skylearn_get_template_path( $template, $type );
@@ -341,6 +358,7 @@ function skylearn_load_template( $template, $args = array(), $type = 'frontend' 
 		include $template_path;
 	}
 }
+}
 
 /**
  * Log debug message
@@ -350,6 +368,7 @@ function skylearn_load_template( $template, $args = array(), $type = 'frontend' 
  * @param    string   $level      Log level (info, warning, error)
  * @return   void
  */
+if ( ! function_exists( 'skylearn_log' ) ) {
 function skylearn_log( $message, $level = 'info' ) {
 	
 	if ( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) {
@@ -360,6 +379,7 @@ function skylearn_log( $message, $level = 'info' ) {
 	$log_message = "[{$timestamp}] SkyLearn Flashcards [{$level}]: {$message}";
 	
 	error_log( $log_message );
+}
 }
 
 /**

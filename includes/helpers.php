@@ -21,6 +21,7 @@ if ( ! defined( 'WPINC' ) ) {
  * @param array $data Raw flashcard data
  * @return array Sanitized flashcard data
  */
+if ( ! function_exists( 'skylearn_sanitize_flashcard_data' ) ) {
 function skylearn_sanitize_flashcard_data( $data ) {
 	if ( ! is_array( $data ) ) {
 		return array();
@@ -45,6 +46,7 @@ function skylearn_sanitize_flashcard_data( $data ) {
 	}
 	
 	return $sanitized;
+}
 }
 
 /**
@@ -87,8 +89,10 @@ function skylearn_get_logo_url( $type = 'horizontal' ) {
  * @since 1.0.0
  * @return bool True if user can manage flashcards
  */
+if ( ! function_exists( 'skylearn_current_user_can_manage' ) ) {
 function skylearn_current_user_can_manage() {
 	return current_user_can( 'manage_skylearn_flashcards' );
+}
 }
 
 /**
@@ -97,8 +101,10 @@ function skylearn_current_user_can_manage() {
  * @since 1.0.0
  * @return bool True if user can edit flashcards
  */
+if ( ! function_exists( 'skylearn_current_user_can_edit' ) ) {
 function skylearn_current_user_can_edit() {
 	return current_user_can( 'edit_skylearn_flashcards' );
+}
 }
 
 /**
@@ -108,6 +114,7 @@ function skylearn_current_user_can_edit() {
  * @param int $set_id Flashcard set ID
  * @return array|false Flashcard set data or false if not found
  */
+if ( ! function_exists( 'skylearn_get_flashcard_set' ) ) {
 function skylearn_get_flashcard_set( $set_id ) {
 	$post = get_post( $set_id );
 	
@@ -131,6 +138,7 @@ function skylearn_get_flashcard_set( $set_id ) {
 		'created'     => $post->post_date,
 		'modified'    => $post->post_modified,
 	);
+}
 }
 
 /**
@@ -182,9 +190,11 @@ function skylearn_user_can_create_set( $user_id = 0 ) {
  * @param mixed  $default Default value
  * @return mixed Setting value
  */
+if ( ! function_exists( 'skylearn_get_setting' ) ) {
 function skylearn_get_setting( $key, $default = null ) {
 	$settings = get_option( 'skylearn_flashcards_settings', array() );
 	return $settings[ $key ] ?? $default;
+}
 }
 
 /**
@@ -193,12 +203,14 @@ function skylearn_get_setting( $key, $default = null ) {
  * @since 1.0.0
  * @return string Session ID
  */
+if ( ! function_exists( 'skylearn_generate_session_id' ) ) {
 function skylearn_generate_session_id() {
 	if ( ! session_id() ) {
 		session_start();
 	}
 	
 	return session_id();
+}
 }
 
 /**
@@ -207,6 +219,7 @@ function skylearn_generate_session_id() {
  * @since 1.0.0
  * @return string IP address
  */
+if ( ! function_exists( 'skylearn_get_user_ip' ) ) {
 function skylearn_get_user_ip() {
 	$ip_keys = array( 'HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR' );
 	
@@ -223,6 +236,7 @@ function skylearn_get_user_ip() {
 	
 	return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
 }
+}
 
 /**
  * Load template file
@@ -232,6 +246,7 @@ function skylearn_get_user_ip() {
  * @param array  $args Variables to pass to template
  * @param string $template_path Template subdirectory (admin/frontend)
  */
+if ( ! function_exists( 'skylearn_load_template' ) ) {
 function skylearn_load_template( $template_name, $args = array(), $template_path = 'frontend' ) {
 	if ( ! empty( $args ) && is_array( $args ) ) {
 		extract( $args );
@@ -244,6 +259,7 @@ function skylearn_load_template( $template_name, $args = array(), $template_path
 	} else {
 		skylearn_log( "Template not found: {$template_file}", 'warning' );
 	}
+}
 }
 
 /**
@@ -317,10 +333,12 @@ function skylearn_get_version() {
  * @param mixed  $message Message to log
  * @param string $level Log level: 'info', 'warning', 'error'
  */
+if ( ! function_exists( 'skylearn_log' ) ) {
 function skylearn_log( $message, $level = 'info' ) {
 	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
 		error_log( sprintf( '[SkyLearn Flashcards %s] %s', strtoupper( $level ), print_r( $message, true ) ) );
 	}
+}
 }
 
 /**
@@ -329,6 +347,7 @@ function skylearn_log( $message, $level = 'info' ) {
  * @since 1.0.0
  * @return bool True if premium features are available
  */
+if ( ! function_exists( 'skylearn_is_premium' ) ) {
 function skylearn_is_premium() {
 	$license_status = get_option( 'skylearn_flashcards_license_status', 'inactive' );
 	$license_key = get_option( 'skylearn_flashcards_license_key', '' );
@@ -344,6 +363,7 @@ function skylearn_is_premium() {
 	}
 	
 	return false;
+}
 }
 
 /**
