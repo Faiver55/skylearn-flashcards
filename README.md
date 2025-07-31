@@ -113,10 +113,73 @@ Or use the Gutenberg block:
 
 ## 📋 System Requirements
 
-- **WordPress:** 5.0 or higher
+- **WordPress:** 5.0 or higher (6.1+ recommended for best compatibility)
 - **PHP:** 7.4 or higher
 - **MySQL:** 5.6 or higher
 - **Memory:** 128MB minimum (256MB recommended)
+
+### WordPress 6.1+ Compatibility
+
+SkyLearn Flashcards is fully compatible with WordPress 6.1+ and the `map_meta_cap` changes. The plugin uses proper capability checking patterns to ensure seamless operation across all WordPress versions.
+
+## 🔐 Capabilities & Admin Access
+
+### Custom Capabilities
+
+SkyLearn Flashcards uses custom capabilities for fine-grained permission control:
+
+- `manage_skylearn_flashcards` - Full admin access (settings, all features)
+- `edit_skylearn_flashcards` - Create and edit flashcard sets
+- `delete_skylearn_flashcards` - Delete flashcard sets
+- `read_skylearn_flashcards` - View private flashcard sets
+- `view_skylearn_analytics` - Access analytics and reports
+- `export_skylearn_flashcards` - Export flashcard data
+- `manage_skylearn_leads` - Manage lead collection (premium)
+
+### Admin Access
+
+Administrator users automatically receive all plugin capabilities. The plugin includes multiple safety nets to ensure admin access is never lost:
+
+1. **Activation hooks** - Capabilities assigned during plugin activation
+2. **Admin initialization** - Capabilities verified on every admin load
+3. **Helper functions** - Safe capability checking throughout the codebase
+4. **Debug tools** - Built-in capability testing page for troubleshooting
+
+### Capability Best Practices
+
+For developers extending the plugin:
+
+```php
+// ✅ Correct - Use plugin-specific capabilities
+if ( skylearn_current_user_can_edit() ) {
+    // User can edit flashcards
+}
+
+// ✅ Correct - Safe post-specific capability check
+if ( skylearn_current_user_can_edit_post( $post_id, 'flashcard_set' ) ) {
+    // User can edit this specific flashcard set
+}
+
+// ❌ Incorrect - Avoid edit_post without post ID (WordPress 6.1+ incompatible)
+if ( current_user_can( 'edit_post' ) ) {
+    // This may fail in WordPress 6.1+
+}
+
+// ✅ Correct alternative - Use edit_posts (plural) for general checks
+if ( current_user_can( 'edit_posts' ) ) {
+    // General editing capability check
+}
+```
+
+### Troubleshooting Admin Access
+
+If admin users cannot access the plugin:
+
+1. Visit **SkyLearn Flashcards > Cap Test** (visible to admins in debug mode)
+2. Click "Fix Admin Capabilities" to restore missing capabilities
+3. Check that your user has the "administrator" role
+4. Deactivate and reactivate the plugin if needed
+5. Review error logs for capability-related messages
 
 ## 🎨 Brand Guidelines
 

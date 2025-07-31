@@ -263,31 +263,9 @@ function skylearn_get_user_ip() {
 }
 }
 
-/**
- * Check if current user can manage flashcards
- *
- * @since    1.0.0
- * @return   bool    True if user can manage flashcards, false otherwise
- */
-if ( ! function_exists( 'skylearn_current_user_can_manage' ) ) {
-function skylearn_current_user_can_manage() {
-	
-	return current_user_can( 'manage_skylearn_flashcards' ) || current_user_can( 'manage_options' );
-}
-}
-
-/**
- * Check if current user can edit flashcards
- *
- * @since    1.0.0
- * @return   bool    True if user can edit flashcards, false otherwise
- */
-if ( ! function_exists( 'skylearn_current_user_can_edit' ) ) {
-function skylearn_current_user_can_edit() {
-	
-	return current_user_can( 'edit_skylearn_flashcards' ) || skylearn_current_user_can_manage();
-}
-}
+// Capability helper functions moved to capability-helpers.php
+// Load the capability helpers
+require_once SKYLEARN_FLASHCARDS_PATH . 'includes/helpers/capability-helpers.php';
 
 /**
  * Validate email address

@@ -484,8 +484,8 @@ class SkyLearn_Flashcards_TutorLMS {
 			return;
 		}
 		
-		// Check permissions
-		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		// Check permissions - use our safe capability helper for lesson
+		if ( ! skylearn_current_user_can_edit_post( $post_id, 'lesson' ) ) {
 			return;
 		}
 		
@@ -523,8 +523,8 @@ class SkyLearn_Flashcards_TutorLMS {
 			return;
 		}
 		
-		// Check permissions
-		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		// Check permissions - use our safe capability helper for course
+		if ( ! skylearn_current_user_can_edit_post( $post_id, 'courses' ) ) {
 			return;
 		}
 		

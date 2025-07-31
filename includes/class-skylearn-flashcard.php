@@ -148,6 +148,11 @@ class SkyLearn_Flashcard {
 		require_once SKYLEARN_FLASHCARDS_PATH . 'includes/admin/class-editor.php';
 
 		/**
+		 * The capability test page (debug/dev only).
+		 */
+		require_once SKYLEARN_FLASHCARDS_PATH . 'includes/admin/class-capability-test.php';
+
+		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
@@ -158,6 +163,7 @@ class SkyLearn_Flashcard {
 		 */
 		require_once SKYLEARN_FLASHCARDS_PATH . 'includes/helpers/functions.php';
 		require_once SKYLEARN_FLASHCARDS_PATH . 'includes/helpers.php';
+		require_once SKYLEARN_FLASHCARDS_PATH . 'includes/helpers/capability-helpers.php';
 
 		/**
 		 * Premium functionality (if enabled)

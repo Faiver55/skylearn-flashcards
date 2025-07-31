@@ -85,7 +85,7 @@ class SkyLearn_Flashcards_Shortcode {
 		}
 		
 		// Check if post is published (unless user can edit)
-		if ( $flashcard_set['status'] !== 'publish' && ! current_user_can( 'edit_post', $set_id ) ) {
+		if ( $flashcard_set['status'] !== 'publish' && ! skylearn_current_user_can_edit_post( $set_id, 'flashcard_set' ) ) {
 			return $this->render_error( __( 'This flashcard set is not available.', 'skylearn-flashcards' ) );
 		}
 		
@@ -210,7 +210,7 @@ class SkyLearn_Flashcards_Shortcode {
 	 * @return   string                Error HTML
 	 */
 	private function render_error( $message ) {
-		if ( current_user_can( 'edit_posts' ) ) {
+		if ( skylearn_current_user_can_edit() ) {
 			return sprintf(
 				'<div class="skylearn-flashcard-error"><p><strong>SkyLearn Flashcards:</strong> %s</p></div>',
 				esc_html( $message )
