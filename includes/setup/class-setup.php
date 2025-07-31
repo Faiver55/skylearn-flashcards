@@ -301,6 +301,7 @@ class SkyLearn_Flashcards_Setup {
 				'delete_posts'       => 'delete_skylearn_flashcards',
 				'publish_posts'      => 'edit_skylearn_flashcards',
 				'read_private_posts' => 'read_skylearn_flashcards',
+				'create_posts'       => 'edit_skylearn_flashcards',
 			),
 			'map_meta_cap'        => true,
 			'has_archive'         => true,
