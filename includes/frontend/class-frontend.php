@@ -19,6 +19,10 @@
  * @subpackage SkyLearn_Flashcards/includes/frontend
  * @author     Ferdous Khalifa <support@skyian.com>
  */
+
+// Include the setup class for post type and taxonomy registration
+require_once SKYLEARN_FLASHCARDS_PATH . 'includes/setup/class-setup.php';
+
 class SkyLearn_Flashcards_Frontend {
 
 	/**
