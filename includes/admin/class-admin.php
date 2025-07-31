@@ -125,23 +125,23 @@ class SkyLearn_Flashcards_Admin {
 	 */
 	public function add_admin_menu() {
 
-		// Main menu page
+		// Main menu page - available to all logged-in users
 		add_menu_page(
 			__( 'SkyLearn Flashcards', 'skylearn-flashcards' ),
 			__( 'Flashcards', 'skylearn-flashcards' ),
-			'edit_skylearn_flashcards',
+			'read',
 			'skylearn-flashcards',
 			array( $this, 'display_main_page' ),
 			'dashicons-book-alt',
 			30
 		);
 
-		// Submenu pages
+		// Submenu pages - available to all logged-in users
 		add_submenu_page(
 			'skylearn-flashcards',
 			__( 'All Flashcard Sets', 'skylearn-flashcards' ),
 			__( 'All Sets', 'skylearn-flashcards' ),
-			'edit_skylearn_flashcards',
+			'read',
 			'skylearn-flashcards',
 			array( $this, 'display_main_page' )
 		);
@@ -150,7 +150,7 @@ class SkyLearn_Flashcards_Admin {
 			'skylearn-flashcards',
 			__( 'Add New Flashcard Set', 'skylearn-flashcards' ),
 			__( 'Add New', 'skylearn-flashcards' ),
-			'edit_skylearn_flashcards',
+			'read',
 			'skylearn-flashcards-new',
 			array( $this, 'display_editor_page' )
 		);
@@ -159,17 +159,18 @@ class SkyLearn_Flashcards_Admin {
 			'skylearn-flashcards',
 			__( 'Analytics', 'skylearn-flashcards' ),
 			__( 'Analytics', 'skylearn-flashcards' ),
-			'view_skylearn_analytics',
+			'read',
 			'skylearn-flashcards-analytics',
 			array( $this, 'display_analytics_page' )
 		);
 
+		// Premium-only menu items
 		if ( skylearn_is_premium() ) {
 			add_submenu_page(
 				'skylearn-flashcards',
 				__( 'Leads', 'skylearn-flashcards' ),
 				__( 'Leads', 'skylearn-flashcards' ),
-				'manage_skylearn_leads',
+				'read',
 				'skylearn-flashcards-leads',
 				array( $this, 'display_leads_page' )
 			);
@@ -178,7 +179,7 @@ class SkyLearn_Flashcards_Admin {
 				'skylearn-flashcards',
 				__( 'Reports', 'skylearn-flashcards' ),
 				__( 'Reports', 'skylearn-flashcards' ),
-				'view_skylearn_analytics',
+				'read',
 				'skylearn-flashcards-reports',
 				array( $this, 'display_reports_page' )
 			);
@@ -188,7 +189,7 @@ class SkyLearn_Flashcards_Admin {
 			'skylearn-flashcards',
 			__( 'Settings', 'skylearn-flashcards' ),
 			__( 'Settings', 'skylearn-flashcards' ),
-			'manage_skylearn_flashcards',
+			'read',
 			'skylearn-flashcards-settings',
 			array( $this, 'display_settings_page' )
 		);

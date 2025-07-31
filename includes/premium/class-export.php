@@ -60,7 +60,7 @@ class SkyLearn_Flashcards_Export {
 			'skylearn-flashcards',
 			__( 'Export & Backup', 'skylearn-flashcards' ),
 			__( 'Export', 'skylearn-flashcards' ),
-			'export_skylearn_flashcards',
+			'read',
 			'skylearn-export',
 			array( $this, 'display_export_page' )
 		);
@@ -409,7 +409,7 @@ class SkyLearn_Flashcards_Export {
 		}
 		
 		// Check permissions
-		if ( ! current_user_can( 'export_skylearn_flashcards' ) ) {
+		if ( ! is_user_logged_in() && skylearn_is_premium() ) {
 			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'skylearn-flashcards' ) ) );
 		}
 		
@@ -478,7 +478,7 @@ class SkyLearn_Flashcards_Export {
 		}
 		
 		// Check permissions
-		if ( ! current_user_can( 'export_skylearn_flashcards' ) ) {
+		if ( ! is_user_logged_in() && skylearn_is_premium() ) {
 			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'skylearn-flashcards' ) ) );
 		}
 		
@@ -891,7 +891,7 @@ class SkyLearn_Flashcards_Export {
 		}
 		
 		// Check permissions
-		if ( ! current_user_can( 'edit_skylearn_flashcards' ) ) {
+		if ( ! is_user_logged_in() ) {
 			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'skylearn-flashcards' ) ) );
 		}
 		
@@ -956,7 +956,7 @@ class SkyLearn_Flashcards_Export {
 		}
 		
 		// Check permissions
-		if ( ! current_user_can( 'edit_skylearn_flashcards' ) ) {
+		if ( ! is_user_logged_in() ) {
 			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'skylearn-flashcards' ) ) );
 		}
 		
@@ -1002,7 +1002,7 @@ class SkyLearn_Flashcards_Export {
 		}
 		
 		// Check permissions
-		if ( ! current_user_can( 'edit_skylearn_flashcards' ) ) {
+		if ( ! is_user_logged_in() ) {
 			wp_send_json_error( array( 'message' => __( 'Insufficient permissions.', 'skylearn-flashcards' ) ) );
 		}
 		

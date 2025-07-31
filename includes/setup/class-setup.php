@@ -220,44 +220,16 @@ class SkyLearn_Flashcards_Setup {
 	}
 
 	/**
-	 * Add custom capabilities
+	 * Legacy capability addition - no longer needed.
 	 *
-	 * Note: There's also a dedicated activation hook function 'skylearn_flashcards_add_caps' 
-	 * in the main plugin file that ensures the edit_skylearn_flashcards capability 
-	 * is assigned to administrators as a safety net, and admin_init hook in capabilities.php
-	 * ensures all capabilities are present on every admin load.
+	 * The plugin now uses simple logged-in user checks instead of custom capabilities.
+	 * This method is kept for backwards compatibility but does nothing.
 	 *
 	 * @since    1.0.0
 	 */
 	private static function add_capabilities() {
-		
-		// Get administrator role
-		$admin_role = get_role( 'administrator' );
-		
-		if ( $admin_role ) {
-			$admin_role->add_cap( 'manage_skylearn_flashcards' );
-			$admin_role->add_cap( 'edit_skylearn_flashcards' );
-			$admin_role->add_cap( 'delete_skylearn_flashcards' );
-			$admin_role->add_cap( 'read_skylearn_flashcards' );
-			$admin_role->add_cap( 'view_skylearn_analytics' );
-			$admin_role->add_cap( 'export_skylearn_flashcards' );
-			$admin_role->add_cap( 'manage_skylearn_leads' );
-		}
-
-		// Add teacher role capabilities (if role exists)
-		$teacher_role = get_role( 'teacher' );
-		if ( $teacher_role ) {
-			$teacher_role->add_cap( 'edit_skylearn_flashcards' );
-			$teacher_role->add_cap( 'read_skylearn_flashcards' );
-			$teacher_role->add_cap( 'view_skylearn_analytics' );
-		}
-
-		// Add editor role capabilities
-		$editor_role = get_role( 'editor' );
-		if ( $editor_role ) {
-			$editor_role->add_cap( 'edit_skylearn_flashcards' );
-			$editor_role->add_cap( 'read_skylearn_flashcards' );
-		}
+		// No longer adding custom capabilities - all logged-in users can access features
+		// Premium features are controlled by skylearn_is_premium() only
 	}
 
 	/**
@@ -291,17 +263,17 @@ class SkyLearn_Flashcards_Setup {
 			'show_in_menu'        => false, // We'll add our own menu
 			'query_var'           => true,
 			'rewrite'             => array( 'slug' => 'flashcard-set' ),
-			'capability_type'     => 'flashcard_set',
+			'capability_type'     => 'post',
 			'capabilities'        => array(
-				'edit_post'          => 'edit_skylearn_flashcards',
-				'read_post'          => 'read_skylearn_flashcards',
-				'delete_post'        => 'delete_skylearn_flashcards',
-				'edit_posts'         => 'edit_skylearn_flashcards',
-				'edit_others_posts'  => 'manage_skylearn_flashcards',
-				'delete_posts'       => 'delete_skylearn_flashcards',
-				'publish_posts'      => 'edit_skylearn_flashcards',
-				'read_private_posts' => 'read_skylearn_flashcards',
-				'create_posts'       => 'edit_skylearn_flashcards',
+				'edit_post'          => 'edit_posts',
+				'read_post'          => 'read',
+				'delete_post'        => 'delete_posts',
+				'edit_posts'         => 'edit_posts',
+				'edit_others_posts'  => 'edit_others_posts',
+				'delete_posts'       => 'delete_posts',
+				'publish_posts'      => 'publish_posts',
+				'read_private_posts' => 'read_private_posts',
+				'create_posts'       => 'edit_posts',
 			),
 			'map_meta_cap'        => true,
 			'has_archive'         => true,

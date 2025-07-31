@@ -97,21 +97,7 @@ function skylearn_flashcards_uninstall() {
 	// Clear any cached data that has been removed
 	wp_cache_flush();
 	
-	// Remove capabilities
-	$role = get_role( 'administrator' );
-	if ( $role ) {
-		$role->remove_cap( 'manage_skylearn_flashcards' );
-		$role->remove_cap( 'edit_skylearn_flashcards' );
-		$role->remove_cap( 'delete_skylearn_flashcards' );
-		$role->remove_cap( 'view_skylearn_analytics' );
-	}
-	
-	// Remove teacher role capabilities if they exist
-	$teacher_role = get_role( 'teacher' );
-	if ( $teacher_role ) {
-		$teacher_role->remove_cap( 'edit_skylearn_flashcards' );
-		$teacher_role->remove_cap( 'view_skylearn_analytics' );
-	}
+	// Note: No longer removing custom capabilities as they are not used
 	
 	// For multisite installations
 	if ( is_multisite() ) {
