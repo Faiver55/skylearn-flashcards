@@ -4,27 +4,24 @@
 
 **The Ultimate WordPress Flashcards Plugin for Educational Excellence**
 
-[![Beta Version](https://img.shields.io/badge/Version-1.0.0--beta-orange.svg)](https://github.com/Faiver55/skylearn-flashcards)
+[![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg)](https://github.com/Faiver55/skylearn-flashcards)
 [![WordPress Plugin Version](https://img.shields.io/badge/WordPress-6.4+-blue.svg)](https://wordpress.org)
 [![PHP Version](https://img.shields.io/badge/PHP-7.4+-purple.svg)](https://php.net)
 [![License: GPL v2+](https://img.shields.io/badge/License-GPL%20v2+-green.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
-[![Beta Testing](https://img.shields.io/badge/Status-Beta%20Testing-yellow.svg)](https://github.com/Faiver55/skylearn-flashcards)
+[![Release Status](https://img.shields.io/badge/Status-Public%20Release-green.svg)](https://skyian.com/skylearn-flashcards/)
 
-## 🧪 **BETA RELEASE** - We Need Your Feedback!
+## 🎉 **NOW AVAILABLE** - SkyLearn Flashcards is Live!
 
-> **Welcome to the SkyLearn Flashcards Beta Program!** This is a pre-release version designed for testing and feedback. If you're a beta tester, thank you for helping us make this plugin better. If you're discovering this for the first time, please note this is **not the final release**.
+> **The wait is over!** SkyLearn Flashcards is now publicly available and ready for production use. Create engaging, interactive flashcard experiences for your students, courses, and educational content.
 
-### 🎯 Beta Testing Program
-- **Current Version**: 1.0.0-beta
-- **Beta Duration**: 4-6 weeks
-- **Feedback Deadline**: [See beta communication]
-- **Public Launch**: Coming soon after beta completion
+### 📍 Get SkyLearn Flashcards
+- **WordPress.org**: [Download Free Version](https://wordpress.org/plugins/skylearn-flashcards/) (Coming Soon)
+- **Premium Version**: [Get Premium Features](https://skyian.com/skylearn-flashcards/premium/)
+- **Documentation**: [View Complete Guide](https://skyian.com/skylearn-flashcards/docs/)
 
-**👥 Are you a beta tester?** Start with our [Beta Onboarding Guide](docs/ONBOARDING.md)
+**🔥 Launch Special**: Get 25% off Premium licenses during our launch month!
 
-**🐛 Found an issue?** Use our [Feedback Template](docs/FEEDBACK_TEMPLATE.md)
-
-**📧 Questions?** Email us at support@skyian.com
+**💬 Need Help?** Check our [Support Portal](https://skyian.com/support/) or email support@skyian.com
 
 ---
 
@@ -212,6 +209,74 @@ npm install
 # Set up development environment
 npm run dev
 ```
+
+## 🎯 Getting Started
+
+### Free Version (WordPress.org)
+1. Install from WordPress admin: **Plugins → Add New → Search "SkyLearn Flashcards"**
+2. Or download from [WordPress Repository](https://wordpress.org/plugins/skylearn-flashcards/)
+3. Activate the plugin
+4. Go to **SkyLearn Flashcards** in your WordPress menu
+5. Create your first flashcard set!
+
+### Premium Version
+1. Purchase license at [skyian.com/skylearn-flashcards/premium/](https://skyian.com/skylearn-flashcards/premium/)
+2. Download premium plugin from your account
+3. Install and activate
+4. Enter your license key in **Settings → License**
+5. Enjoy premium features!
+
+## 🆘 Support & Resources
+
+### Getting Help
+- **📖 Documentation**: [Complete User Guide](https://skyian.com/skylearn-flashcards/docs/)
+- **🎥 Video Tutorials**: [Watch Setup Videos](https://skyian.com/skylearn-flashcards/videos/)
+- **❓ FAQ**: [Frequently Asked Questions](https://skyian.com/skylearn-flashcards/faq/)
+- **💬 Support Forum**: [Community Support](https://skyian.com/support/)
+
+### Support Channels
+
+#### Free Users
+- **Community Forum**: https://skyian.com/support/
+- **Documentation**: https://skyian.com/skylearn-flashcards/docs/
+- **GitHub Issues**: https://github.com/Faiver55/skylearn-flashcards/issues
+- **Response Time**: 48-72 hours
+
+#### Premium Users
+- **Priority Email**: support@skyian.com
+- **Direct Support Portal**: https://skyian.com/support/premium/
+- **Live Chat**: Available during business hours
+- **Response Time**: 24 hours or less
+
+### What We Support
+✅ Plugin installation and activation  
+✅ Basic configuration and setup  
+✅ Feature explanations and usage  
+✅ Compatibility issues  
+✅ Bug reports and fixes  
+✅ License activation (Premium)  
+
+### What We Don't Support
+❌ Custom theme modifications  
+❌ Server configuration issues  
+❌ Third-party plugin conflicts (beyond basic troubleshooting)  
+❌ WordPress core issues  
+❌ Custom code development  
+
+### Business Hours
+- **Monday - Friday**: 9:00 AM - 6:00 PM EST
+- **Weekend**: Limited support via email
+- **Holidays**: Emergency support only
+
+### Before Contacting Support
+Please have this information ready:
+- WordPress version
+- Plugin version  
+- PHP version
+- Active theme name
+- List of active plugins
+- Description of the issue
+- Steps to reproduce the problem
 
 ## 📚 Documentation
 

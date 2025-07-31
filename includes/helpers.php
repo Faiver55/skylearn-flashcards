@@ -488,3 +488,119 @@ function skylearn_get_lms_linked_sets( $lms_content_id, $lms_type = 'learndash',
 	// Filter out invalid set IDs
 	return array_filter( array_map( 'absint', $linked_sets ) );
 }
+
+/**
+ * Check if current installation has premium license
+ *
+ * @since 1.0.0
+ * @return bool True if premium license is active
+ */
+if ( ! function_exists( 'skylearn_is_premium' ) ) {
+function skylearn_is_premium() {
+	// Check if license class exists and is valid
+	if ( class_exists( 'SkyLearn_Flashcards_License' ) ) {
+		$license = new SkyLearn_Flashcards_License();
+		return $license->is_valid();
+	}
+	
+	// Fallback: Check license status option directly
+	$license_status = get_option( 'skylearn_flashcards_license_status', 'invalid' );
+	return $license_status === 'valid';
+}
+}
+
+/**
+ * Check if specific premium feature is available
+ *
+ * @since 1.0.0
+ * @param string $feature Feature name to check
+ * @return bool True if feature is available
+ */
+if ( ! function_exists( 'skylearn_is_feature_available' ) ) {
+function skylearn_is_feature_available( $feature ) {
+	// Free features always available
+	$free_features = array(
+		'basic_flashcards',
+		'shortcode_display',
+		'gutenberg_block',
+		'basic_analytics',
+		'responsive_design'
+	);
+	
+	if ( in_array( $feature, $free_features ) ) {
+		return true;
+	}
+	
+	// Premium features require valid license
+	return skylearn_is_premium();
+}
+}
+
+/**
+ * Get premium upgrade URL for a specific feature
+ *
+ * @since 1.0.0
+ * @param string $feature Feature name for tracking
+ * @return string Upgrade URL
+ */
+if ( ! function_exists( 'skylearn_get_upgrade_url' ) ) {
+function skylearn_get_upgrade_url( $feature = '' ) {
+	$base_url = 'https://skyian.com/skylearn-flashcards/premium/';
+	
+	$utm_params = array(
+		'utm_source'   => 'plugin',
+		'utm_medium'   => 'upgrade-link',
+		'utm_campaign' => 'skylearn-flashcards',
+		'site_url'     => urlencode( home_url() ),
+	);
+	
+	if ( ! empty( $feature ) ) {
+		$utm_params['utm_content'] = sanitize_key( $feature );
+	}
+	
+	return add_query_arg( $utm_params, $base_url );
+}
+}
+
+/**
+ * Display premium feature gate message
+ *
+ * @since 1.0.0
+ * @param string $feature Feature name
+ * @param string $context Context where the gate is shown
+ */
+if ( ! function_exists( 'skylearn_show_premium_gate' ) ) {
+function skylearn_show_premium_gate( $feature, $context = 'general' ) {
+	if ( skylearn_is_premium() ) {
+		return;
+	}
+	
+	$messages = array(
+		'advanced_reporting' => __( 'Advanced analytics and detailed reporting are available in the Premium version.', 'skylearn-flashcards' ),
+		'bulk_export'        => __( 'Bulk export and import functionality is available in the Premium version.', 'skylearn-flashcards' ),
+		'unlimited_sets'     => __( 'Create unlimited flashcard sets with the Premium version.', 'skylearn-flashcards' ),
+		'email_integration'  => __( 'Email marketing integrations are available in the Premium version.', 'skylearn-flashcards' ),
+		'custom_branding'    => __( 'Custom branding and white-label options are available in the Premium version.', 'skylearn-flashcards' ),
+	);
+	
+	$message = isset( $messages[ $feature ] ) ? $messages[ $feature ] : __( 'This feature is available in the Premium version.', 'skylearn-flashcards' );
+	$upgrade_url = skylearn_get_upgrade_url( $feature );
+	
+	?>
+	<div class="skylearn-premium-gate">
+		<div class="skylearn-premium-gate-content">
+			<h4><span class="dashicons dashicons-star-filled"></span> <?php _e( 'Premium Feature', 'skylearn-flashcards' ); ?></h4>
+			<p><?php echo esc_html( $message ); ?></p>
+			<p>
+				<a href="<?php echo esc_url( $upgrade_url ); ?>" class="button button-primary" target="_blank">
+					<?php _e( 'Upgrade to Premium', 'skylearn-flashcards' ); ?>
+				</a>
+				<a href="https://skyian.com/skylearn-flashcards/features/" class="button" target="_blank">
+					<?php _e( 'Learn More', 'skylearn-flashcards' ); ?>
+				</a>
+			</p>
+		</div>
+	</div>
+	<?php
+}
+}
