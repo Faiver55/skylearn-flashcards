@@ -101,6 +101,12 @@ register_activation_hook( __FILE__, 'skylearn_flashcards_add_caps' );
 register_deactivation_hook( __FILE__, 'deactivate_skylearn_flashcards' );
 
 /**
+ * Admin capability management
+ * This ensures administrators always have the required capabilities
+ */
+require_once SKYLEARN_FLASHCARDS_PATH . 'includes/admin/capabilities.php';
+
+/**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
