@@ -18,25 +18,16 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Ensure administrators always have the required SkyLearn Flashcards capabilities.
+ * Legacy admin capability management functionality - no longer needed.
  *
- * This function ensures that the administrator role always has all the
- * required capabilities to access the plugin's admin pages and menu items.
- * This provides a safety net in case capabilities are removed or not properly 
- * set during activation, and ensures capabilities are present on every admin load.
- *
- * Enhanced version that uses our capability helper functions for better reliability.
+ * The plugin now uses simple logged-in user checks instead of custom capabilities.
+ * This function is kept for backwards compatibility but does nothing.
  *
  * @since 1.0.0
  */
 function skylearn_flashcards_ensure_admin_caps() {
-	// Use our enhanced capability helper
-	skylearn_ensure_admin_capabilities();
-	
-	// Log any issues in debug mode
-	if ( defined( 'WP_DEBUG' ) && WP_DEBUG && ! skylearn_current_user_has_any_capability() ) {
-		skylearn_log_capability_warning( 'Current admin user lacks SkyLearn Flashcards capabilities after ensure_admin_caps' );
-	}
+	// No longer using custom capabilities - all logged-in users can access features
+	// Premium features are controlled by skylearn_is_premium() only
 }
 
 // Hook into admin_init to ensure capabilities are always present

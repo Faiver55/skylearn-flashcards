@@ -21,11 +21,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Check if current user can manage flashcards (admin-level access)
  *
  * @since    1.0.0
- * @return   bool    True if user can manage flashcards, false otherwise
+ * @return   bool    True if user is logged in, false otherwise
  */
 if ( ! function_exists( 'skylearn_current_user_can_manage' ) ) {
 function skylearn_current_user_can_manage() {
-	return current_user_can( 'manage_skylearn_flashcards' ) || current_user_can( 'manage_options' );
+	return is_user_logged_in();
 }
 }
 
@@ -33,11 +33,11 @@ function skylearn_current_user_can_manage() {
  * Check if current user can edit flashcards (editor-level access)
  *
  * @since    1.0.0
- * @return   bool    True if user can edit flashcards, false otherwise
+ * @return   bool    True if user is logged in, false otherwise
  */
 if ( ! function_exists( 'skylearn_current_user_can_edit' ) ) {
 function skylearn_current_user_can_edit() {
-	return current_user_can( 'edit_skylearn_flashcards' ) || skylearn_current_user_can_manage();
+	return is_user_logged_in();
 }
 }
 
@@ -45,11 +45,11 @@ function skylearn_current_user_can_edit() {
  * Check if current user can view analytics
  *
  * @since    1.0.0
- * @return   bool    True if user can view analytics, false otherwise
+ * @return   bool    True if user is logged in, false otherwise
  */
 if ( ! function_exists( 'skylearn_current_user_can_view_analytics' ) ) {
 function skylearn_current_user_can_view_analytics() {
-	return current_user_can( 'view_skylearn_analytics' ) || skylearn_current_user_can_manage();
+	return is_user_logged_in();
 }
 }
 
@@ -57,11 +57,11 @@ function skylearn_current_user_can_view_analytics() {
  * Check if current user can manage leads (premium feature)
  *
  * @since    1.0.0
- * @return   bool    True if user can manage leads, false otherwise
+ * @return   bool    True if user is logged in and premium is active, false otherwise
  */
 if ( ! function_exists( 'skylearn_current_user_can_manage_leads' ) ) {
 function skylearn_current_user_can_manage_leads() {
-	return current_user_can( 'manage_skylearn_leads' ) || skylearn_current_user_can_manage();
+	return is_user_logged_in() && skylearn_is_premium();
 }
 }
 
@@ -69,11 +69,11 @@ function skylearn_current_user_can_manage_leads() {
  * Check if current user can export flashcards
  *
  * @since    1.0.0
- * @return   bool    True if user can export flashcards, false otherwise
+ * @return   bool    True if user is logged in, false otherwise
  */
 if ( ! function_exists( 'skylearn_current_user_can_export' ) ) {
 function skylearn_current_user_can_export() {
-	return current_user_can( 'export_skylearn_flashcards' ) || skylearn_current_user_can_manage();
+	return is_user_logged_in();
 }
 }
 
@@ -90,10 +90,14 @@ function skylearn_current_user_can_export() {
  */
 if ( ! function_exists( 'skylearn_current_user_can_edit_post' ) ) {
 function skylearn_current_user_can_edit_post( $post_id = 0, $post_type = '' ) {
-	// If no post ID provided, check general editing capability
+	// Must be logged in
+	if ( ! is_user_logged_in() ) {
+		return false;
+	}
+
+	// If no post ID provided, return true for logged-in users
 	if ( empty( $post_id ) ) {
-		skylearn_log_capability_warning( 'skylearn_current_user_can_edit_post called without post ID' );
-		return skylearn_current_user_can_edit();
+		return true;
 	}
 
 	$post_id = absint( $post_id );
@@ -114,10 +118,10 @@ function skylearn_current_user_can_edit_post( $post_id = 0, $post_type = '' ) {
 		return false;
 	}
 
-	// For flashcard sets, check our custom capability first
+	// For flashcard sets, check if user owns the post or use standard WordPress capability
 	if ( $post->post_type === 'flashcard_set' ) {
-		// Check if user owns the post or has manage capability
-		if ( $post->post_author == get_current_user_id() || skylearn_current_user_can_manage() ) {
+		// Check if user owns the post or has edit capability
+		if ( $post->post_author == get_current_user_id() || current_user_can( 'edit_others_posts' ) ) {
 			return true;
 		}
 		
@@ -140,10 +144,14 @@ function skylearn_current_user_can_edit_post( $post_id = 0, $post_type = '' ) {
  */
 if ( ! function_exists( 'skylearn_current_user_can_delete_post' ) ) {
 function skylearn_current_user_can_delete_post( $post_id = 0, $post_type = '' ) {
-	// If no post ID provided, check general capability
+	// Must be logged in
+	if ( ! is_user_logged_in() ) {
+		return false;
+	}
+
+	// If no post ID provided, return true for logged-in users
 	if ( empty( $post_id ) ) {
-		skylearn_log_capability_warning( 'skylearn_current_user_can_delete_post called without post ID' );
-		return current_user_can( 'delete_skylearn_flashcards' ) || skylearn_current_user_can_manage();
+		return true;
 	}
 
 	$post_id = absint( $post_id );
@@ -161,10 +169,10 @@ function skylearn_current_user_can_delete_post( $post_id = 0, $post_type = '' ) 
 		return false;
 	}
 
-	// For flashcard sets, check our custom capability first
+	// For flashcard sets, check if user owns the post or use standard WordPress capability
 	if ( $post->post_type === 'flashcard_set' ) {
-		// Check if user owns the post or has manage capability
-		if ( $post->post_author == get_current_user_id() || skylearn_current_user_can_manage() ) {
+		// Check if user owns the post or has delete capability
+		if ( $post->post_author == get_current_user_id() || current_user_can( 'delete_others_posts' ) ) {
 			return true;
 		}
 		
@@ -180,7 +188,7 @@ function skylearn_current_user_can_delete_post( $post_id = 0, $post_type = '' ) 
 /**
  * Check if user can create new flashcard sets
  *
- * Checks both capability and set limits for free users.
+ * Checks both logged-in status and set limits for free users.
  *
  * @since    1.0.0
  * @param    int      $user_id    User ID to check (optional, defaults to current user)
@@ -192,8 +200,8 @@ function skylearn_user_can_create_set( $user_id = 0 ) {
 		$user_id = get_current_user_id();
 	}
 
-	// Check basic capability
-	if ( ! skylearn_current_user_can_edit() ) {
+	// Must be logged in
+	if ( ! is_user_logged_in() ) {
 		return false;
 	}
 
@@ -272,76 +280,39 @@ function skylearn_log_capability_warning( $message ) {
 }
 
 /**
- * Get all SkyLearn Flashcards capabilities
+ * Get all SkyLearn Flashcards capabilities (legacy)
  *
  * @since    1.0.0
- * @return   array    Array of capability names and descriptions
+ * @return   array    Empty array - capabilities no longer used
  */
 function skylearn_get_plugin_capabilities() {
-	return array(
-		'manage_skylearn_flashcards' => __( 'Manage Flashcards (full admin access)', 'skylearn-flashcards' ),
-		'edit_skylearn_flashcards'   => __( 'Edit Flashcards (create/edit sets)', 'skylearn-flashcards' ),
-		'delete_skylearn_flashcards' => __( 'Delete Flashcards (delete sets)', 'skylearn-flashcards' ),
-		'read_skylearn_flashcards'   => __( 'Read Flashcards (view private sets)', 'skylearn-flashcards' ),
-		'view_skylearn_analytics'    => __( 'View Analytics (access reports)', 'skylearn-flashcards' ),
-		'export_skylearn_flashcards' => __( 'Export Flashcards (download data)', 'skylearn-flashcards' ),
-		'manage_skylearn_leads'      => __( 'Manage Leads (premium feature)', 'skylearn-flashcards' ),
-	);
+	// No longer using custom capabilities - return empty array for backwards compatibility
+	return array();
 }
 
 /**
- * Check if current user has any SkyLearn Flashcards capabilities
+ * Check if current user has any SkyLearn Flashcards capabilities (legacy)
  *
  * @since    1.0.0
- * @return   bool    True if user has any plugin capabilities, false otherwise
+ * @return   bool    True if user is logged in, false otherwise
  */
 function skylearn_current_user_has_any_capability() {
-	$capabilities = array_keys( skylearn_get_plugin_capabilities() );
-	
-	foreach ( $capabilities as $cap ) {
-		if ( current_user_can( $cap ) ) {
-			return true;
-		}
-	}
-	
-	// Check for general WordPress capabilities that should also work
-	$general_caps = array( 'manage_options', 'edit_posts', 'publish_posts' );
-	foreach ( $general_caps as $cap ) {
-		if ( current_user_can( $cap ) ) {
-			return true;
-		}
-	}
-	
-	return false;
+	// Simply check if user is logged in - no more custom capabilities
+	return is_user_logged_in();
 }
 
 /**
- * Ensure admin users have all required capabilities
+ * Legacy admin capabilities function - no longer needed
  *
- * This is a safety net function that can be called to ensure
+ * This is a safety net function that was used to ensure
  * admin users always have access to the plugin.
  *
  * @since    1.0.0
- * @return   bool    True if capabilities were added, false if not needed
+ * @return   bool    Always returns false - no capabilities to add
  */
 function skylearn_ensure_admin_capabilities() {
-	$admin_role = get_role( 'administrator' );
-	if ( ! $admin_role ) {
-		return false;
-	}
-
-	$capabilities = array_keys( skylearn_get_plugin_capabilities() );
-	$added_any = false;
-
-	foreach ( $capabilities as $cap ) {
-		if ( ! $admin_role->has_cap( $cap ) ) {
-			$admin_role->add_cap( $cap );
-			$added_any = true;
-			skylearn_log( "Added missing capability '{$cap}' to administrator role" );
-		}
-	}
-
-	return $added_any;
+	// No longer adding custom capabilities
+	return false;
 }
 
 /**

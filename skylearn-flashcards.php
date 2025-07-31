@@ -79,26 +79,16 @@ function deactivate_skylearn_flashcards() {
 }
 
 /**
- * Ensure admin capability is assigned during activation.
+ * Legacy capability function - no longer needed.
  * 
- * This function provides a safety net to ensure that the administrator role has 
- * the required capabilities to access the Flashcards admin pages. While the main
- * activation process in SkyLearn_Flashcards_Setup::add_capabilities() also adds
- * these capabilities, this dedicated hook ensures they're present even if there were
- * issues during the main activation process.
+ * The plugin now uses simple logged-in user checks instead of custom capabilities.
+ * This function is kept for backwards compatibility but does nothing.
  *
  * @since    1.0.0
  */
 function skylearn_flashcards_add_caps() {
-	$role = get_role( 'administrator' );
-	if ( $role ) {
-		if ( ! $role->has_cap( 'edit_skylearn_flashcards' ) ) {
-			$role->add_cap( 'edit_skylearn_flashcards' );
-		}
-		if ( ! $role->has_cap( 'read_skylearn_flashcards' ) ) {
-			$role->add_cap( 'read_skylearn_flashcards' );
-		}
-	}
+	// No longer adding custom capabilities - all logged-in users can access features
+	// Premium features are controlled by skylearn_is_premium() only
 }
 
 register_activation_hook( __FILE__, 'activate_skylearn_flashcards' );
@@ -106,8 +96,8 @@ register_activation_hook( __FILE__, 'skylearn_flashcards_add_caps' );
 register_deactivation_hook( __FILE__, 'deactivate_skylearn_flashcards' );
 
 /**
- * Admin capability management
- * This ensures administrators always have the required capabilities
+ * Legacy capability management - no longer needed.
+ * The plugin now uses simple logged-in user checks instead of custom capabilities.
  */
 require_once SKYLEARN_FLASHCARDS_PATH . 'includes/admin/capabilities.php';
 

@@ -55,7 +55,7 @@ class SkyLearn_Flashcards_Advanced_Reporting {
 			'skylearn-flashcards',
 			__( 'Advanced Reports', 'skylearn-flashcards' ),
 			__( 'Reports', 'skylearn-flashcards' ),
-			'view_skylearn_analytics',
+			'read',
 			'skylearn-reports',
 			array( $this, 'display_reports_page' )
 		);
