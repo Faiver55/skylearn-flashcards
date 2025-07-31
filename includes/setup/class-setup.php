@@ -224,7 +224,8 @@ class SkyLearn_Flashcards_Setup {
 	 *
 	 * Note: There's also a dedicated activation hook function 'skylearn_flashcards_add_caps' 
 	 * in the main plugin file that ensures the edit_skylearn_flashcards capability 
-	 * is assigned to administrators as a safety net.
+	 * is assigned to administrators as a safety net, and admin_init hook in capabilities.php
+	 * ensures all capabilities are present on every admin load.
 	 *
 	 * @since    1.0.0
 	 */
@@ -237,6 +238,7 @@ class SkyLearn_Flashcards_Setup {
 			$admin_role->add_cap( 'manage_skylearn_flashcards' );
 			$admin_role->add_cap( 'edit_skylearn_flashcards' );
 			$admin_role->add_cap( 'delete_skylearn_flashcards' );
+			$admin_role->add_cap( 'read_skylearn_flashcards' );
 			$admin_role->add_cap( 'view_skylearn_analytics' );
 			$admin_role->add_cap( 'export_skylearn_flashcards' );
 			$admin_role->add_cap( 'manage_skylearn_leads' );
@@ -246,6 +248,7 @@ class SkyLearn_Flashcards_Setup {
 		$teacher_role = get_role( 'teacher' );
 		if ( $teacher_role ) {
 			$teacher_role->add_cap( 'edit_skylearn_flashcards' );
+			$teacher_role->add_cap( 'read_skylearn_flashcards' );
 			$teacher_role->add_cap( 'view_skylearn_analytics' );
 		}
 
@@ -253,6 +256,7 @@ class SkyLearn_Flashcards_Setup {
 		$editor_role = get_role( 'editor' );
 		if ( $editor_role ) {
 			$editor_role->add_cap( 'edit_skylearn_flashcards' );
+			$editor_role->add_cap( 'read_skylearn_flashcards' );
 		}
 	}
 

@@ -20,17 +20,35 @@ if ( ! defined( 'WPINC' ) ) {
 /**
  * Ensure administrators always have the required SkyLearn Flashcards capabilities.
  *
- * This function ensures that the administrator role always has the
- * 'edit_skylearn_flashcards' capability, which is required to access
- * the plugin's admin pages and menu items. This provides a safety net
- * in case capabilities are removed or not properly set during activation.
+ * This function ensures that the administrator role always has all the
+ * required capabilities to access the plugin's admin pages and menu items.
+ * This provides a safety net in case capabilities are removed or not properly 
+ * set during activation, and ensures capabilities are present on every admin load.
  *
  * @since 1.0.0
  */
 function skylearn_flashcards_ensure_admin_caps() {
 	$role = get_role( 'administrator' );
-	if ( $role && ! $role->has_cap( 'edit_skylearn_flashcards' ) ) {
-		$role->add_cap( 'edit_skylearn_flashcards' );
+	if ( ! $role ) {
+		return;
+	}
+
+	// Core flashcard capabilities
+	$capabilities = array(
+		'manage_skylearn_flashcards',
+		'edit_skylearn_flashcards',
+		'delete_skylearn_flashcards',
+		'read_skylearn_flashcards',
+		'view_skylearn_analytics',
+		'export_skylearn_flashcards',
+		'manage_skylearn_leads',
+	);
+
+	// Add any missing capabilities
+	foreach ( $capabilities as $capability ) {
+		if ( ! $role->has_cap( $capability ) ) {
+			$role->add_cap( $capability );
+		}
 	}
 }
 
