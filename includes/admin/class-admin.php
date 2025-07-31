@@ -463,7 +463,7 @@ class SkyLearn_Flashcards_Admin {
 		}
 
 		// Check permissions
-		if ( ! current_user_can( 'export_skylearn_flashcards' ) ) {
+		if ( ! skylearn_current_user_can_export() ) {
 			wp_die( __( 'Insufficient permissions.', 'skylearn-flashcards' ) );
 		}
 
