@@ -166,6 +166,13 @@ class SkyLearn_Flashcard {
 			require_once SKYLEARN_FLASHCARDS_PATH . 'includes/premium/class-premium.php';
 		}
 
+		/**
+		 * Beta functionality (if beta version)
+		 */
+		if ( $this->is_beta_version() ) {
+			require_once SKYLEARN_FLASHCARDS_PATH . 'includes/beta/class-beta.php';
+		}
+
 		$this->loader = new SkyLearn_Flashcards_Loader();
 	}
 
@@ -242,6 +249,11 @@ class SkyLearn_Flashcard {
 		
 		// Add set limit enforcement hook
 		$this->loader->add_action( 'wp_insert_post', $this, 'enforce_set_limit', 10, 3 );
+
+		// Initialize beta functionality if this is a beta version
+		if ( $this->is_beta_version() ) {
+			$beta = new SkyLearn_Flashcards_Beta();
+		}
 	}
 
 	/**
@@ -321,9 +333,24 @@ class SkyLearn_Flashcard {
 	 * @return    bool    True if premium is enabled, false otherwise.
 	 */
 	private function is_premium_enabled() {
+		// For beta version, enable premium features for testing
+		if ( $this->is_beta_version() ) {
+			return true;
+		}
+		
 		// Check for premium license or setting
 		$premium_license = get_option( 'skylearn_flashcards_premium_license', false );
 		return !empty( $premium_license );
+	}
+
+	/**
+	 * Check if this is a beta version.
+	 *
+	 * @since     1.0.0-beta
+	 * @return    bool    True if this is a beta version, false otherwise.
+	 */
+	private function is_beta_version() {
+		return strpos( $this->version, 'beta' ) !== false;
 	}
 
 	/**
