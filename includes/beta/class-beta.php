@@ -99,7 +99,7 @@ class SkyLearn_Flashcards_Beta {
 			'edit.php?post_type=skylearn_flashcard',
 			__( 'Beta Feedback', 'skylearn-flashcards' ),
 			__( '🧪 Beta Feedback', 'skylearn-flashcards' ),
-			'read',
+			'edit_posts',
 			'skylearn-beta-feedback',
 			array( $this, 'beta_feedback_page' )
 		);
@@ -108,7 +108,7 @@ class SkyLearn_Flashcards_Beta {
 			'edit.php?post_type=skylearn_flashcard',
 			__( 'Beta Settings', 'skylearn-flashcards' ),
 			__( '⚙️ Beta Settings', 'skylearn-flashcards' ),
-			'read',
+			'manage_options',
 			'skylearn-beta-settings',
 			array( $this, 'beta_settings_page' )
 		);

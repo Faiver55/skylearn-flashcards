@@ -125,23 +125,23 @@ class SkyLearn_Flashcards_Admin {
 	 */
 	public function add_admin_menu() {
 
-		// Main menu page - available to all logged-in users
+		// Main menu page - requires edit_posts capability for proper access control
 		add_menu_page(
 			__( 'SkyLearn Flashcards', 'skylearn-flashcards' ),
 			__( 'Flashcards', 'skylearn-flashcards' ),
-			'read',
+			'edit_posts',
 			'skylearn-flashcards',
 			array( $this, 'display_main_page' ),
 			'dashicons-book-alt',
 			30
 		);
 
-		// Submenu pages - available to all logged-in users
+		// Submenu pages - use appropriate capabilities for each function
 		add_submenu_page(
 			'skylearn-flashcards',
 			__( 'All Flashcard Sets', 'skylearn-flashcards' ),
 			__( 'All Sets', 'skylearn-flashcards' ),
-			'read',
+			'edit_posts',
 			'skylearn-flashcards',
 			array( $this, 'display_main_page' )
 		);
@@ -150,7 +150,7 @@ class SkyLearn_Flashcards_Admin {
 			'skylearn-flashcards',
 			__( 'Add New Flashcard Set', 'skylearn-flashcards' ),
 			__( 'Add New', 'skylearn-flashcards' ),
-			'read',
+			'edit_posts',
 			'skylearn-flashcards-new',
 			array( $this, 'display_editor_page' )
 		);
@@ -159,7 +159,7 @@ class SkyLearn_Flashcards_Admin {
 			'skylearn-flashcards',
 			__( 'Analytics', 'skylearn-flashcards' ),
 			__( 'Analytics', 'skylearn-flashcards' ),
-			'read',
+			'edit_posts',
 			'skylearn-flashcards-analytics',
 			array( $this, 'display_analytics_page' )
 		);
@@ -170,7 +170,7 @@ class SkyLearn_Flashcards_Admin {
 				'skylearn-flashcards',
 				__( 'Leads', 'skylearn-flashcards' ),
 				__( 'Leads', 'skylearn-flashcards' ),
-				'read',
+				'edit_posts',
 				'skylearn-flashcards-leads',
 				array( $this, 'display_leads_page' )
 			);
@@ -179,7 +179,7 @@ class SkyLearn_Flashcards_Admin {
 				'skylearn-flashcards',
 				__( 'Reports', 'skylearn-flashcards' ),
 				__( 'Reports', 'skylearn-flashcards' ),
-				'read',
+				'edit_posts',
 				'skylearn-flashcards-reports',
 				array( $this, 'display_reports_page' )
 			);
@@ -189,7 +189,7 @@ class SkyLearn_Flashcards_Admin {
 			'skylearn-flashcards',
 			__( 'Settings', 'skylearn-flashcards' ),
 			__( 'Settings', 'skylearn-flashcards' ),
-			'read',
+			'manage_options',
 			'skylearn-flashcards-settings',
 			array( $this, 'display_settings_page' )
 		);

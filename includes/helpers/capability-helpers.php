@@ -21,11 +21,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Check if current user can manage flashcards (admin-level access)
  *
  * @since    1.0.0
- * @return   bool    True if user is logged in, false otherwise
+ * @return   bool    True if user can manage options, false otherwise
  */
 if ( ! function_exists( 'skylearn_current_user_can_manage' ) ) {
 function skylearn_current_user_can_manage() {
-	return is_user_logged_in();
+	return current_user_can( 'manage_options' );
 }
 }
 
@@ -33,11 +33,11 @@ function skylearn_current_user_can_manage() {
  * Check if current user can edit flashcards (editor-level access)
  *
  * @since    1.0.0
- * @return   bool    True if user is logged in, false otherwise
+ * @return   bool    True if user can edit posts, false otherwise
  */
 if ( ! function_exists( 'skylearn_current_user_can_edit' ) ) {
 function skylearn_current_user_can_edit() {
-	return is_user_logged_in();
+	return current_user_can( 'edit_posts' );
 }
 }
 
@@ -45,11 +45,11 @@ function skylearn_current_user_can_edit() {
  * Check if current user can view analytics
  *
  * @since    1.0.0
- * @return   bool    True if user is logged in, false otherwise
+ * @return   bool    True if user can edit posts, false otherwise
  */
 if ( ! function_exists( 'skylearn_current_user_can_view_analytics' ) ) {
 function skylearn_current_user_can_view_analytics() {
-	return is_user_logged_in();
+	return current_user_can( 'edit_posts' );
 }
 }
 
@@ -57,11 +57,11 @@ function skylearn_current_user_can_view_analytics() {
  * Check if current user can manage leads (premium feature)
  *
  * @since    1.0.0
- * @return   bool    True if user is logged in and premium is active, false otherwise
+ * @return   bool    True if user can edit posts and premium is active, false otherwise
  */
 if ( ! function_exists( 'skylearn_current_user_can_manage_leads' ) ) {
 function skylearn_current_user_can_manage_leads() {
-	return is_user_logged_in() && skylearn_is_premium();
+	return current_user_can( 'edit_posts' ) && skylearn_is_premium();
 }
 }
 
@@ -69,48 +69,70 @@ function skylearn_current_user_can_manage_leads() {
  * Check if current user can export flashcards
  *
  * @since    1.0.0
- * @return   bool    True if user is logged in, false otherwise
+ * @return   bool    True if user can edit posts, false otherwise
  */
 if ( ! function_exists( 'skylearn_current_user_can_export' ) ) {
 function skylearn_current_user_can_export() {
-	return is_user_logged_in();
+	return current_user_can( 'edit_posts' );
 }
 }
 
 /**
- * Check if user can edit posts (simplified - no post-specific capability checks)
+ * Check if user can edit specific posts with proper capability mapping
  *
  * @since    1.0.0
- * @param    int      $post_id    Post ID (ignored, for backward compatibility)
- * @param    string   $post_type  Post type (ignored, for backward compatibility)
- * @return   bool                 True if user is logged in, false otherwise
+ * @param    int      $post_id    Post ID to check (required for proper capability checking)
+ * @param    string   $post_type  Post type (optional, will be determined from post if not provided)
+ * @return   bool                 True if user can edit the specific post, false otherwise
  */
 if ( ! function_exists( 'skylearn_current_user_can_edit_post' ) ) {
 function skylearn_current_user_can_edit_post( $post_id = 0, $post_type = '' ) {
-	// Simply check if user is logged in - no post-specific capability checks
-	return is_user_logged_in();
+	// If no post ID provided, check general edit_posts capability
+	if ( empty( $post_id ) ) {
+		return current_user_can( 'edit_posts' );
+	}
+
+	// Validate post exists
+	$post = get_post( $post_id );
+	if ( ! $post ) {
+		return false;
+	}
+
+	// Use the post-specific edit capability with post ID for proper WordPress 6.1+ compatibility
+	return current_user_can( 'edit_post', $post_id );
 }
 }
 
 /**
- * Check if user can delete posts (simplified - no post-specific capability checks)
+ * Check if user can delete specific posts with proper capability mapping
  *
  * @since    1.0.0
- * @param    int      $post_id    Post ID (ignored, for backward compatibility)
- * @param    string   $post_type  Post type (ignored, for backward compatibility)
- * @return   bool                 True if user is logged in, false otherwise
+ * @param    int      $post_id    Post ID to check (required for proper capability checking)
+ * @param    string   $post_type  Post type (optional, will be determined from post if not provided)
+ * @return   bool                 True if user can delete the specific post, false otherwise
  */
 if ( ! function_exists( 'skylearn_current_user_can_delete_post' ) ) {
 function skylearn_current_user_can_delete_post( $post_id = 0, $post_type = '' ) {
-	// Simply check if user is logged in - no post-specific capability checks
-	return is_user_logged_in();
+	// If no post ID provided, check general delete_posts capability
+	if ( empty( $post_id ) ) {
+		return current_user_can( 'delete_posts' );
+	}
+
+	// Validate post exists
+	$post = get_post( $post_id );
+	if ( ! $post ) {
+		return false;
+	}
+
+	// Use the post-specific delete capability with post ID for proper WordPress 6.1+ compatibility
+	return current_user_can( 'delete_post', $post_id );
 }
 }
 
 /**
  * Check if user can create new flashcard sets
  *
- * Checks both logged-in status and set limits for free users.
+ * Checks both capability and set limits for free users.
  *
  * @since    1.0.0
  * @param    int      $user_id    User ID to check (optional, defaults to current user)
@@ -122,8 +144,8 @@ function skylearn_user_can_create_set( $user_id = 0 ) {
 		$user_id = get_current_user_id();
 	}
 
-	// Must be logged in
-	if ( ! is_user_logged_in() ) {
+	// Must have edit_posts capability
+	if ( ! current_user_can( 'edit_posts' ) ) {
 		return false;
 	}
 
@@ -216,11 +238,11 @@ function skylearn_get_plugin_capabilities() {
  * Check if current user has any SkyLearn Flashcards capabilities (legacy)
  *
  * @since    1.0.0
- * @return   bool    True if user is logged in, false otherwise
+ * @return   bool    True if user can edit posts, false otherwise
  */
 function skylearn_current_user_has_any_capability() {
-	// Simply check if user is logged in - no more custom capabilities
-	return is_user_logged_in();
+	// Check if user has basic editing capability
+	return current_user_can( 'edit_posts' );
 }
 
 /**
@@ -254,4 +276,30 @@ function skylearn_deprecated_capability_check( $capability, ...$args ) {
 	
 	// Call the actual WordPress function
 	return current_user_can( $capability, ...$args );
+}
+
+/**
+ * Check if user can read specific posts with proper capability mapping
+ *
+ * @since    1.0.0
+ * @param    int      $post_id    Post ID to check (required for proper capability checking)
+ * @param    string   $post_type  Post type (optional, will be determined from post if not provided)
+ * @return   bool                 True if user can read the specific post, false otherwise
+ */
+if ( ! function_exists( 'skylearn_current_user_can_read_post' ) ) {
+function skylearn_current_user_can_read_post( $post_id = 0, $post_type = '' ) {
+	// If no post ID provided, check general read capability
+	if ( empty( $post_id ) ) {
+		return true; // Public posts are readable by everyone
+	}
+
+	// Validate post exists
+	$post = get_post( $post_id );
+	if ( ! $post ) {
+		return false;
+	}
+
+	// Use the post-specific read capability with post ID for proper WordPress 6.1+ compatibility
+	return current_user_can( 'read_post', $post_id );
+}
 }

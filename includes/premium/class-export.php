@@ -60,7 +60,7 @@ class SkyLearn_Flashcards_Export {
 			'skylearn-flashcards',
 			__( 'Export & Backup', 'skylearn-flashcards' ),
 			__( 'Export', 'skylearn-flashcards' ),
-			'read',
+			'edit_posts',
 			'skylearn-export',
 			array( $this, 'display_export_page' )
 		);
