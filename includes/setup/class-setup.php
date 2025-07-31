@@ -222,6 +222,10 @@ class SkyLearn_Flashcards_Setup {
 	/**
 	 * Add custom capabilities
 	 *
+	 * Note: There's also a dedicated activation hook function 'skylearn_flashcards_add_caps' 
+	 * in the main plugin file that ensures the edit_skylearn_flashcards capability 
+	 * is assigned to administrators as a safety net.
+	 *
 	 * @since    1.0.0
 	 */
 	private static function add_capabilities() {

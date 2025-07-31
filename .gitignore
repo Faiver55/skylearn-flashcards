@@ -105,6 +105,7 @@ local-config.php
 /phpcs.xml
 /.phpunit.result.cache
 /clover.xml
+capability-test.php
 
 # Documentation
 # -------------
