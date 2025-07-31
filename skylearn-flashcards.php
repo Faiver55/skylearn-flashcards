@@ -3,7 +3,7 @@
  * Plugin Name: SkyLearn Flashcards
  * Plugin URI: https://skyian.com/skylearn-flashcards/
  * Description: A premium WordPress flashcard plugin for teachers, students, schools, and online academies. Create interactive flashcard sets with LMS integration and advanced reporting.
- * Version: 1.0.0-beta
+ * Version: 1.0.0
  * Author: Ferdous Khalifa
  * Author URI: https://skyian.com/
  * License: GPL v2 or later
@@ -30,7 +30,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'SKYLEARN_FLASHCARDS_VERSION', '1.0.0-beta' );
+define( 'SKYLEARN_FLASHCARDS_VERSION', '1.0.0' );
 
 /**
  * Plugin constants

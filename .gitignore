@@ -130,3 +130,6 @@ capability-test.php
 /tags/
 /trunk/
 /branches/
+# Placeholder Marketing Assets (replace before submission)
+./assets/banner-772x250.png
+./assets/icon-256x256.png

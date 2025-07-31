@@ -31,6 +31,10 @@ class SkyLearn_Flashcards_Premium {
 		add_action( 'init', array( $this, 'init' ) );
 		add_action( 'admin_notices', array( $this, 'license_notice' ) );
 		
+		// Initialize license and upgrade management
+		$this->init_license_management();
+		$this->init_upgrade_management();
+		
 	}
 
 	/**
@@ -218,6 +222,32 @@ class SkyLearn_Flashcards_Premium {
 		}
 		
 		return add_query_arg( $utm_params, $base_url );
+		
+	}
+
+	/**
+	 * Initialize license management
+	 *
+	 * @since 1.0.0
+	 */
+	private function init_license_management() {
+		
+		// Load license class
+		require_once SKYLEARN_FLASHCARDS_PATH . 'includes/premium/class-license.php';
+		new SkyLearn_Flashcards_License();
+		
+	}
+
+	/**
+	 * Initialize upgrade management
+	 *
+	 * @since 1.0.0
+	 */
+	private function init_upgrade_management() {
+		
+		// Load upgrade class
+		require_once SKYLEARN_FLASHCARDS_PATH . 'includes/premium/class-upgrade.php';
+		new SkyLearn_Flashcards_Upgrade();
 		
 	}
 

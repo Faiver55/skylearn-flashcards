@@ -1,6 +1,6 @@
 {
   "name": "skylearn-flashcards",
-  "version": "1.0.0-beta",
+  "version": "1.0.0",
   "description": "Premium WordPress flashcard plugin for interactive learning experiences",
   "main": "assets/js/frontend.js",
   "scripts": {
