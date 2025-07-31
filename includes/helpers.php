@@ -21,33 +21,7 @@ if ( ! defined( 'WPINC' ) ) {
  * @param array $data Raw flashcard data
  * @return array Sanitized flashcard data
  */
-if ( ! function_exists( 'skylearn_sanitize_flashcard_data' ) ) {
-function skylearn_sanitize_flashcard_data( $data ) {
-	if ( ! is_array( $data ) ) {
-		return array();
-	}
-
-	$sanitized = array();
-	
-	foreach ( $data as $card ) {
-		if ( ! is_array( $card ) ) {
-			continue;
-		}
-		
-		$sanitized_card = array(
-			'front' => wp_kses_post( trim( $card['front'] ?? '' ) ),
-			'back'  => wp_kses_post( trim( $card['back'] ?? '' ) ),
-		);
-		
-		// Only add cards that have both front and back content
-		if ( ! empty( $sanitized_card['front'] ) && ! empty( $sanitized_card['back'] ) ) {
-			$sanitized[] = $sanitized_card;
-		}
-	}
-	
-	return $sanitized;
-}
-}
+// Note: skylearn_sanitize_flashcard_data() is defined in includes/helpers/functions.php
 
 /**
  * Get plugin branding colors
@@ -89,23 +63,9 @@ function skylearn_get_logo_url( $type = 'horizontal' ) {
  * @since 1.0.0
  * @return bool True if user can manage flashcards
  */
-if ( ! function_exists( 'skylearn_current_user_can_manage' ) ) {
-function skylearn_current_user_can_manage() {
-	return current_user_can( 'manage_skylearn_flashcards' );
-}
-}
+// Note: skylearn_current_user_can_manage() is defined in includes/helpers/capability-helpers.php
 
-/**
- * Check if current user can edit flashcards
- *
- * @since 1.0.0
- * @return bool True if user can edit flashcards
- */
-if ( ! function_exists( 'skylearn_current_user_can_edit' ) ) {
-function skylearn_current_user_can_edit() {
-	return current_user_can( 'edit_skylearn_flashcards' );
-}
-}
+// Note: skylearn_current_user_can_edit() is defined in includes/helpers/capability-helpers.php
 
 /**
  * Get flashcard set data by ID
@@ -114,32 +74,7 @@ function skylearn_current_user_can_edit() {
  * @param int $set_id Flashcard set ID
  * @return array|false Flashcard set data or false if not found
  */
-if ( ! function_exists( 'skylearn_get_flashcard_set' ) ) {
-function skylearn_get_flashcard_set( $set_id ) {
-	$post = get_post( $set_id );
-	
-	if ( ! $post || $post->post_type !== 'flashcard_set' ) {
-		return false;
-	}
-	
-	$cards = get_post_meta( $set_id, '_skylearn_flashcard_data', true );
-	if ( ! is_array( $cards ) ) {
-		$cards = array();
-	}
-	
-	return array(
-		'id'          => $set_id,
-		'title'       => $post->post_title,
-		'description' => $post->post_content,
-		'author_id'   => $post->post_author,
-		'cards'       => $cards,
-		'card_count'  => count( $cards ),
-		'status'      => $post->post_status,
-		'created'     => $post->post_date,
-		'modified'    => $post->post_modified,
-	);
-}
-}
+// Note: skylearn_get_flashcard_set() is defined in includes/helpers/functions.php
 
 /**
  * Get user flashcard set count
@@ -164,23 +99,7 @@ function skylearn_get_user_set_count( $user_id = 0 ) {
 	return $query->found_posts;
 }
 
-/**
- * Check if user can create more flashcard sets (free limit: 5)
- *
- * @since 1.0.0
- * @param int $user_id User ID (default: current user)
- * @return bool True if user can create more sets
- */
-function skylearn_user_can_create_set( $user_id = 0 ) {
-	if ( skylearn_is_premium() ) {
-		return true; // Premium users have unlimited sets
-	}
-	
-	$current_count = skylearn_get_user_set_count( $user_id );
-	$max_sets = apply_filters( 'skylearn_max_sets_free', 5 );
-	
-	return $current_count < $max_sets;
-}
+// Note: skylearn_user_can_create_set() is defined in includes/helpers/capability-helpers.php
 
 /**
  * Get plugin setting
@@ -190,12 +109,7 @@ function skylearn_user_can_create_set( $user_id = 0 ) {
  * @param mixed  $default Default value
  * @return mixed Setting value
  */
-if ( ! function_exists( 'skylearn_get_setting' ) ) {
-function skylearn_get_setting( $key, $default = null ) {
-	$settings = get_option( 'skylearn_flashcards_settings', array() );
-	return $settings[ $key ] ?? $default;
-}
-}
+// Note: skylearn_get_setting() is defined in includes/helpers/functions.php
 
 /**
  * Generate unique session ID for tracking
@@ -203,15 +117,7 @@ function skylearn_get_setting( $key, $default = null ) {
  * @since 1.0.0
  * @return string Session ID
  */
-if ( ! function_exists( 'skylearn_generate_session_id' ) ) {
-function skylearn_generate_session_id() {
-	if ( ! session_id() ) {
-		session_start();
-	}
-	
-	return session_id();
-}
-}
+// Note: skylearn_generate_session_id() is defined in includes/helpers/functions.php
 
 /**
  * Get user IP address
@@ -219,24 +125,7 @@ function skylearn_generate_session_id() {
  * @since 1.0.0
  * @return string IP address
  */
-if ( ! function_exists( 'skylearn_get_user_ip' ) ) {
-function skylearn_get_user_ip() {
-	$ip_keys = array( 'HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'REMOTE_ADDR' );
-	
-	foreach ( $ip_keys as $key ) {
-		if ( array_key_exists( $key, $_SERVER ) === true ) {
-			foreach ( explode( ',', $_SERVER[ $key ] ) as $ip ) {
-				$ip = trim( $ip );
-				if ( filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) !== false ) {
-					return $ip;
-				}
-			}
-		}
-	}
-	
-	return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-}
-}
+// Note: skylearn_get_user_ip() is defined in includes/helpers/functions.php
 
 /**
  * Load template file
@@ -246,21 +135,7 @@ function skylearn_get_user_ip() {
  * @param array  $args Variables to pass to template
  * @param string $template_path Template subdirectory (admin/frontend)
  */
-if ( ! function_exists( 'skylearn_load_template' ) ) {
-function skylearn_load_template( $template_name, $args = array(), $template_path = 'frontend' ) {
-	if ( ! empty( $args ) && is_array( $args ) ) {
-		extract( $args );
-	}
-	
-	$template_file = SKYLEARN_FLASHCARDS_PATH . "includes/{$template_path}/views/{$template_name}.php";
-	
-	if ( file_exists( $template_file ) ) {
-		include $template_file;
-	} else {
-		skylearn_log( "Template not found: {$template_file}", 'warning' );
-	}
-}
-}
+// Note: skylearn_load_template() is defined in includes/helpers/functions.php
 
 /**
  * Format flashcard statistics for display
@@ -333,38 +208,9 @@ function skylearn_get_version() {
  * @param mixed  $message Message to log
  * @param string $level Log level: 'info', 'warning', 'error'
  */
-if ( ! function_exists( 'skylearn_log' ) ) {
-function skylearn_log( $message, $level = 'info' ) {
-	if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-		error_log( sprintf( '[SkyLearn Flashcards %s] %s', strtoupper( $level ), print_r( $message, true ) ) );
-	}
-}
-}
+// Note: skylearn_log() is defined in includes/helpers/functions.php
 
-/**
- * Check if premium features are available
- *
- * @since 1.0.0
- * @return bool True if premium features are available
- */
-if ( ! function_exists( 'skylearn_is_premium' ) ) {
-function skylearn_is_premium() {
-	$license_status = get_option( 'skylearn_flashcards_license_status', 'inactive' );
-	$license_key = get_option( 'skylearn_flashcards_license_key', '' );
-	
-	// Check if we have a valid license
-	if ( $license_status === 'valid' && ! empty( $license_key ) ) {
-		return true;
-	}
-	
-	// Allow developers to override for testing
-	if ( defined( 'SKYLEARN_FORCE_PREMIUM' ) && SKYLEARN_FORCE_PREMIUM ) {
-		return true;
-	}
-	
-	return false;
-}
-}
+// Note: skylearn_is_premium() is defined later in this file (line ~482)
 
 /**
  * Get default flashcard settings

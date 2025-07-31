@@ -116,13 +116,7 @@ function skylearn_get_default_set_settings() {
  * @since    1.0.0
  * @return   bool    True if premium is active, false otherwise
  */
-if ( ! function_exists( 'skylearn_is_premium' ) ) {
-function skylearn_is_premium() {
-	
-	$license_status = get_option( 'skylearn_flashcards_license_status', 'inactive' );
-	return $license_status === 'valid';
-}
-}
+// Note: skylearn_is_premium() is defined in includes/helpers.php
 
 /**
  * Get plugin settings
