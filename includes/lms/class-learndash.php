@@ -235,8 +235,8 @@ class SkyLearn_Flashcards_LearnDash {
 			return;
 		}
 		
-		// Check permissions
-		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		// Check permissions - use our safe capability helper
+		if ( ! skylearn_current_user_can_edit_post( $post_id, 'sfwd-lessons' ) ) {
 			return;
 		}
 		

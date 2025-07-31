@@ -301,8 +301,8 @@ class SkyLearn_Flashcards_Frontend {
 			wp_die( __( 'Invalid flashcard set ID.', 'skylearn-flashcards' ) );
 		}
 
-		// Check permissions
-		if ( ! current_user_can( 'edit_posts' ) ) {
+		// Check permissions - must be able to edit flashcards
+		if ( ! skylearn_current_user_can_edit() ) {
 			wp_die( __( 'You do not have permission to preview flashcards.', 'skylearn-flashcards' ) );
 		}
 
