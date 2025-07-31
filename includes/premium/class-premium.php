@@ -27,6 +27,14 @@ class SkyLearn_Flashcards_Premium {
 	 */
 	public function __construct() {
 		
+		// Initialize license management
+		require_once SKYLEARN_FLASHCARDS_PATH . 'includes/premium/class-license.php';
+		new SkyLearn_Flashcards_License();
+		
+		// Initialize upgrade flow
+		require_once SKYLEARN_FLASHCARDS_PATH . 'includes/premium/class-upgrade.php';
+		new SkyLearn_Flashcards_Upgrade();
+		
 		// Add premium hooks
 		add_action( 'init', array( $this, 'init' ) );
 		add_action( 'admin_notices', array( $this, 'license_notice' ) );

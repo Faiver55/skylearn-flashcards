@@ -6,7 +6,8 @@ module.exports = {
     frontend: './assets/js/frontend.js',
     flashcard: './assets/js/flashcard.js',
     export: './assets/js/export.js',
-    reporting: './assets/js/reporting.js'
+    reporting: './assets/js/reporting.js',
+    upgrade: './assets/js/upgrade.js'
   },
   output: {
     path: path.resolve(__dirname, 'assets/js/dist'),
