@@ -394,7 +394,7 @@ class SkyLearn_Flashcards_TutorLMS {
 		
 		// Get available flashcard sets
 		$available_sets = get_posts( array(
-			'post_type'   => 'skylearn_flashcard',
+			'post_type'   => 'flashcard_set',
 			'post_status' => 'publish',
 			'numberposts' => -1,
 		) );
@@ -444,7 +444,7 @@ class SkyLearn_Flashcards_TutorLMS {
 		
 		// Get available flashcard sets
 		$available_sets = get_posts( array(
-			'post_type'   => 'skylearn_flashcard',
+			'post_type'   => 'flashcard_set',
 			'post_status' => 'publish',
 			'numberposts' => -1,
 		) );

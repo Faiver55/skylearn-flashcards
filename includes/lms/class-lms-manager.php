@@ -289,7 +289,7 @@ class SkyLearn_Flashcards_LMS_Manager {
 			'skylearn-lms-integration',
 			__( 'LMS Integration', 'skylearn-flashcards' ),
 			array( $this, 'render_lms_meta_box' ),
-			'skylearn_flashcard',
+			'flashcard_set',
 			'side',
 			'default'
 		);
@@ -463,7 +463,7 @@ class SkyLearn_Flashcards_LMS_Manager {
 		}
 		
 		// Check post type
-		if ( get_post_type( $post_id ) !== 'skylearn_flashcard' ) {
+		if ( get_post_type( $post_id ) !== 'flashcard_set' ) {
 			return;
 		}
 		

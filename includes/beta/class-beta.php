@@ -659,7 +659,7 @@ class SkyLearn_Flashcards_Beta {
 	 */
 	private function has_created_flashcard_sets() {
 		$sets = get_posts( array(
-			'post_type' => 'skylearn_flashcard',
+			'post_type' => 'flashcard_set',
 			'post_status' => array( 'publish', 'draft', 'private' ),
 			'numberposts' => 1,
 		) );
