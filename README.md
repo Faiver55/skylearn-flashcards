@@ -4,9 +4,29 @@
 
 **The Ultimate WordPress Flashcards Plugin for Educational Excellence**
 
+[![Beta Version](https://img.shields.io/badge/Version-1.0.0--beta-orange.svg)](https://github.com/Faiver55/skylearn-flashcards)
 [![WordPress Plugin Version](https://img.shields.io/badge/WordPress-6.4+-blue.svg)](https://wordpress.org)
 [![PHP Version](https://img.shields.io/badge/PHP-7.4+-purple.svg)](https://php.net)
 [![License: GPL v2+](https://img.shields.io/badge/License-GPL%20v2+-green.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
+[![Beta Testing](https://img.shields.io/badge/Status-Beta%20Testing-yellow.svg)](https://github.com/Faiver55/skylearn-flashcards)
+
+## 🧪 **BETA RELEASE** - We Need Your Feedback!
+
+> **Welcome to the SkyLearn Flashcards Beta Program!** This is a pre-release version designed for testing and feedback. If you're a beta tester, thank you for helping us make this plugin better. If you're discovering this for the first time, please note this is **not the final release**.
+
+### 🎯 Beta Testing Program
+- **Current Version**: 1.0.0-beta
+- **Beta Duration**: 4-6 weeks
+- **Feedback Deadline**: [See beta communication]
+- **Public Launch**: Coming soon after beta completion
+
+**👥 Are you a beta tester?** Start with our [Beta Onboarding Guide](docs/ONBOARDING.md)
+
+**🐛 Found an issue?** Use our [Feedback Template](docs/FEEDBACK_TEMPLATE.md)
+
+**📧 Questions?** Email us at support@skyian.com
+
+---
 
 ## 🚀 Overview
 
@@ -31,7 +51,7 @@ SkyLearn Flashcards is a premium WordPress plugin designed for teachers, student
 - **TutorLMS Support** - Enhanced learning management features
 - **Progress Tracking** - Student performance monitoring
 
-### 💎 Premium Features
+### 💎 Premium Features (Available in Beta)
 - **Advanced Reporting** - Detailed analytics and insights
 - **Lead Collection** - Capture student information
 - **Bulk Export** - Export flashcard sets and data
@@ -39,21 +59,34 @@ SkyLearn Flashcards is a premium WordPress plugin designed for teachers, student
 - **Unlimited Sets** - No restrictions on flashcard collections
 - **Priority Support** - Direct access to our support team
 
+> **🎁 Beta Bonus**: Premium features are fully unlocked during the beta period!
+
 ## 🛠️ Installation
 
-### Method 1: WordPress Admin Dashboard
+### 🧪 Beta Installation (Current)
+
+**For Beta Testers:**
+1. **Download** the beta ZIP file from your invitation email
+2. **Go to** Plugins > Add New > Upload Plugin in WordPress admin
+3. **Upload** `skylearn-flashcards-beta.zip`
+4. **Activate** and follow the welcome wizard
+5. **Start testing** with our [Beta Onboarding Guide](docs/ONBOARDING.md)
+
+### 📦 Standard Installation (After Public Release)
+
+#### Method 1: WordPress Admin Dashboard
 1. Download the plugin ZIP file
 2. Go to **Plugins > Add New** in your WordPress admin
 3. Click **Upload Plugin** and select the ZIP file
 4. Click **Install Now** and then **Activate**
 
-### Method 2: Manual Installation
+#### Method 2: Manual Installation
 1. Extract the plugin files to `/wp-content/plugins/skylearn-flashcards/`
 2. Activate the plugin through the **Plugins** menu in WordPress
 
-### Method 3: WordPress.org Repository
+#### Method 3: WordPress.org Repository
 ```bash
-# Coming soon to WordPress.org repository
+# Available after public launch
 ```
 
 ## 🚀 Quick Start Guide

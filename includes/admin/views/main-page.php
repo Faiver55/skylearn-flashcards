@@ -35,11 +35,28 @@ $flashcard_sets = get_posts( array(
 	<?php if ( $is_welcome ) : ?>
 		<!-- Welcome Screen -->
 		<div class="skylearn-welcome-panel">
-			<div class="skylearn-admin-header">
+			<div class="skylearn-admin-header <?php echo ( strpos( SKYLEARN_FLASHCARDS_VERSION, 'beta' ) !== false ) ? 'beta-version' : ''; ?>">
 				<img src="<?php echo esc_url( skylearn_get_asset_url( 'img/logo-horiz.png' ) ); ?>" alt="SkyLearn Flashcards" class="skylearn-logo">
-				<h1><?php esc_html_e( 'Welcome to SkyLearn Flashcards!', 'skylearn-flashcards' ); ?></h1>
-				<p><?php esc_html_e( 'Thank you for installing SkyLearn Flashcards. Let\'s get you started with creating your first flashcard set.', 'skylearn-flashcards' ); ?></p>
+				<h1>
+					<?php esc_html_e( 'Welcome to SkyLearn Flashcards!', 'skylearn-flashcards' ); ?>
+					<?php if ( strpos( SKYLEARN_FLASHCARDS_VERSION, 'beta' ) !== false ) : ?>
+						<span class="skylearn-beta-badge">Beta</span>
+					<?php endif; ?>
+				</h1>
+				<?php if ( strpos( SKYLEARN_FLASHCARDS_VERSION, 'beta' ) !== false ) : ?>
+					<p><?php esc_html_e( 'Thank you for participating in our BETA program! Your feedback helps us create the best flashcard plugin for WordPress.', 'skylearn-flashcards' ); ?></p>
+				<?php else : ?>
+					<p><?php esc_html_e( 'Thank you for installing SkyLearn Flashcards. Let\'s get you started with creating your first flashcard set.', 'skylearn-flashcards' ); ?></p>
+				<?php endif; ?>
 			</div>
+			
+			<?php if ( strpos( SKYLEARN_FLASHCARDS_VERSION, 'beta' ) !== false ) : ?>
+				<!-- Beta-specific welcome content -->
+				<div class="beta-success">
+					<h4><?php esc_html_e( 'Beta Tester Benefits', 'skylearn-flashcards' ); ?></h4>
+					<p><?php esc_html_e( 'As a beta tester, you have access to ALL premium features during the testing period. Please share your feedback to help us improve!', 'skylearn-flashcards' ); ?></p>
+				</div>
+			<?php endif; ?>
 			
 			<div class="skylearn-admin-content">
 				<div class="skylearn-welcome-steps">
@@ -73,27 +90,59 @@ $flashcard_sets = get_posts( array(
 						<p><?php esc_html_e( 'Use shortcodes or Gutenberg blocks to display your flashcards on any page or post.', 'skylearn-flashcards' ); ?></p>
 						<code>[skylearn_flashcards id="SET_ID"]</code>
 					</div>
+					
+					<?php if ( strpos( SKYLEARN_FLASHCARDS_VERSION, 'beta' ) !== false ) : ?>
+					<div class="skylearn-welcome-step">
+						<div class="skylearn-step-icon">
+							<span class="dashicons dashicons-feedback" style="color: var(--skylearn-beta);"></span>
+						</div>
+						<h3><?php esc_html_e( 'Provide Beta Feedback', 'skylearn-flashcards' ); ?></h3>
+						<p><?php esc_html_e( 'Share your experience and help us improve the plugin before public release.', 'skylearn-flashcards' ); ?></p>
+						<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=skylearn_flashcard&page=skylearn-beta-feedback' ) ); ?>" class="skylearn-btn" style="background: var(--skylearn-beta); border-color: var(--skylearn-beta);">
+							<?php esc_html_e( 'Beta Feedback', 'skylearn-flashcards' ); ?>
+						</a>
+					</div>
+					<?php endif; ?>
 				</div>
 				
 				<div class="skylearn-welcome-footer">
 					<p>
-						<?php 
-						printf( 
-							esc_html__( 'Need help? Check out our %1$sdocumentation%2$s or %3$scontact support%4$s.', 'skylearn-flashcards' ),
-							'<a href="https://skyian.com/skylearn-flashcards/docs/" target="_blank">',
-							'</a>',
-							'<a href="mailto:support@skyian.com">',
-							'</a>'
-						);
-						?>
+						<?php if ( strpos( SKYLEARN_FLASHCARDS_VERSION, 'beta' ) !== false ) : ?>
+							<?php 
+							printf( 
+								esc_html__( 'Beta tester resources: %1$sBeta Guide%2$s | %3$sFeedback Template%4$s | %5$sSupport%6$s', 'skylearn-flashcards' ),
+								'<a href="https://github.com/Faiver55/skylearn-flashcards/blob/main/docs/ONBOARDING.md" target="_blank">',
+								'</a>',
+								'<a href="https://github.com/Faiver55/skylearn-flashcards/blob/main/docs/FEEDBACK_TEMPLATE.md" target="_blank">',
+								'</a>',
+								'<a href="mailto:support@skyian.com?subject=Beta Support">',
+								'</a>'
+							);
+							?>
+						<?php else : ?>
+							<?php 
+							printf( 
+								esc_html__( 'Need help? Check out our %1$sdocumentation%2$s or %3$scontact support%4$s.', 'skylearn-flashcards' ),
+								'<a href="https://skyian.com/skylearn-flashcards/docs/" target="_blank">',
+								'</a>',
+								'<a href="mailto:support@skyian.com">',
+								'</a>'
+							);
+							?>
+						<?php endif; ?>
 					</p>
 				</div>
 			</div>
 		</div>
 	<?php else : ?>
 		<!-- Main Dashboard -->
-		<div class="skylearn-admin-header">
-			<h1><?php esc_html_e( 'SkyLearn Flashcards', 'skylearn-flashcards' ); ?></h1>
+		<div class="skylearn-admin-header <?php echo ( strpos( SKYLEARN_FLASHCARDS_VERSION, 'beta' ) !== false ) ? 'beta-version' : ''; ?>">
+			<h1>
+				<?php esc_html_e( 'SkyLearn Flashcards', 'skylearn-flashcards' ); ?>
+				<?php if ( strpos( SKYLEARN_FLASHCARDS_VERSION, 'beta' ) !== false ) : ?>
+					<span class="skylearn-beta-badge">Beta</span>
+				<?php endif; ?>
+			</h1>
 			<a href="<?php echo esc_url( admin_url( 'admin.php?page=skylearn-flashcards-new' ) ); ?>" class="skylearn-btn">
 				<?php esc_html_e( 'Add New Set', 'skylearn-flashcards' ); ?>
 			</a>

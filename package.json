@@ -1,6 +1,6 @@
 {
   "name": "skylearn-flashcards",
-  "version": "1.0.0",
+  "version": "1.0.0-beta",
   "description": "Premium WordPress flashcard plugin for interactive learning experiences",
   "main": "assets/js/frontend.js",
   "scripts": {
@@ -18,8 +18,10 @@
     "minify": "npm run build && npm run minify:css && npm run minify:js",
     "minify:css": "cleancss -o assets/css/frontend.min.css assets/css/frontend.css",
     "minify:js": "uglifyjs assets/js/frontend.js -o assets/js/frontend.min.js --compress --mangle",
-    "zip": "npm run build && zip -r skylearn-flashcards.zip . -x 'node_modules/*' 'src/*' '*.json' '*.md' '.git*' 'tests/*' 'docs/*'",
-    "release": "npm run build && npm run test && npm run zip"
+    "zip": "npm run build && zip -r skylearn-flashcards.zip . -x 'node_modules/*' '*.json' '*.md' '.git*' 'tests/*' 'docs/*' 'webpack.config.js'",
+    "zip:beta": "zip -r skylearn-flashcards-beta.zip . -x 'node_modules/*' '*.json' '*.md' '.git*' 'tests/*' 'webpack.config.js' '.github/*' 'bin/*'",
+    "release": "npm run build && npm run test && npm run zip",
+    "release:beta": "npm run build && npm run zip:beta"
   },
   "keywords": [
     "wordpress",
