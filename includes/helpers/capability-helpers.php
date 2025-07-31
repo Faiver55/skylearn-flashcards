@@ -47,8 +47,10 @@ function skylearn_current_user_can_edit() {
  * @since    1.0.0
  * @return   bool    True if user can view analytics, false otherwise
  */
+if ( ! function_exists( 'skylearn_current_user_can_view_analytics' ) ) {
 function skylearn_current_user_can_view_analytics() {
 	return current_user_can( 'view_skylearn_analytics' ) || skylearn_current_user_can_manage();
+}
 }
 
 /**
@@ -57,8 +59,10 @@ function skylearn_current_user_can_view_analytics() {
  * @since    1.0.0
  * @return   bool    True if user can manage leads, false otherwise
  */
+if ( ! function_exists( 'skylearn_current_user_can_manage_leads' ) ) {
 function skylearn_current_user_can_manage_leads() {
 	return current_user_can( 'manage_skylearn_leads' ) || skylearn_current_user_can_manage();
+}
 }
 
 /**
@@ -67,8 +71,10 @@ function skylearn_current_user_can_manage_leads() {
  * @since    1.0.0
  * @return   bool    True if user can export flashcards, false otherwise
  */
+if ( ! function_exists( 'skylearn_current_user_can_export' ) ) {
 function skylearn_current_user_can_export() {
 	return current_user_can( 'export_skylearn_flashcards' ) || skylearn_current_user_can_manage();
+}
 }
 
 /**
@@ -82,6 +88,7 @@ function skylearn_current_user_can_export() {
  * @param    string   $post_type  Expected post type (optional)
  * @return   bool                 True if user can edit the post, false otherwise
  */
+if ( ! function_exists( 'skylearn_current_user_can_edit_post' ) ) {
 function skylearn_current_user_can_edit_post( $post_id = 0, $post_type = '' ) {
 	// If no post ID provided, check general editing capability
 	if ( empty( $post_id ) ) {
@@ -121,6 +128,7 @@ function skylearn_current_user_can_edit_post( $post_id = 0, $post_type = '' ) {
 	// For other post types, use standard WordPress capability check
 	return current_user_can( 'edit_post', $post_id );
 }
+}
 
 /**
  * Safely check if user can delete a specific post
@@ -130,6 +138,7 @@ function skylearn_current_user_can_edit_post( $post_id = 0, $post_type = '' ) {
  * @param    string   $post_type  Expected post type (optional)
  * @return   bool                 True if user can delete the post, false otherwise
  */
+if ( ! function_exists( 'skylearn_current_user_can_delete_post' ) ) {
 function skylearn_current_user_can_delete_post( $post_id = 0, $post_type = '' ) {
 	// If no post ID provided, check general capability
 	if ( empty( $post_id ) ) {
@@ -165,6 +174,7 @@ function skylearn_current_user_can_delete_post( $post_id = 0, $post_type = '' ) 
 
 	// For other post types, use standard WordPress capability check
 	return current_user_can( 'delete_post', $post_id );
+}
 }
 
 /**
